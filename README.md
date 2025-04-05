@@ -9,7 +9,7 @@ you can use it to make your mod more powerful!
 
 ---
 ### What is HyPsych Engine?
-It's a fork of [Psych Engine](https://github.com/shadowMario/FNF-PsychEngine), but with a lot of new features and improvements.
+It's a fork of [Psych Engine 1.0.4](https://github.com/shadowMario/FNF-PsychEngine), but with a lot of new features and improvements.
 
 ### Features:
 - **HScript on Lua [Beta]**  

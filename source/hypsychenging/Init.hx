@@ -8,10 +8,6 @@ import hypsychenging.hyper.UrlGen;
 import hypsychenging.hyper.WindowManager;
 import haxe.ds.IntMap;
 
-#if LUA_ALLOWED
-import psychlua.FunkinLua;
-#end
-
 var tagUrlGen: Map<String, UrlGen> = new Map();
 var windowManagerMap:Map<String, WindowManager> = new Map();
 

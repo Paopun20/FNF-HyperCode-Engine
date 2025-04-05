@@ -1,75 +1,110 @@
-shoutouts to tom fulp--lmao
-Ludum dare--extraordinaire
-cyberzone--coming soon
-love to thriftman--swag
-ultimate rhythm gaming--probably
-dope ass game--playstation magazine
-in loving memory of--henryeyes
-dancin--forever
-funkin--forever
-ritz dx--rest in peace lol
-rate five--pls no blam
-rhythm gaming--ultimate
-game of the year--forever
-you already know--we really out here
-rise and grind--love to luis
-like parappa--but cooler
-album of the year--chuckie finster
-free gitaroo man--with love to wandaboy
-better than geometry dash--fight me robtop
-kiddbrute for president--vote now
-play dead estate--on newgrounds
-this is a god damn prototype--we workin on it okay
-women are real--this is official
-too over exposed--newgrounds cant handle us
-Hatsune Miku--biggest inspiration
-too many people--my head hurts
-newgrounds--forever
-refined taste in music--if i say so myself
-his name isnt keith--dumb eggy lol
-his name isnt evan--silly tiktok
-stream chuckie finster--on spotify
-never forget to--pray to god
-dont play rust--we only funkin
-good bye--my penis
-dababy--biggest inspiration
-fashionably late--but here it is
-yooooooooooo--yooooooooo
-pico funny--pico funny
-updates each friday--on time every time
-shoutouts to mason--for da homies
-bonk--get in the discord call
-this isn't a copy of ke--*vine boom*
-we do a little trolling--h
-sexiest engine--in da block
-he's named evilsk8er--not evilsker
-actual functional--input system
-its nerf--or nothing
-penis--balls even
-fnf is not for kids--go outside
-little herobrine--im cumming in your mom
-what you know about--rolling down in the deep
-oh god i'm white--and i'm on twitter
-i gotta--bucket of chicken
-dream stans--literally scare me
-weeg mod--check it out
-what da dog--doin
-go mango go--go mango go
-go pico yeah yeah--*twerks cutely*
-forever engine--my beloved
-wash your hands--stay safe bro
-wear a mask--even if vaccinated
-you dont understand--i hate society as a whole
-psych engine port--fatherless behavior
-i made a psych port--free clout yay
-wanna work on my fnf--fnf mod
-gazozoz--sickest bomb recoveries
-atvdriver--the rats are coming
-pessy--pure perfection
-pessy mod--coming soon
-maliciousbunny--biggest cutie in the world
-luquinhas--voce eh a coisa mais feliz
-mansour says--fnf is shit lol
-medodecordas self promote--watch?v=dQw4w9WgXcQ
-ezhalt says--olha a bombaaa
-stevan--love cats
+watch it--watch?v=Z_PzwWDbiI0
+i love--my mom
+CCCAAAAATTTTT CCCCAAAAAATTTTTTT CATTTTTTTTTTTTTTTT--CCCCCCAAAAAAAATTTTT CCCCCCCAAAAAAAAATTTTTTTT CCCCCCCCCAAAAAAAAAAAAAATTT
+O I I a I a o I I I a I I--O I I a I a o I I I a
+A a a a I I--A a a a
+A a a a I I--A a a I a o I I I a I
+Never Gonna Give You Up--Never Gonna Let You Down
+I know your ip address--I know your location, just kidding
+GET OUT--FROM MY HEAD A SPINNING CAT
+your ip address is 92.28.211.234--just kidding
+while True:-- print("bark")
+i am in your home--just kidding
+404--brain not found
+i fixed the bug--by deleting the feature
+AI will take your job--unless it's JavaScript
+undefined is not a function--undefined is your life
+i wrote clean code--2 hours later i rewrote it
+console.log("hello")--world says goodbye
+this line--does nothing
+@:build--i don’t know what this does
+macro broke--again
+haxe.Exception--is my new therapist
+“Unknown identifier”--but I just defined you
+i cast it--now it's broken
+@:enum abstract--black magic begins
+it works in neko--but not in cpp
+@:forward--to madness
+@:native--to chaos
+Dead code elimination--killed my dreams
+git commit -m "final" --5 more commits later--final_final_v2
+merge conflict--my worst enemy
+git pull--and pray
+i fixed it--with git reset --hard
+force push--forgive me team
+git log--reveals my sins
+git blame--always points to me
+git is easy--until it's not
+i added comments--they say "idk why this works"
+stash now--cry later
+nil--again?
+i printed a table--got memory address
+metatable--more like mega pain
+Lua is simple--until it's not
+require("module")--module not found
+table.insert--into madness
+one global variable--ruined everything
+true or false--depends on the typo
+the button works--if you click it twice
+player got stuck--but it looks funny
+camera shaking--like my anxiety
+animations work--until they don’t
+ui overlaps--because why not
+frame drop--in the main menu
+i spent 10 hours--on a health bar
+this is placeholder--forever
+game is done--just needs polish (10 years later)
+gl_Position--pray it shows up
+my shader compiles--but everything's pink
+fragColor--more like fragMySoul
+why is everything inverted--oops gl_FrontFacing
+i touched normals--everything exploded
+shader bug--can't reproduce, can't ignore
+gl_FragCoord--does not spark joy
+everything is purple--I am fear itself
+discard;--now you see me, now you don't
+my model--turned into spaghetti
+why is it stretching--oh no UVs
+vec3(1.0)--too bright, too powerful
+normal.xyz--summoned a demon
+depth buffer--more like depression buffer
+lightDir--coming from the void
+float time--the illusion of control
+nil is a value--of infinite pain
+local function--who needs scope anyway?
+pairs()--the chaos generator
+_"attempt to index nil"_--my favorite horror story
+print("debug")--never prints
+Lua coroutine--I coroutine'd my brain
+idle animation--never idle
+hitbox--does not hit
+jump feels floaty--gravity is a lie
+UI scale--scales your sadness
+“polish pass”--year 5
+frame 0--where nightmares live
+button hover--but never clicks
+screen fade--straight to blackhole
+placeholder.png--is the final asset
+haxe --main Main--but which Main?
+Null<Object>--Null<Hope>
+@:build macro--summons ghosts
+deadlock--but single thread
+Git conflict--with myself
+force push--like a Jedi mistake
+git pull--regret begins
+merge hell--population: me
+commit message: “fix”--no idea what I fixed
+@:enum abstract--are you sure this is legal?
+it compiles--but does it live?
+bug fixed itself--I'm scared
+not a bug--a feature from hell
+worked yesterday--I swear
+I am become error--destroyer of builds
+every pixel--cries in silence
+who needs sleep--when you have shaders?
+this is fine--everything is fine
+i am the bug--the bug is me
+this is not a bug--it's an undocumented feature
+i am the error--the error is me
+English or Spanish--whoever moves first is gay
+bug to feature--it's a feature now

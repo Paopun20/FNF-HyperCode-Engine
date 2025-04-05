@@ -2,7 +2,7 @@
 <project>
 	<!-- _________________________ Application Settings _________________________ -->
 
-	<app title="Friday Night Funkin': Psych Engine" file="PsychEngine" packageName="com.shadowmario.psychengine" package="com.shadowmario.psychengine" main="Main" version="0.2.8" company="ShadowMario" />
+	<app title="Friday Night Funkin': HyPsych Engine" file="HyPsychEngine" packageName="com.paopun20.hypsychengine" package="com.paopun20.hypsychengine" main="Main" version="0.2.8" company="Paopun20" />
 
 	<!--Switch Export with Unique ApplicationID and Icon-->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />
@@ -137,7 +137,7 @@
 	<!-- ______________________________ Haxedefines _____________________________ -->
 
 	<!--Enable the Flixel core recording system-->
-	<!--<haxedef name="FLX_RECORD" />-->
+	<haxedef name="FLX_RECORD" />
 
 	<!--Disable the right and middle mouse buttons-->
 	<!-- <haxedef name="FLX_NO_MOUSE_ADVANCED" /> -->
@@ -176,6 +176,15 @@
 	
 	<!--Disable deprecated warnings-->
 	<haxedef name='no-deprecation-warnings' />
+
+	<!-- GC Settings -->
+	<haxedef name="HXCPP_GC_BIG_BLOCKS" />
+	<haxedef name="HXCPP_GC_DYNAMIC_SIZE" />
+	<haxedef name="HXCPP_GC_GENERATIONAL" />
+
+	<!-- C++11 -->
+	<haxedef name="HXCPP_CPP_GC_MARK_MOVE" />
+	<haxedef name="HXCPP_CPP11" />
 
 	<!-- Haxe 4.3.0+: Enable pretty syntax errors and stuff. -->
 	<!-- pretty (haxeflixel default), indent, classic (haxe compiler default) -->

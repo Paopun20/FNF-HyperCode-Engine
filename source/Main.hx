@@ -222,7 +222,7 @@ class Main extends Sprite
 		dateNow = dateNow.replace(" ", "_");
 		dateNow = dateNow.replace(":", "'");
 
-		path = "./crash/" + "PsychEngine_" + dateNow + ".txt";
+		path = "./crash/" + "HyPsychEngine_" + dateNow + ".txt";
 
 		for (stackItem in callStack)
 		{
@@ -241,7 +241,7 @@ class Main extends Sprite
 		#if officialBuild
 		errMsg += "\nPlease report this error to the GitHub page: https://github.com/ShadowMario/FNF-PsychEngine";
 		#end
-		errMsg += "\n\n> Crash Handler written by: sqirra-rng";
+		errMsg += "\n\n> Crash Handler written by: sqirra-rng From Psych Engine";
 
 		if (!FileSystem.exists("./crash/"))
 			FileSystem.createDirectory("./crash/");

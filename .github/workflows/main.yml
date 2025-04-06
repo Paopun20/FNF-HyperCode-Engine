@@ -86,35 +86,82 @@ jobs:
 
   buildMac:
     name: 🌟 Build on macOS
-    runs-on: macos-15
+    runs-on: macos-13
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4.1.7
-
-      - name: Setup Haxe
-        uses: krdlab/setup-haxe@master
+      - uses: actions/checkout@v4.1.7
+      - uses: krdlab/setup-haxe@master
         with:
           haxe-version: 4.3.6
-
-      - name: Install Dependencies & Setup
+      - name: Install Haxelib
         run: |
           haxelib setup ~/haxelib
-          haxelib install hxcpp --quiet
+          haxelib install hxcpp > /dev/null --quiet
+          haxelib install lime --quiet
+          haxelib run lime rebuild lime mac -arch arm64
           chmod +x ./setup/unix.sh
-          ./setup/unix.sh
-
+          sh ./setup/unix.sh
       - name: Skip SScript setup mode
         run: echo 'oy9:showMacroty8:loopCosti25y10:includeAllfg' >> ~/settings.cocoa
 
       - name: Create Version Tag
         run: echo "${{ github.run_id }}" > VERSION
-
-      - name: Compile for macOS
-        run: haxelib run lime build mac --app-version="4.0.0-${{ github.run_id }}" -D officialBuild
-
-      - name: Upload Artifact
+      - name: Compile
+        run: haxelib run lime build mac --app-version="4.0.0-${{ github.run_id }}"  -D officialBuild
+      - name: Publish Artifact
         uses: actions/upload-artifact@v4.3.4
         with:
           name: macBuild
           path: export/release/macos/bin
+
+  notifyDiscord:
+    name: 📣 Notify Discord
+    runs-on: ubuntu-latest
+    if: always()
+    needs: [buildLinux, buildWindows, buildMac]
+    steps:
+      - name: Send Discord Notification
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          STATUS_LINUX="${{ needs.buildLinux.result }}"
+          STATUS_WIN="${{ needs.buildWindows.result }}"
+          STATUS_MAC="${{ needs.buildMac.result }}"
+
+          msg_linux="LINUX: ❎ Build Error"
+          msg_win="WIN: ❎ Build Error"
+          msg_mac="MAC: ❎ Build Error"
+
+          [[ "$STATUS_LINUX" == "success" ]] && msg_linux="LINUX: ✅ Build Completed"
+          [[ "$STATUS_WIN" == "success" ]] && msg_win="WIN: ✅ Build Completed"
+          [[ "$STATUS_MAC" == "success" ]] && msg_mac="MAC: ✅ Build Completed"
+
+          if [[ "$STATUS_LINUX" == "success" && "$STATUS_WIN" == "success" && "$STATUS_MAC" == "success" ]]; then
+            TITLE="✅ Build Successful"
+            COLOR=65280
+          else
+            TITLE="❎ Build Error"
+            COLOR=16711680
+          fi
+
+          DESCRIPTION="$msg_linux\n$msg_win\n$msg_mac"
+
+          curl -H "Content-Type: application/json" \
+            -X POST \
+            -d "{
+              \"username\": \"Github Action Report\",
+              \"embeds\": [{
+                \"title\": \"$TITLE\",
+                \"description\": \"$DESCRIPTION\",
+                \"color\": $COLOR,
+                \"fields\": [
+                  { \"name\": \"🔗 Workflow Run\", \"value\": \"[View on GitHub]($RUN_URL)\" }
+                ],
+                \"footer\": {
+                  \"text\": \"GitHub Actions • ${{ github.repository }}\"
+                },
+                \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
+              }]
+            }" \
+            $DISCORD_WEBHOOK

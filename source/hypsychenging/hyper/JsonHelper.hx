@@ -1,21 +1,21 @@
 package hypsychenging.hyper;
 
-import haxe.ds.StringMap;
+import haxe.ds.Map;
 import haxe.Json;
 import Reflect;
 
 class JsonHelper {
-    public static function Encode(table: StringMap<Dynamic>): String {
+    public static function encode(table: Dynamic): String {
         try {
             return Json.stringify(table);
         } catch (e) {
-            trace("StringMap to JSON encoding error for " + Std.string(table) + " - Error: " + e);
-            return "{}"; // Return empty JSON on error
+            trace("JSON encoding error for " + Std.string(table) + " - Error: " + e);
+            return "{}";
         }
     }
 
-    public static function Decode(json): StringMap<Dynamic> {
-        var result = new StringMap<Dynamic>();
+    public static function decode(json: String): Map<String, Dynamic> {
+        var result = new Map<String, Dynamic>();
         try {
             var decoded = Json.parse(json);
             if (Reflect.isObject(decoded)) {

@@ -17,6 +17,9 @@ class WindowManager {
         }
         // Create the window
         this.window = Application.current.createWindow(attributes);
+        if (this.window == null) {
+            throw "Error: Failed to create window.";
+        }
     }
 
     /**

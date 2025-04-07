@@ -176,19 +176,19 @@ class HttpClient {
             if (data != null) {
                 http.setPostData(Json.stringify(data));
             }
-            trace("Sending " + method + " request with data: " + Json.stringify(data));
+            //trace("Sending " + method + " request with data: " + Json.stringify(data));
         } else {
-            trace("Sending " + method + " request to: " + parsedUrl);
+            //trace("Sending " + method + " request to: " + parsedUrl);
         }
 
         // Handle the response status
         http.onStatus = function(status) {
-            trace(method + " Status: " + status);
+            //trace(method + " Status: " + status);
         };
 
         // Handle successful response
         http.onData = function(response) {
-            trace("Response received: " + response);
+            //trace("Response received: " + response);
             safeCallback(callback, true, response);
         };
 
@@ -197,7 +197,7 @@ class HttpClient {
             var errorType = categorizeError(error);
             logError(errorType, url, retries);
             if (shouldRetry(errorType)) {
-                trace("Retrying... Attempt " + (retries + 1));
+                //trace("Retrying... Attempt " + (retries + 1));
                 sendRequest(url, data, callback, isPost, headers, retries + 1, method, queryParams);
             } else {
                 safeCallback(callback, false, { error: errorType, details: error, url: url });
@@ -225,6 +225,15 @@ class HttpClient {
     private static function categorizeError(error: String): String {
         if (error.indexOf("Timeout") != -1) return "Timeout Error";
         if (error.indexOf("Connection refused") != -1) return "Network Error";
+        if (error.indexOf("Invalid URL") != -1) return "Invalid URL";
+        if (error.indexOf("Failed to connect") != -1) return "Network Error";
+        if (error.indexOf("Bad Request") != -1) return "Bad Request";
+        if (error.indexOf("Unauthorized") != -1) return "Unauthorized";
+        if (error.indexOf("Forbidden") != -1) return "Forbidden";
+        if (error.indexOf("Not Found") != -1) return "Not Found";
+        if (error.indexOf("Internal Server Error") != -1) return "Internal Server Error";
+        if (error.indexOf("Service Unavailable") != -1) return "Service Unavailable";
+
         return "General Error";
     }
 
@@ -232,14 +241,19 @@ class HttpClient {
      * Determine whether the request should be retried based on the error type.
      */
     private static function shouldRetry(errorType: String): Bool {
-        return errorType == "Network Error" || errorType == "Timeout Error";
+        return (
+            errorType == "Network Error" || 
+            errorType == "Timeout Error" || 
+            errorType == "General Error" ||
+            errorType == "Service Unavailable"
+        );
     }
 
     /**
      * Log errors with relevant information (error type, URL, and retries).
      */
     private static function logError(error: String, url: String, retries: Int = 0): Void {
-        trace("Error occurred: " + error + " | URL: " + url + " | Retry: " + retries);
+        //trace("Error occurred: " + error + " | URL: " + url + " | Retry: " + retries);
     }
 
     /**
@@ -263,10 +277,10 @@ class HttpClient {
             if (callback != null) {
                 callback(success, result);
             } else {
-                trace("Warning: No callback provided.");
+                //trace("Warning: No callback provided.");
             }
         } catch (e: Dynamic) {
-            trace("Callback execution failed: " + e);
+            //trace("Callback execution failed: " + e);
         }
     }
 }

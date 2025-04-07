@@ -1,10 +1,13 @@
 package hypsychenging.hyper;
+import Sys;
 
 class GetArgs {
-    public static function getArgs(): Map<Int, String> {
-        var args = Sys.args();
-        var argsMap = new Map<Int, String>();
-        for (i in 0...args.length) argsMap.set(i + 1, args[i]);
-        return argsMap;
+    public static function getArgs():Array<String> {
+        #if (desktop && cpp)
+        return Sys.args();
+        #else
+        trace("⚠️ Sys.args() not supported on this platform.");
+        return [];
+        #end
     }
 }

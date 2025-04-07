@@ -72,13 +72,14 @@ class UrlGen {
             url += "/" + pathSegments.join("/");
         }
     
-        // Append query parameters
-        if (queryParams.keys().hasNext()) {
-            var query = iteratorToArray(queryParams.keys())
-                .map(key -> urlEncode(key) + "=" + urlEncode(queryParams.get(key)))
-                .join("&");
-            url += "?" + query;
-        }
+		// Append query parameters
+		if (queryParams.keys().hasNext()) {
+			var query = [];
+			for (key in queryParams.keys()) {
+				query.push(urlEncode(key) + "=" + urlEncode(queryParams.get(key)));
+			}
+			url += "?" + query.join("&");
+		}
     
         return url;
     }

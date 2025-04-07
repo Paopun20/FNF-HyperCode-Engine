@@ -19,6 +19,7 @@ class BrainFuck {
         var tape = [0];
         var tapePointer = 0;
         var codePointer = 0;
+        var index = 0;
         var output = new StringBuf();
         var bracketMap = validateAndMapBrackets(filteredCode);
 
@@ -44,8 +45,12 @@ class BrainFuck {
                         String.fromCharCode(charCode) : "?");
                     
                 case ',':
-                    tape[tapePointer] = input.exists(tapePointer) ? 
-                        input.get(tapePointer) : 0;
+                    if (input.exists(index)) {
+                        tape[tapePointer] = input.get(index);
+                        index++;
+                    } else {
+                        tape[tapePointer] = 0;
+                    }
                     
                 case '[':
                     if (tape[tapePointer] == 0)

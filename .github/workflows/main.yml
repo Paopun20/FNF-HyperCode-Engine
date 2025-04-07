@@ -114,6 +114,7 @@ jobs:
           name: macBuild
           path: export/release/macos/bin
 
+  # Notify Discord about build status
   notifyDiscord:
     name: 📣 Notify Discord
     runs-on: ubuntu-latest
@@ -124,6 +125,7 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RELEASE_URL: https://github.com/${{ github.repository }}/releases/tag/v${{ github.run_id }}
         run: |
           STATUS_LINUX="${{ needs.buildLinux.result }}"
           STATUS_WIN="${{ needs.buildWindows.result }}"
@@ -145,7 +147,7 @@ jobs:
             COLOR=16711680
           fi
 
-          DESCRIPTION="$msg_linux\n$msg_win\n$msg_mac"
+          DESCRIPTION="$msg_linux\n$msg_win\n$msg_mac\n\nRelease: [Download Builds]($RELEASE_URL)"
 
           curl -H "Content-Type: application/json" \
             -X POST \

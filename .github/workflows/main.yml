@@ -11,7 +11,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Build on Linux
   buildLinux:
     name: ✨ Build on Linux
     runs-on: ubuntu-latest
@@ -34,7 +33,7 @@ jobs:
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
 
-      - name: Skip SScript Setup Mode
+      - name: Skip SScript setup mode
         run: echo 'oy9:showMacroty8:loopCosti25y10:includeAllfg' >> ~/settings.cocoa
 
       - name: Create Version Tag
@@ -49,7 +48,6 @@ jobs:
           name: linuxBuild
           path: export/release/linux/bin
 
-  # Build on Windows
   buildWindows:
     name: 🌐 Build on Windows
     runs-on: windows-latest
@@ -70,7 +68,7 @@ jobs:
           setup\windows.bat
         shell: cmd
 
-      - name: Skip SScript Setup Mode
+      - name: Skip SScript setup mode
         run: echo 'oy9:showMacroty8:loopCosti25y10:includeAllfg' >> %USERPROFILE%\settings.cocoa
         shell: cmd
 
@@ -86,7 +84,6 @@ jobs:
           name: windowsBuild
           path: export/release/windows/bin
 
-  # Build on macOS
   buildMac:
     name: 🌟 Build on macOS
     runs-on: macos-13
@@ -104,7 +101,7 @@ jobs:
           haxelib run lime rebuild lime mac -arch arm64
           chmod +x ./setup/unix.sh
           sh ./setup/unix.sh
-      - name: Skip SScript Setup Mode
+      - name: Skip SScript setup mode
         run: echo 'oy9:showMacroty8:loopCosti25y10:includeAllfg' >> ~/settings.cocoa
 
       - name: Create Version Tag
@@ -117,29 +114,6 @@ jobs:
           name: macBuild
           path: export/release/macos/bin
 
-  # Upload Artifact to GitHub Release
-  uploadRelease:
-    name: Upload to GitHub Release
-    needs: [buildLinux, buildWindows, buildMac]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4.1.7
-
-      - name: Create GitHub Release
-        run: |
-          VERSION_TAG="v${{ github.run_id }}"
-          gh release create $VERSION_TAG \
-            export/release/linux/bin/* export/release/windows/bin/* export/release/macos/bin/* \
-            --title "Release $VERSION_TAG" --notes "Builds for Linux, Windows, and macOS."
-
-      - name: Upload Artifact to GitHub Release
-        uses: actions/upload-artifact@v4.3.4
-        with:
-          name: releaseArtifacts
-          path: export/release/*
-
-  # Notify Discord about build status
   notifyDiscord:
     name: 📣 Notify Discord
     runs-on: ubuntu-latest
@@ -150,7 +124,6 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          RELEASE_URL: https://github.com/${{ github.repository }}/releases/tag/v${{ github.run_id }}
         run: |
           STATUS_LINUX="${{ needs.buildLinux.result }}"
           STATUS_WIN="${{ needs.buildWindows.result }}"
@@ -172,7 +145,7 @@ jobs:
             COLOR=16711680
           fi
 
-          DESCRIPTION="$msg_linux\n$msg_win\n$msg_mac\n\nRelease: [Download Builds]($RELEASE_URL)"
+          DESCRIPTION="$msg_linux\n$msg_win\n$msg_mac"
 
           curl -H "Content-Type: application/json" \
             -X POST \

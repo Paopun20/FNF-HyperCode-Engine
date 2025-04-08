@@ -4,13 +4,17 @@
 
 # Welcome to HyPsych engine!
 
-<video src="./docs/GHREADMEFile/HPE_Loop.mp4" width="100%" autoplay loop muted></video>
+![HyPsych Engine](docs/GHREADMEFile/HPE_Loop.gif)
 
 ---
 
 # HyPsych Enging Is next-gen of Psych Engine!
 This is a Friday Night Funkin' engine based on Psych Engine.
 This engine is a fork of Psych Engine 1.0.4, but with a lot of new features and improvements.
+
+## Document
+### [HyPsych Enging Lua API](docs/HyPsychEnging/LuaAPI.md)
+### [Psych Engine API](https://shadowmario.github.io/psychengine.lua/)
 
 ## About
 This engine is made for fun and learning purposes.
@@ -26,11 +30,11 @@ I hope you enjoy it!
 - **C++11 Codebase**
   A modern, efficient codebase to maximize performance and ensure compatibility with the latest systems.
 
-- **Replay Functionality [Work in Progress]**
-  Record your best (or worst) runs and play them back at any time!
-
 - **Buffer [Work in Progress]**
   Buffers temporarily store data in memory for more efficient data handling, improving overall performance.
+
+- **3D model support**
+  Now you can use 3D models in your mods! This feature allows for more complex and visually appealing scenes.
 
 - **Gameplay**
   **HXCPP_GC_DYNAMIC_SIZE**

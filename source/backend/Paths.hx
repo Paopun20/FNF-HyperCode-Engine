@@ -196,6 +196,95 @@ class Paths
 	inline static public function lua(key:String, ?folder:String)
 		return getPath('$key.lua', TEXT, folder, true);
 
+	//AWAY3D PATHS
+	inline static public function obj(key:String) return getModelPath(key, "obj");
+	inline static public function dae(key:String) return getModelPath(key, "dae");
+	inline static public function md2(key:String) return getModelPath(key, "md2");
+	inline static public function md5(key:String) return getModelPath(key, "md5");
+	inline static public function awd(key:String) return getModelPath(key, "awd");
+
+	static public function getModelPath(key:String, ext:String)
+		{
+			#if MODS_ALLOWED
+			var file:String = modsModel(key, ext);
+			if(FileSystem.exists(file)) {
+				return file;
+			}
+			#end
+			return 'assets/$key';
+		}
+		
+	#if MODS_ALLOWED
+	inline static public function modsModel(key:String, type:String) {
+		return modFolders('models/$key.$type');
+	}
+	#end
+
+	// 3D Model Texture Handling
+	inline static public function modelTexture(key:String, ?extension:String = "png") {
+		#if MODS_ALLOWED
+		var file:String = modsModelTexture(key, extension);
+		if(FileSystem.exists(file)) {
+			return file;
+		}
+		#end
+		return 'assets/images/$key.$extension'; // Or a dedicated folder like 'assets/textures/'
+	}
+
+	#if MODS_ALLOWED
+	inline static public function modsModelTexture(key:String, type:String) {
+		return modFolders('textures/$key.$type');
+	}
+	#end
+
+	// 3D Model Material Handling
+	inline static public function modelMaterial(key:String) {
+		#if MODS_ALLOWED
+		var file:String = modsModelMaterial(key);
+		if(FileSystem.exists(file)) {
+			return file;
+		}
+		#end
+		return 'assets/models/$key.mtl'; // Or a dedicated folder
+	}
+
+	#if MODS_ALLOWED
+	inline static public function modsModelMaterial(key:String) {
+		return modFolders('models/$key.mtl');
+	}
+	#end
+
+	// 3D Model Shader Handling
+	inline static public function modelFragmentShader(key:String) {
+		#if MODS_ALLOWED
+		var file:String = modsModelShaderFragment(key);
+		if(FileSystem.exists(file)) {
+			return file;
+		}
+		#end
+		return 'assets/shaders/model/$key.frag';
+	}
+
+	inline static public function modelVertexShader(key:String) {
+		#if MODS_ALLOWED
+		var file:String = modsModelShaderVertex(key);
+		if(FileSystem.exists(file)) {
+			return file;
+		}
+		#end
+		return 'assets/shaders/model/$key.vert';
+	}
+
+	#if MODS_ALLOWED
+	inline static public function modsModelShaderFragment(key:String) {
+		return modFolders('shaders/model/$key.frag');
+	}
+
+	inline static public function modsModelShaderVertex(key:String) {
+		return modFolders('shaders/model/$key.vert');
+	}
+	#end
+
 	static public function video(key:String)
 	{
 		#if MODS_ALLOWED

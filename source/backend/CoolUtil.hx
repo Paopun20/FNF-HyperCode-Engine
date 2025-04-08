@@ -2,21 +2,19 @@ package backend;
 
 import openfl.utils.Assets;
 import lime.utils.Assets as LimeAssets;
-import hypsychenging.hyper.HttpClient;
+import hypsychenging.HttpClient;
+import EngineConfig;
 
 class CoolUtil
 {
 	public static function checkForUpdates(url:String = null):String {
-		if (url == null || url.length == 0)
-			// https://raw.githubusercontent.com/Paopun20/FNF-HyPsych-Engine/main/gitVersion.txt
-			url = "https://raw.githubusercontent.com/Paopun20/FNF-HyPsych-Engine/main/gitVersion.txt";
+		if (url == null || url.length == 0) url = EngineConfig.GITVERSION;
 		var version:String = states.MainMenuState.psychEngineVersion.trim();
 		if(ClientPrefs.data.checkForUpdates) {
 			trace('checking for updates...');
-			var http = new haxe.Http(url);
-			http.onData = function (data:String)
-			{
-				HttpClient.getRequest(url, function(suss, data) {
+			HttpClient.getRequest(url, function(suss, data) {
+				if (suss) {
+					//data = data;
 					if(data != null && data.length > 0) {
 						var newVersion:String = data.split('\n')[0].trim();
 						trace('version online: $newVersion, your version: $version');
@@ -25,14 +23,10 @@ class CoolUtil
 							version = newVersion;
 						}
 					}
-				});
-			}
-			http.onError = function (error) {
-				trace('error: $error');
-			}
-			http.request();
-
-
+				} else {
+					trace('failed to check for updates (error type: '+data.error+')');
+				}
+			});
 		}
 		return version;
 	}

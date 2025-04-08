@@ -3,6 +3,7 @@
 	<!-- _________________________ Application Settings _________________________ -->
 
 	<app title="Friday Night Funkin': HyPsych Engine" file="HyPsychEngine" packageName="com.paopun20.hypsychengine" package="com.paopun20.hypsychengine" main="Main" version="0.2.8" company="Paopun20" />
+	<window background="null" if="desktop"/>
 
 	<!--Switch Export with Unique ApplicationID and Icon-->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />
@@ -133,6 +134,9 @@
 	<haxedef name="HXC_LIBVLC_LOGGING" if="VIDEOS_ALLOWED debug" />
 	<haxedef name="HXVLC_NO_SHARE_DIRECTORY" if="VIDEOS_ALLOWED" />
 	<define name="x86_BUILD" if="32bits" />
+
+	<haxelib name="away3d" />
+	<define name="IMPORT_AWAY3D" />
 	
 	<!-- ______________________________ Haxedefines _____________________________ -->
 

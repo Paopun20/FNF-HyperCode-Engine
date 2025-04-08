@@ -29,7 +29,7 @@ import states.FreeplayState;
 
 import substates.PauseSubState;
 import substates.GameOverSubstate;
-import hypsychenging.Init as HyPsychEnging;
+import hypsychenging.LuaCallbackInit as HyPsychEngingLua;
 import psychlua.LuaUtils;
 import psychlua.LuaUtils.LuaTweenOptions;
 #if HSCRIPT_ALLOWED
@@ -1567,7 +1567,7 @@ class FunkinLua {
 		ShaderFunctions.implement(this);
 		DeprecatedFunctions.implement(this);
 		
-		HyPsychEnging.addLuaCallbacks(lua);
+		HyPsychEngingLua.addLuaCallbacks(lua);
 
 		for (name => func in customFunctions)
 		{

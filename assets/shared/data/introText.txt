@@ -27,7 +27,6 @@ it works in neko--but not in cpp
 @:forward--to madness
 @:native--to chaos
 Dead code elimination--killed my dreams
-git commit -m "final" --5 more commits later--final_final_v2
 merge conflict--my worst enemy
 git pull--and pray
 i fixed it--with git reset --hard

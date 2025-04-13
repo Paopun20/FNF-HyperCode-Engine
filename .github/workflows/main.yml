@@ -42,7 +42,7 @@ jobs:
           path: export/release/linux/bin
 
   buildWindows:
-    name: 🌐 Build on Windows (64-bit)
+    name: Build on Windows (64-bit)
     runs-on: windows-latest
     steps:
       - name: Checkout Code
@@ -112,8 +112,8 @@ jobs:
           haxelib setup ~/haxelib
           haxelib install hxcpp --quiet
           haxelib install lime --quiet
-          haxelib run lime rebuild lime mac -arch x86_64
-          haxelib run lime rebuild lime mac -arch arm64
+          haxelib run lime rebuild lime mac -64
+          haxelib run lime rebuild lime mac -Dmac-catalyst -Dmac-arm64
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
       - name: Skip SScript setup mode

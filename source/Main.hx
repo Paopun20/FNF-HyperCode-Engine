@@ -7,6 +7,8 @@ import android.content.Context;
 import debug.FPSCounter;
 import EngineConfig;
 
+import hypsychenging.ImportCore;
+
 import flixel.graphics.FlxGraphic;
 import flixel.FlxGame;
 import flixel.FlxState;

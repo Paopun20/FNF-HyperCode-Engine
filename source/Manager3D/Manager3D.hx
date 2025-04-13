@@ -1,31 +1,23 @@
-package hypsychenging;
+package manager3D;
 
+import away3d.containers.View3D;
 import flixel.FlxG;
-import flixel.FlxSprite;
-import flixel.graphics.FlxGraphic;
-import flx3d.Flx3DCamera;
+import openfl.display.DisplayObject;
 import away3d.entities.Mesh;
 import away3d.events.Asset3DEvent;
-import backend.Paths;
-import openfl.display3D.Context3D;
-import openfl.display3D.textures.Texture;
-import openfl.display3D.textures.TextureBase;
-import openfl.display3D.textures.RectangleTexture;
+import openfl.geom.Vector3D;
 import openfl.display.BitmapData;
-import openfl.geom.Rectangle;
+import away3d.textures.BitmapTexture;
+import flx3d.Flx3DCamera;
+import away3d.materials.TextureMaterial;
+import manager3D.util.RaycastHelper;
+import manager3D.extensions.MeshExtension;
+import openfl.Assets;
+import away3d.library.assets.Asset3DType;
 
-/**
- * A static utility class for managing 3D models and rendering within the HyPsychEngine.
- */
 class Manager3D {
-    /**
-     * The main 3D camera used for rendering.
-     */
     public static var camera:Flx3DCamera;
-
-    /**
-     * A map to store loaded 3D models, keyed by their asset path.
-     */
+    public static var view:View3D;
     public static var loadedModels:Map<String, Mesh> = new Map<String, Mesh>();
 
     /**
@@ -47,6 +39,7 @@ class Manager3D {
 
         camera = new Flx3DCamera(x, y, width, height);
         FlxG.cameras.add(camera);
+        view = camera.view;
     }
 
     /**
@@ -66,17 +59,23 @@ class Manager3D {
         }
 
         if (camera == null) {
-            trace("Error: 3D camera not initialized. Call ThreeDManager.initCamera() first.");
+            trace("Error: 3D camera not initialized. Call Manager3D.initCamera() first.");
             return;
         }
 
+        // In Manager3D.hx, inside loadModel
         camera.addModel(assetPath, function(event:Asset3DEvent) {
-            if (event.asset != null && event.asset.assetType == away3d.library.assets.Asset3DType.MESH) {
+            if (event.asset != null && (event.asset.assetType == Asset3DType.MESH || event.asset.assetType == Asset3DType.CONTAINER || event.asset.assetType == Asset3DType.GEOMETRY )) {
                 var mesh:Mesh = cast event.asset;
                 loadedModels.set(assetPath, mesh);
+                // Success: Call the original callback
                 callback(event);
             } else {
-                trace('Error loading model: $assetPath');
+                // Error: Trace the error AND call the original callback
+                // Add more detail to the trace:
+                trace('Error loading model: $assetPath. Asset returned: ${event.asset}, AssetType: ${event.asset?.assetType}');
+                // Still call the callback so the caller knows the operation finished.
+                // callback(event);
             }
         }, texturePath, smoothTexture);
     }
@@ -91,20 +90,21 @@ class Manager3D {
      */
     public static function addModelToScene(assetPath:String, x:Float = 0, y:Float = 0, z:Float = 0):Void {
         if (camera == null) {
-            trace("Error: 3D camera not initialized. Call ThreeDManager.initCamera() first.");
+            trace("Error: 3D camera not initialized. Call Manager3D.initCamera() first.");
             return;
         }
 
         if (!loadedModels.exists(assetPath)) {
-            trace("Error: Model not loaded: $assetPath. Call ThreeDManager.loadModel() first.");
+            trace("Error: Model not loaded: $assetPath. Call Manager3D.loadModel() first.");
             return;
         }
 
         var model:Mesh = loadedModels.get(assetPath);
+        if (model == null) return;
         model.x = x;
         model.y = y;
         model.z = z;
-        camera.addChild(model);
+        view.scene.addChild(model);
     }
 
     /**
@@ -112,8 +112,8 @@ class Manager3D {
      * @param assetPath The path to the loaded 3D model.
      */
     public static function removeModelFromScene(assetPath:String):Void {
-        if (camera == null) {
-            trace("Error: 3D camera not initialized. Call ThreeDManager.initCamera() first.");
+        if (view == null) {
+            trace("Error: 3D camera not initialized. Call Manager3D.initCamera() first.");
             return;
         }
 
@@ -123,20 +123,23 @@ class Manager3D {
         }
 
         var model:Mesh = loadedModels.get(assetPath);
-        camera.removeChild(model);
+        if (model == null) return;
+        view.scene.removeChild(cast model);
     }
 
     /**
      * Removes all models from the scene and clears the loaded models map.
      */
     public static function clearScene():Void {
-        if (camera == null) {
-            trace("Error: 3D camera not initialized. Call ThreeDManager.initCamera() first.");
+        if (view == null) {
+            trace("Error: 3D camera not initialized. Call Manager3D.initCamera() first.");
             return;
         }
 
         for (model in loadedModels) {
-            camera.removeChild(model);
+            if (view.scene.contains(model)) {
+                view.scene.removeChild(cast model);
+            }
         }
         loadedModels.clear();
     }
@@ -146,8 +149,13 @@ class Manager3D {
      */
     public static function destroy():Void {
         clearScene();
+        if (view != null) {
+            view.dispose();
+            view = null;
+        }
+        loadedModels.clear();
         if (camera != null) {
-            camera.destroy();
+            FlxG.cameras.remove(camera);
             camera = null;
         }
     }
@@ -158,15 +166,41 @@ class Manager3D {
      * @param texturePath The path to the texture.
      */
     public static function applyTexture(mesh:Mesh, texturePath:String):Void {
-        #if sys
-        var texture:FlxGraphic = Paths.image(texturePath);
-        #else
-        var texture:String = 'assets/images/$texturePath.png';
-        #end
-        if (texture != null) {
-            camera.applyTexture(mesh, texture);
+        if (texturePath != null && texturePath.length > 0) {
+            var texture = new BitmapTexture(Assets.getBitmapData(texturePath));
+            mesh.material = new TextureMaterial(texture);
         } else {
             trace('Texture not found: $texturePath');
         }
+    }
+    
+    /**
+     * Move mesh in the scene by applying transformations.
+     * @param mesh The mesh to move.
+     * @param x The target X position.
+     * @param y The target Y position.
+     * @param z The target Z position.
+     */
+    public static function moveMesh(mesh:Mesh, x:Float, y:Float, z:Float):Void {
+        MeshExtension.moveTo(mesh, x, y, z);
+    }
+
+    /**
+     * Rotate mesh in the scene by applying a rotation.
+     * @param mesh The mesh to rotate.
+     * @param axis The axis of rotation ('x', 'y', 'z').
+     * @param angle The angle of rotation in degrees.
+     */
+    public static function rotateMesh(mesh:Mesh, axis:String, angle:Float):Void {
+        MeshExtension.rotateMesh(mesh, axis, angle);
+    }
+
+    /**
+     * Change color of the mesh.
+     * @param mesh The mesh to change color.
+     * @param color The new color in hex format (e.g., 0xFF0000 for red).
+     */
+    public static function changeMeshColor(mesh:Mesh, color:Int):Void {
+        MeshExtension.setColor(mesh, color);
     }
 }

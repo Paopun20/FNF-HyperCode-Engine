@@ -1,5 +1,5 @@
 # GitHub Actions Workflow for Building Haxe Project
-# Improved for readability, maintainability, and efficiency
+# Now with 32-bit Windows support and fixed macOS multi-arch build
 
 name: Build
 
@@ -12,18 +12,15 @@ on:
 
 jobs:
   buildLinux:
-    name: ✨ Build on Linux
+    name: Build on Linux
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4.1.7
-
       - name: Setup Haxe
         uses: krdlab/setup-haxe@master
         with:
           haxe-version: 4.3.6
-
       - name: Install Dependencies & Setup
         run: |
           sudo apt-get update
@@ -32,16 +29,12 @@ jobs:
           haxelib install hxcpp --quiet
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
-
       - name: Skip SScript setup mode
         run: echo 'oy9:showMacroty8:loopCosti25y10:includeAllfg' >> ~/settings.cocoa
-
       - name: Create Version Tag
         run: echo "${{ github.run_id }}" > VERSION
-
       - name: Compile for Linux
         run: haxelib run lime build Project.xml linux --app-version="4.0.0-${{ github.run_id }}" -D officialBuild
-
       - name: Upload Artifact
         uses: actions/upload-artifact@v4.3.4
         with:
@@ -49,45 +42,66 @@ jobs:
           path: export/release/linux/bin
 
   buildWindows:
-    name: 🌐 Build on Windows
+    name: 🌐 Build on Windows (64-bit)
     runs-on: windows-latest
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4.1.7
-
       - name: Setup Haxe
         uses: krdlab/setup-haxe@master
         with:
           haxe-version: 4.3.6
-
       - name: Install Dependencies & Setup
         run: |
           haxelib setup C:/haxelib
           haxelib install hxcpp --quiet
           setup\windows.bat
         shell: cmd
-
       - name: Skip SScript setup mode
         run: echo 'oy9:showMacroty8:loopCosti25y10:includeAllfg' >> %USERPROFILE%\settings.cocoa
         shell: cmd
-
       - name: Create Version Tag
         run: echo "${{ github.run_id }}" > VERSION
-
-      - name: Compile for Windows
+      - name: Compile for Windows 64-bit
         run: haxelib run lime build windows --app-version="4.0.0-${{ github.run_id }}" -D officialBuild
-
       - name: Upload Artifact
         uses: actions/upload-artifact@v4.3.4
         with:
-          name: windowsBuild
+          name: windowsBuild64
+          path: export/release/windows/bin
+
+  buildWindows32:
+    name: Build on Windows (32-bit)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4.1.7
+      - name: Setup Haxe
+        uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: 4.3.6
+      - name: Install Dependencies & Setup
+        run: |
+          haxelib setup C:/haxelib
+          haxelib install hxcpp --quiet
+          setup\windows.bat
+        shell: cmd
+      - name: Skip SScript setup mode
+        run: echo 'oy9:showMacroty8:loopCosti25y10:includeAllfg' >> %USERPROFILE%\settings.cocoa
+        shell: cmd
+      - name: Create Version Tag
+        run: echo "${{ github.run_id }}" > VERSION
+      - name: Compile for Windows 32-bit
+        run: haxelib run lime build windows -D HXCPP_M32 --app-version="4.0.0-${{ github.run_id }}" -D officialBuild
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4.3.4
+        with:
+          name: windowsBuild32
           path: export/release/windows/bin
 
   buildMac:
-    name: 🌟 Build on macOS
+    name: Build on macOS (Universal)
     runs-on: macos-13
-
     steps:
       - uses: actions/checkout@v4.1.7
       - uses: krdlab/setup-haxe@master
@@ -96,30 +110,29 @@ jobs:
       - name: Install Haxelib
         run: |
           haxelib setup ~/haxelib
-          haxelib install hxcpp > /dev/null --quiet
+          haxelib install hxcpp --quiet
           haxelib install lime --quiet
+          haxelib run lime rebuild lime mac -arch x86_64
           haxelib run lime rebuild lime mac -arch arm64
           chmod +x ./setup/unix.sh
-          sh ./setup/unix.sh
+          ./setup/unix.sh
       - name: Skip SScript setup mode
         run: echo 'oy9:showMacroty8:loopCosti25y10:includeAllfg' >> ~/settings.cocoa
-
       - name: Create Version Tag
         run: echo "${{ github.run_id }}" > VERSION
-      - name: Compile
-        run: haxelib run lime build mac --app-version="4.0.0-${{ github.run_id }}"  -D officialBuild
+      - name: Compile for macOS Universal
+        run: haxelib run lime build mac --app-version="4.0.0-${{ github.run_id }}" -D officialBuild
       - name: Publish Artifact
         uses: actions/upload-artifact@v4.3.4
         with:
           name: macBuild
           path: export/release/macos/bin
 
-  # Notify Discord about build status
   notifyDiscord:
     name: 📣 Notify Discord
     runs-on: ubuntu-latest
     if: always()
-    needs: [buildLinux, buildWindows, buildMac]
+    needs: [buildLinux, buildWindows, buildWindows32, buildMac]
     steps:
       - name: Send Discord Notification
         env:
@@ -128,18 +141,21 @@ jobs:
           RELEASE_URL: https://github.com/${{ github.repository }}/releases/tag/v${{ github.run_id }}
         run: |
           STATUS_LINUX="${{ needs.buildLinux.result }}"
-          STATUS_WIN="${{ needs.buildWindows.result }}"
+          STATUS_WIN64="${{ needs.buildWindows.result }}"
+          STATUS_WIN32="${{ needs.buildWindows32.result }}"
           STATUS_MAC="${{ needs.buildMac.result }}"
 
           msg_linux="LINUX: ❎ Build Error"
-          msg_win="WIN: ❎ Build Error"
+          msg_win64="WIN64: ❎ Build Error"
+          msg_win32="WIN32: ❎ Build Error"
           msg_mac="MAC: ❎ Build Error"
 
           [[ "$STATUS_LINUX" == "success" ]] && msg_linux="LINUX: ✅ Build Completed"
-          [[ "$STATUS_WIN" == "success" ]] && msg_win="WIN: ✅ Build Completed"
+          [[ "$STATUS_WIN64" == "success" ]] && msg_win64="WIN64: ✅ Build Completed"
+          [[ "$STATUS_WIN32" == "success" ]] && msg_win32="WIN32: ✅ Build Completed"
           [[ "$STATUS_MAC" == "success" ]] && msg_mac="MAC: ✅ Build Completed"
 
-          if [[ "$STATUS_LINUX" == "success" && "$STATUS_WIN" == "success" && "$STATUS_MAC" == "success" ]]; then
+          if [[ "$STATUS_LINUX" == "success" && "$STATUS_WIN64" == "success" && "$STATUS_WIN32" == "success" && "$STATUS_MAC" == "success" ]]; then
             TITLE="✅ Build Successful"
             COLOR=65280
           else
@@ -147,7 +163,7 @@ jobs:
             COLOR=16711680
           fi
 
-          DESCRIPTION="$msg_linux\n$msg_win\n$msg_mac\n\nRelease: [Download Builds]($RELEASE_URL)"
+          DESCRIPTION="$msg_linux\n$msg_win64\n$msg_win32\n$msg_mac\n\nRelease: [Download Builds]($RELEASE_URL)"
 
           curl -H "Content-Type: application/json" \
             -X POST \
@@ -161,7 +177,7 @@ jobs:
                   { \"name\": \"🔗 Workflow Run\", \"value\": \"[View on GitHub]($RUN_URL)\" }
                 ],
                 \"footer\": {
-                  \"text\": \"GitHub Actions • ${{ github.repository }}\"
+                  \"text\": \"GitHub Actions • ${{ github.repository }}\" 
                 },
                 \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
               }]

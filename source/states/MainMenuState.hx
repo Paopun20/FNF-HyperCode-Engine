@@ -29,7 +29,8 @@ class MainMenuState extends MusicBeatState
 		'story_mode',
 		'freeplay',
 		#if MODS_ALLOWED 'mods', #end
-		'credits'
+		'credits',
+		'TEST'
 	];
 
 	var leftOption:String = #if ACHIEVEMENTS_ALLOWED 'achievements' #else null #end;
@@ -320,6 +321,9 @@ class MainMenuState extends MusicBeatState
 								PlayState.SONG.splashSkin = null;
 								PlayState.stageUI = 'normal';
 							}
+						case 'TEST':
+							MusicBeatState.switchState(new TestState());
+
 						case 'donate':
 							CoolUtil.browserLoad('https://ninja-muffin24.itch.io/funkin');
 							selectedSomethin = false;

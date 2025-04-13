@@ -21,8 +21,8 @@ This engine is made for fun and learning purposes.
 I hope you enjoy it!
 
 # Features:
-- **HScript on Lua [Beta]**
-  Classic HScript syntax now runs alongside Lua! This allows for greater flexibility in scripting. (We’re working on fixing one minor bug—stay tuned!)
+- **HScript on Lua**
+  Classic HScript syntax now runs alongside Lua! This allows for greater flexibility in scripting.
 
 - **Optimized Garbage Collection**
   Experience smoother gameplay with fewer performance hitches. Your mods won’t stutter, even during complex beats!
@@ -33,19 +33,15 @@ I hope you enjoy it!
 - **Buffer [Work in Progress]**
   Buffers temporarily store data in memory for more efficient data handling, improving overall performance.
 
-- **3D model support**
+- **3D model support [ !! Work in Progress !! | NOT WORKING, IT TOO MUCH ERROR ]**
   Now you can use 3D models in your mods! This feature allows for more complex and visually appealing scenes.
 
+# Haxe Code \(or .Hx file\)
+- **NDLLS SUPPORTED**
+  NdllUtil for haxe from Codename Engine. (modifier ver)
+
 - **Gameplay**
-  **HXCPP_GC_DYNAMIC_SIZE**
-  This new feature allows you to change the size of dynamic memory allocation, providing flexibility for memory management during gameplay.
-
-  **HXCPP_GC_BIG_BLOCKS**
-  This feature optimizes memory allocation by using larger memory blocks, which can reduce fragmentation and improve performance.
-
-  **HXCPP_GC_GENERATIONAL**
-  A garbage collection approach that uses multiple generations of objects, optimizing memory usage and reducing the cost of collection in long-running processes.
-
+  I'll write it later. LOL
 
 # Lua Extensions
 

@@ -197,21 +197,18 @@ class Paths
 		return getPath('$key.lua', TEXT, folder, true);
 
 	//AWAY3D PATHS
-	inline static public function obj(key:String) return getModelPath(key, "obj");
+    inline static public function obj(key:String) return getModelPath(key, "obj");
 	inline static public function dae(key:String) return getModelPath(key, "dae");
 	inline static public function md2(key:String) return getModelPath(key, "md2");
 	inline static public function md5(key:String) return getModelPath(key, "md5");
 	inline static public function awd(key:String) return getModelPath(key, "awd");
 
-	static public function getModelPath(key:String, ext:String)
+	static public function getModelPath(key:String='', ext:String='')
 		{
-			#if MODS_ALLOWED
-			var file:String = modsModel(key, ext);
-			if(FileSystem.exists(file)) {
-				return file;
-			}
-			#end
-			return 'assets/$key';
+			if (StringTools.trim(key) == '' || StringTools.trim(ext) == '')
+				return null;
+			
+			return 'models/$key.$ext'; // Changed this line
 		}
 		
 	#if MODS_ALLOWED
@@ -285,6 +282,11 @@ class Paths
 	}
 	#end
 
+	// ndll
+	inline static public function ndll(key:String) return getPath('ndlls/$key', BINARY);
+	inline static public function ndllPath(key:String) return getPath('$key', BINARY);
+
+	// video
 	static public function video(key:String)
 	{
 		#if MODS_ALLOWED

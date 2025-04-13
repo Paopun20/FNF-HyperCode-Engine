@@ -71,6 +71,7 @@
 
 	<!-- Assets -->
 	<assets path="assets/fonts" />
+	<assets path="assets/models"        include="*.obj *.dae *.md2 *.md5 *.awd" type="binary" />
 	<assets path="assets/shared"        exclude="*.ogg" if="web"/>
 	<assets path="assets/shared"        exclude="*.mp3" unless="web"/>
 	<assets path="assets/embed"         exclude="*.ogg" if="web" embed="true"/>
@@ -124,6 +125,7 @@
 	<haxelib name="hxvlc" if="VIDEOS_ALLOWED" version="2.0.1"/>
 	<haxelib name="hxdiscord_rpc" version="1.2.4" if="DISCORD_ALLOWED"/>
 	<haxelib name="flxanimate"/>
+	<haxelib name="tink_await"/>
 
 	<!-- Disable Discord IO Thread -->
 	<haxedef name="DISCORD_DISABLE_IO_THREAD" if="hxdiscord_rpc" />
@@ -134,9 +136,12 @@
 	<haxedef name="HXC_LIBVLC_LOGGING" if="VIDEOS_ALLOWED debug" />
 	<haxedef name="HXVLC_NO_SHARE_DIRECTORY" if="VIDEOS_ALLOWED" />
 	<define name="x86_BUILD" if="32bits" />
-
+	<define name="x64_BUILD" unless="32bits" />
+	
 	<haxelib name="away3d" />
 	<define name="IMPORT_AWAY3D" />
+	<define name="CUSTOM_CLASSES" />
+	<haxedef name="NDLLS_SUPPORTED" unless="web || iphonesim || hl" />
 	
 	<!-- ______________________________ Haxedefines _____________________________ -->
 

@@ -51,6 +51,8 @@ Rewrite until nothing remains of the original. LOL
   NdllUtil in haxe from Codename Engine. (modifier ver)
 - **3D SUPPORTED**
   3D model support in Haxe from Codename Engine. (modifier ver)
+  flx3d and away3d models from T-Bar Engine.
+
 
 # Lua Extensions
 

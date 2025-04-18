@@ -1,4 +1,4 @@
-package hypsychenging;
+package core;
 import Sys;
 
 class GetArgs {

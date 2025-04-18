@@ -1,4 +1,4 @@
-package hypsychenging;
+package core;
 
 import lime.app.Application;
 import lime.ui.Window;

@@ -20,6 +20,9 @@ This engine is a fork of Psych Engine 1.0.4, but with a lot of new features and 
 This engine is made for fun and learning purposes.
 I hope you enjoy it!
 
+# Psych engine fork Have be rewritten
+Rewrite until nothing remains of the original. LOL
+
 # Features:
 - **HScript on Lua**
   Classic HScript syntax now runs alongside Lua! This allows for greater flexibility in scripting.
@@ -36,26 +39,30 @@ I hope you enjoy it!
 - **3D model support [ !! Work in Progress !! | NOT WORKING, IT TOO MUCH ERROR ]**
   Now you can use 3D models in your mods! This feature allows for more complex and visually appealing scenes.
 
+# **Gameplay**
+  I'll write it later. LOL
+
+# **Easy Modding**
+  (Just like Psych Engine)
+  HyPsych Engine is designed to make modding as easy as possible and difficult to understand at the same time. With a simple and intuitive API, you can create your own mods with ease.
+
 # Haxe Code \(or .Hx file\)
 - **NDLLS SUPPORTED**
-  NdllUtil for haxe from Codename Engine. (modifier ver)
-
-- **Gameplay**
-  I'll write it later. LOL
+  NdllUtil in haxe from Codename Engine. (modifier ver)
+- **3D SUPPORTED**
+  3D model support in Haxe from Codename Engine. (modifier ver)
 
 # Lua Extensions
 
 ### These extensions expand Lua’s functionality in the HyPsych Engine:
-
-| Extension           | Status         | Testing | Description |
-|---------------------|----------------|---------|-------------|
-| **`BrainF*ck`**      | Stable         | Yes     | Allows the execution of BrainF*ck code within your game’s songs. This quirky feature lets modders add unexpected logic or fun programming challenges in their music gameplay, adding an extra layer of meme-worthy fun to your mods. |
-| **`GetArgs`**        | Stable         | Yes     | Enables access to command-line arguments, perfect for creating modding tools or integrating with external configurations. This extension helps retrieve input passed to the game on startup, which can be used for custom settings or tool integrations. |
-| **`HttpClient`**     | Stable         | Yes     | Make HTTP(S) requests from within your mod to interact with external APIs, fetch data, or even interact with platforms like Discord. While it can handle requests and responses, file upload/download functionality is restricted for security purposes, ensuring safe communication. |
-| **`JsonHelper`**     | Stable         | Yes     | A powerful extension to simplify working with JSON data. It provides easy-to-use functions to parse JSON strings into native Haxe objects and vice versa. Perfect for modders who need to handle external JSON configurations or data without dealing with complex parsing logic. |
-| **`ScreenInfo`**     | Unstable (Crash Game) | Yes | Retrieve dynamic screen resolution and size information for any connected display. This is ideal for mods that need to adapt to different screen sizes and setups. However, it is currently unstable and may cause crashes, so use it cautiously. |
-| **`UrlGen`**         | Stable         | Yes     | Build and manipulate URLs dynamically. This extension allows modders to generate custom URLs, append query parameters, and path segments on the fly. It pairs well with HttpClient for sending requests with custom parameters and paths, ideal for interacting with APIs or generating dynamic links within your game. |
-| **`WindowManager`**  | Unstable (Buggy) | Yes     | Provides control over window properties such as position, size, and fullscreen mode. While mostly functional, it’s still in an experimental state, with some bugs related to window resizing and positioning. This feature is primarily useful for mods that need to control the in-game window’s appearance. |
+**`BrainFuck`**
+**`GetArgs`**
+**`HttpClient`**
+**`JsonHelper`**
+**`ScreenInfo`** (Crash Game)
+**`UrlGen`**
+**`WindowManager`** (Buggy)
+**`ToastNotification`** (Windows 10/11 Only)
 
 ---
 
@@ -66,7 +73,21 @@ HyPsych Engine offers many new features and improvements over Psych Engine, incl
 - HScript on Lua, allowing for more flexible scripting.
 - Optimized Garbage Collection for smoother gameplay.
 - C++11-based codebase, offering better performance and system compatibility.
-- New Lua Extensions, such as BrainF*ck, HttpClient, and JsonHelper, which add powerful new functionalities.
+- New Lua Extensions.
+- New Haxe Extensions.
+- more.
+
+### Is HyPsych Engine a fork of Psych Engine?
+
+Yes, HyPsych Engine is a fork of Psych Engine, but with many new features and improvements.
+
+### How do I install HyPsych Engine?
+
+Not available for installation at this time or download from [GitHub actions](https://github.com/Paopun20/FNF-HyPsych-Engine/actions)!
+
+### How can I report bugs or issues?
+
+You can report bugs or issues on GitHub Issues page: [GitHub Issues](https://github.com/Paopun20/FNF-HyPsych-Engine/issues)
 
 ## Credits
 - **Paopun20** - Main Developer \(Sole Developer for this cool engine\)

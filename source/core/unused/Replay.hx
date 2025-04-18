@@ -1,4 +1,4 @@
-package hypsychenging;
+package core;
 
 #if FLX_RECORD
 import flixel.FlxG;
@@ -11,7 +11,7 @@ import sys.io.FileInput;
 
 
 import haxe.ds.StringMap;
-import hypsychenging.JsonHelper;
+import core.JsonHelper;
 import haxe.ds.Map;
 
 class Replay {

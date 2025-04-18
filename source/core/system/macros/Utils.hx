@@ -1,4 +1,4 @@
-package hypsychenging.system.macros;
+package core.system.macros;
 
 #if macro
 import haxe.macro.Context;

@@ -1,12 +1,13 @@
-package hypsychenging.utils;
+package core.utils;
 
 import lime.app.Application;
 import haxe.Log;
-import hypsychenging.system.macros.Utils as SysUtils;
+import core.system.macros.Utils as SysUtils;
 import lime.utils.Assets;
 import backend.Paths;
 import haxe.Log;
 import haxe.PosInfos;
+import lime.system.CFFI;
 
 /**
  * Small util that allows you to load any function from ndlls via `getFunction`.
@@ -22,6 +23,7 @@ import haxe.PosInfos;
  * - The Function cannot be found in the NDLL
  * then an empty function will be returned instead, and a message will be shown in the log.
  */
+@:access(lime.system.CFFI)
 class NdllUtil {
 	#if NDLLS_SUPPORTED
 		#if windows   public static final os:String = "windows";   #end
@@ -47,10 +49,7 @@ class NdllUtil {
 			return noop;
 
 		return Reflect.makeVarArgs(function(a:Array<Dynamic>) {
-			// This generates horrific code
-			// TODO: Find a better way if possible, maybe using @:native?
 			return SysUtils.generateReflectionLike(25, "func", "a");
-			//return Reflect.callMethod(null, func, a); // wouldnt work for some reason, maybe cause like c++ functions doesnt have reflection enabled
 		});
 		#else 
 		trace('NDLLs are not supported on this platform.');
@@ -97,5 +96,7 @@ class NdllUtil {
 		#end
 	}
 
-	@:dox(hide) @:noCompletion static function noop() {}
+	@:dox(hide) @:noCompletion static function noop() {
+		Log.trace('Called noop function (NDLL function not loaded).');
+	}
 }

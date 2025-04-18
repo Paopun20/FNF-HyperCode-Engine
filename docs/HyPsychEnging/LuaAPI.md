@@ -26,7 +26,7 @@ This class allows you to run Brainfuck code in Lua through the `runBrainFuckCode
 This class allows Lua to retrieve the arguments passed to the application.
 
 **Functions:**
-- **appGetArgs(): Array<String>**  
+- **appGetArgs(): Table of String**  
   - **Description:** Retrieves the arguments passed to the application at startup.
   - **Returns:** An array of strings representing the command-line arguments.
 
@@ -37,11 +37,11 @@ This class allows Lua to retrieve the arguments passed to the application.
   This class allows Lua to interact with HTTP requests (GET, POST, PUT, DELETE, PATCH) and check for internet availability.
   
   **Functions:**
-  - **hasInternet(): Bool**  
+  - **hasInternet(): Table**  
     - **Description:** Checks if the system has internet access.
     - **Returns:** `true` if there is internet access, `false` otherwise.
   
-  - **getRequest(url: String, headers: Dynamic, queryParams: Dynamic): Dynamic**  
+  - **getRequest(url: String, headers: Dynamic, queryParams: Dynamic): Table**  
     - **Description:** Performs an HTTP GET request.
     - **Arguments:**
       - `url` (String) - The URL to send the request to.
@@ -49,20 +49,20 @@ This class allows Lua to retrieve the arguments passed to the application.
       - `queryParams` (Dynamic) - Optional query parameters.
     - **Returns:** The response from the GET request.
   
-  - **postRequest(url: String, data: Dynamic, headers: Dynamic, queryParams: Dynamic): Dynamic**  
+  - **postRequest(url: String, data: Table, headers: Dynamic, queryParams: Dynamic): Table**  
     - **Description:** Performs an HTTP POST request.
     - **Arguments:** Same as `getRequest`, with the addition of `data` for POST body.
     - **Returns:** The response from the POST request.
   
-  - **putRequest(url: String, data: Dynamic, headers: Dynamic, queryParams: Dynamic): Dynamic**  
+  - **putRequest(url: String, data: Table, headers: Dynamic, queryParams: Dynamic): Table**  
     - **Description:** Performs an HTTP PUT request.
     - **Returns:** The response from the PUT request.
   
-  - **deleteRequest(url: String, headers: Dynamic, queryParams: Dynamic): Dynamic**  
+  - **deleteRequest(url: String, headers: Dynamic, queryParams: Dynamic): Table**  
     - **Description:** Performs an HTTP DELETE request.
     - **Returns:** The response from the DELETE request.
   
-  - **patchRequest(url: String, data: Dynamic, headers: Dynamic, queryParams: Dynamic): Dynamic**  
+  - **patchRequest(url: String, data: Dynamic, headers: Dynamic, queryParams: Dynamic): Table**  
     - **Description:** Performs an HTTP PATCH request.
     - **Returns:** The response from the PATCH request.
 
@@ -73,11 +73,11 @@ This class allows Lua to retrieve the arguments passed to the application.
   This class allows Lua to easily parse and stringify JSON data.
   
   **Functions:**
-  - **jsonParse(jsonString: String): Dynamic**  
+  - **jsonParse(jsonString: String): Table**  
     - **Description:** Parses a JSON string into a Lua object.
     - **Returns:** A dynamic object representing the parsed JSON.
   
-  - **jsonStringify(data: Dynamic): String**  
+  - **jsonStringify(data: Table): String**  
     - **Description:** Converts a Lua object into a JSON string.
     - **Returns:** A JSON string representation of the Lua object.
   
@@ -88,11 +88,11 @@ This class allows Lua to retrieve the arguments passed to the application.
   This class allows Lua to retrieve screen resolutions.
   
   **Functions:**
-  - **getScreensInfo(): Map<Int, Map<String, Dynamic>>**  
+  - **getScreensInfo(): Table**  
     - **Description:** Retrieves resolutions of all connected screens.
     - **Returns:** A map with screen ID as the key, and a map containing `width` and `height` as the value.
   
-  - **getMainScreenInfo(): Map<Int, Map<String, Dynamic>>**  
+  - **getMainScreenInfo(): Table**  
     - **Description:** Retrieves the resolution of the main screen.
     - **Returns:** A map with screen ID as the key, and `width` and `height` as the value.
 
@@ -110,7 +110,7 @@ This class allows Lua to retrieve the arguments passed to the application.
       - `url` (String) - The base URL.
     - **Returns:** `true` if the URL generator was created successfully, otherwise `false`.
   
-  - **getUrlGen(tag: String): UrlGen**  
+  - **getUrlGen(tag: String): String**  
     - **Description:** Retrieves an existing `UrlGen` object by its tag.
     - **Returns:** The `UrlGen` object associated with the tag, or `null` if not found.
   

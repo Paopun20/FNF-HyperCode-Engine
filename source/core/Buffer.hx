@@ -1,4 +1,4 @@
-package hypsychenging;
+package core;
 
 import haxe.io.Bytes;
 import haxe.io.BytesBuffer;

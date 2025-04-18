@@ -4,10 +4,20 @@ package;
 import android.content.Context;
 #end
 
+#if CRASH_HANDLER
+import openfl.events.UncaughtErrorEvent;
+import haxe.CallStack;
+import haxe.io.Path;
+import sys.FileSystem;
+import sys.io.File;
+import states.PlayState;
+import backend.WeekData;
+#end
+
 import debug.FPSCounter;
 import EngineConfig;
 
-import hypsychenging.ImportCore;
+import core.ImportCore;
 
 import flixel.graphics.FlxGraphic;
 import flixel.FlxGame;
@@ -42,6 +52,7 @@ import haxe.io.Path;
 #end
 
 import backend.Highscore;
+import flixel.util.FlxStringUtil; // Added import
 
 // NATIVE API STUFF, YOU CAN IGNORE THIS AND SCROLL //
 #if (linux && !debug)
@@ -212,52 +223,140 @@ class Main extends Sprite
 		}
 	}
 
+	function saveCrashReport(content:String):String
+		{
+			var path = "./crash/HyPsychEngine_" + Date.now().toString().replace(" ", "_").replace(":", "'") + ".txt";
+			
+			if (!FileSystem.exists("./crash/")) {
+				FileSystem.createDirectory("./crash/");
+			}
+	
+			File.saveContent(path, content + "\n");
+			Sys.println(content);
+			Sys.println("Crash dump saved in " + Path.normalize(path));
+			
+			return path;
+		}
+
 	// Code was entirely made by sqirra-rng for their fnf engine named "Izzy Engine", big props to them!!!
 	// very cool person for real they don't get enough credit for their work
 	#if CRASH_HANDLER
 	function onCrash(e:UncaughtErrorEvent):Void
 	{
 		var errMsg:String = "";
-		var path:String;
 		var callStack:Array<StackItem> = CallStack.exceptionStack(true);
 		var dateNow:String = Date.now().toString();
 
 		dateNow = dateNow.replace(" ", "_");
 		dateNow = dateNow.replace(":", "'");
 
-		path = "./crash/" + "HyPsychEngine_" + dateNow + ".txt";
+		// Basic system info
+		errMsg += "==== CRASH REPORT ====\n";
+		errMsg += "Engine Version: " + EngineConfig.VERSION + "\n";
+		errMsg += "Platform: " + #if windows "Windows" #elseif linux "Linux" #elseif mac "Mac" #elseif android "Android" #elseif ios "iOS" #else "Unknown" #end + "\n";
+		// errMsg += "Build Date: " + CompileTime.getBuildDate() + "\n";
+		// errMsg += "Build Hash: " + CompileTime.getGitHash() + "\n\n";
 
+		// Exception stack trace
+		errMsg += "==== STACK TRACE ====\n";
 		for (stackItem in callStack)
 		{
 			switch (stackItem)
 			{
 				case FilePos(s, file, line, column):
 					errMsg += file + " (line " + line + ")\n";
-				default:
-					Sys.println(stackItem);
+				case CFunction:
+					errMsg += "C Function\n";
+				case Module(m):
+					errMsg += "Module: " + m + "\n";
+				case Method(classname, method):
+					errMsg += "Method: " + classname + "." + method + "\n";
+				case LocalFunction(n):
+					errMsg += "Local Function: " + n + "\n";
 			}
 		}
 
-		errMsg += "\nUncaught Error: " + e.error;
-		// remove if you're modding and want the crash log message to contain the link
-		// please remember to actually modify the link for the github page to report the issues to.
+		// Error details
+		errMsg += "\n==== ERROR DETAILS ====\n";
+		errMsg += "Error: " + e.error + "\n";
+		errMsg += "Error Type: " + Type.getClassName(Type.getClass(e.error)) + "\n";
+
+		// Client preferences and settings
+		try {
+			errMsg += "\n==== CLIENT PREFERENCES ====\n";
+			errMsg += "Framerate: " + ClientPrefs.data.framerate + "\n";
+			errMsg += "Reduced Movements: " + ClientPrefs.data.lowQuality + "\n";
+			errMsg += "Antialiasing: " + ClientPrefs.data.antialiasing + "\n";
+			errMsg += "Note Skin: " + ClientPrefs.data.noteSkin + "\n";
+		} catch(e:Dynamic) {
+			errMsg += "Failed to get client preferences: " + e + "\n";
+		}
+
+		// Current game state info
+		try {
+			errMsg += "\n==== CURRENT STATE ====\n";
+			if (FlxG.game != null) {
+				errMsg += "Game State: " + Type.getClassName(Type.getClass(FlxG.state)) + "\n";
+
+				if (FlxG.state is PlayState) {
+					if (PlayState.instance != null) {
+						errMsg += "Song: " + PlayState.SONG.song + "\n";
+						errMsg += "Difficulty: " + Difficulty.getString(false) + "\n";
+						errMsg += "Week: " + WeekData.weeksList[PlayState.storyWeek] + "\n";
+					}
+				}
+			} else {
+				errMsg += "Game not initialized\n";
+			}
+		} catch(e:Dynamic) {
+			errMsg += "Failed to get current state: " + e + "\n";
+		}
+
+		// Memory info
+		try {
+			errMsg += "\n==== MEMORY INFO ====\n";
+			errMsg += "Memory usage: " + FlxStringUtil.formatBytes(cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_USAGE)) + "\n"; // Used FlxStringUtil here
+			#if cpp
+			errMsg += "GC Memory: " + FlxStringUtil.formatBytes(cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_RESERVED)) + "\n"; // Used FlxStringUtil here
+			#end
+		} catch(e:Dynamic) {
+			errMsg += "Failed to get memory info: " + e + "\n";
+		}
+
+		// Mod info
+		try {
+			#if LUA_ALLOWED
+			errMsg += "\n==== MOD INFO ====\n";
+			errMsg += "Current Mod: " + Mods.currentModDirectory + "\n";
+			@:privateAccess errMsg += "Global Mods: " + Mods.globalMods.join(", ") + "\n";
+			#end
+		} catch(e:Dynamic) {
+			errMsg += "Failed to get mod info: " + e + "\n";
+		}
+
+		// Closing message
 		#if officialBuild
-		errMsg += "\nPlease report this error to the GitHub page: "+EngineConfig.ENGINE_URL;
+		errMsg += "\n==== PLEASE REPORT ====\n";
+		errMsg += "Please report this error to the GitHub page: " + EngineConfig.ENGINE_URL + "\n";
+		errMsg += "Include the crash log and steps to reproduce if possible.\n";
 		#end
-		errMsg += "\n\n> Crash Handler written by: sqirra-rng From Psych Engine";
 
-		if (!FileSystem.exists("./crash/"))
-			FileSystem.createDirectory("./crash/");
+		errMsg += "\n> Crash Handler written by: sqirra-rng (Psych Engine Modified Crash Handler by Paopun20 for HyPsychEngine)";
 
-		File.saveContent(path, errMsg + "\n");
+		// Show error message
+        var displayMsg = "The game crashed!\n";
+        displayMsg += "A crash report has been saved to:\n" + Path.normalize(saveCrashReport(errMsg)) + "\n\n";
+        displayMsg += "Error: " + Std.string(e.error).split("\n")[0] + "\n";
+        #if officialBuild
+        displayMsg += "\nPlease report this issue on GitHub.";
+        #end
 
-		Sys.println(errMsg);
-		Sys.println("Crash dump saved in " + Path.normalize(path));
+        Application.current.window.alert(displayMsg, "Crash Report");
 
-		Application.current.window.alert(errMsg, "Error!");
 		#if DISCORD_ALLOWED
 		DiscordClient.shutdown();
 		#end
+
 		Sys.exit(1);
 	}
 	#end

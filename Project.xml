@@ -3,7 +3,7 @@
 	<!-- _________________________ Application Settings _________________________ -->
 
 	<app title="Friday Night Funkin': HyPsych Engine" file="HyPsychEngine" packageName="com.paopun20.hypsychengine" package="com.paopun20.hypsychengine" main="Main" version="0.2.8" company="Paopun20" />
-	<window background="null" if="desktop"/>
+	<window background="null" if="c"/>
 
 	<!--Switch Export with Unique ApplicationID and Icon-->
 	<set name="APP_ID" value="0x0100f6c013bbc000" />
@@ -71,7 +71,6 @@
 
 	<!-- Assets -->
 	<assets path="assets/fonts" />
-	<assets path="assets/models"        include="*.obj *.dae *.md2 *.md5 *.awd" type="binary" />
 	<assets path="assets/shared"        exclude="*.ogg" if="web"/>
 	<assets path="assets/shared"        exclude="*.mp3" unless="web"/>
 	<assets path="assets/embed"         exclude="*.ogg" if="web" embed="true"/>

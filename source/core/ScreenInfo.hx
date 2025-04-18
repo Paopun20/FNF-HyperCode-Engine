@@ -1,4 +1,4 @@
-package hypsychenging;
+package core;
 
 import openfl.display.Screen;
 import lime.system.System;

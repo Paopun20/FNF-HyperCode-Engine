@@ -5,7 +5,6 @@ import flixel.effects.FlxFlicker;
 import lime.app.Application;
 import states.editors.MasterEditorMenu;
 import options.OptionsState;
-import EngineConfig;
 
 enum MainMenuColumn {
 	LEFT;
@@ -29,8 +28,7 @@ class MainMenuState extends MusicBeatState
 		'story_mode',
 		'freeplay',
 		#if MODS_ALLOWED 'mods', #end
-		'credits',
-		'TEST'
+		'credits'
 	];
 
 	var leftOption:String = #if ACHIEVEMENTS_ALLOWED 'achievements' #else null #end;
@@ -43,6 +41,9 @@ class MainMenuState extends MusicBeatState
 	override function create()
 	{
 		super.create();
+		if (EngineConfig.IS_DEVELOPER) {
+			// optionShit.push('TEST');
+		}
 
 		#if MODS_ALLOWED
 		Mods.pushGlobalMods();
@@ -322,7 +323,7 @@ class MainMenuState extends MusicBeatState
 								PlayState.stageUI = 'normal';
 							}
 						case 'TEST':
-							MusicBeatState.switchState(new TestState());
+							// MusicBeatState.switchState(new TestState());
 
 						case 'donate':
 							CoolUtil.browserLoad('https://ninja-muffin24.itch.io/funkin');

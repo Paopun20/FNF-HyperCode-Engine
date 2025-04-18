@@ -1,12 +1,13 @@
-package hypsychenging;
+package core;
 
-import hypsychenging.BrainFuck;
-import hypsychenging.GetArgs;
-import hypsychenging.HttpClient;
-import hypsychenging.JsonHelper;
-import hypsychenging.ScreenInfo;
-import hypsychenging.UrlGen;
-#if desktop import hypsychenging.WindowManager; #end
+import core.BrainFuck;
+import core.GetArgs;
+import core.HttpClient;
+import core.JsonHelper;
+import core.ScreenInfo;
+import core.UrlGen;
+#if desktop import core.WindowManager; #end
+#if windows import core.winapi.ToastNotification; #end
 
 import haxe.ds.IntMap;
 
@@ -191,12 +192,22 @@ class WindowManagerLua {
 }
 #end
 
+#if windows
+class ToastNotificationLua {
+    public function new(lua: State) {
+        Lua_helper.add_callback(lua, "toastNotification", function(title:String, message:String, duration:Int, iconPath:String) {
+            ToastNotification.showToast(title, message, duration);
+        });
+    }
+}
+#end
+
 class LuaCallbackInit {
     public static function addLuaCallbacks(funk:State) {
-        loadHyPsychEnging(funk);
+        loadcore(funk);
     }
 
-    public static function loadHyPsychEnging(lua: State) {
+    public static function loadcore(lua: State) {
         new BrainFuckLua(lua);
         new GetArgsLua(lua);
         new HttpClientLua(lua);
@@ -204,5 +215,6 @@ class LuaCallbackInit {
         new ScreenInfoLua(lua);
         new UrlGenLua(lua);
         #if desktop new WindowManagerLua(lua); #end
+        #if windows new ToastNotificationLua(lua); #end
     }
 }

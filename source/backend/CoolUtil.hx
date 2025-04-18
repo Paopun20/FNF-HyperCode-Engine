@@ -2,7 +2,7 @@ package backend;
 
 import openfl.utils.Assets;
 import lime.utils.Assets as LimeAssets;
-import hypsychenging.HttpClient;
+import core.HttpClient;
 import EngineConfig;
 
 class CoolUtil

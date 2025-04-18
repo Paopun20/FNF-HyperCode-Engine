@@ -29,7 +29,7 @@ import states.FreeplayState;
 
 import substates.PauseSubState;
 import substates.GameOverSubstate;
-import hypsychenging.LuaCallbackInit as HyPsychEngingLua;
+import core.LuaCallbackInit as HyPsychEngingLua;
 import psychlua.LuaUtils;
 import psychlua.LuaUtils.LuaTweenOptions;
 #if HSCRIPT_ALLOWED

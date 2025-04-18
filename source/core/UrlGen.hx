@@ -1,4 +1,4 @@
-package hypsychenging;
+package core;
 
 class UrlGen {
     private var baseUrl: String;

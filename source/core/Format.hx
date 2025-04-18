@@ -1,4 +1,4 @@
-package hypsychenging;
+package core;
 
 class FormatHelper {
     private static final SUFFIXES = ["","K", "M", "B", "T", "Q"];

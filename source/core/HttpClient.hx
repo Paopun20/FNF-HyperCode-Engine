@@ -1,4 +1,4 @@
-package hypsychenging;
+package core;
 
 import haxe.Http;
 import haxe.http.HttpStatus;

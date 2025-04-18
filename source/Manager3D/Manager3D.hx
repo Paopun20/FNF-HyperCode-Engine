@@ -36,7 +36,6 @@ class Manager3D {
             width = FlxG.width;
         if (height == 0)
             height = FlxG.height;
-
         camera = new Flx3DCamera(x, y, width, height);
         FlxG.cameras.add(camera);
         view = camera.view;
@@ -65,18 +64,16 @@ class Manager3D {
 
         // In Manager3D.hx, inside loadModel
         camera.addModel(assetPath, function(event:Asset3DEvent) {
-            if (event.asset != null && (event.asset.assetType == Asset3DType.MESH || event.asset.assetType == Asset3DType.CONTAINER || event.asset.assetType == Asset3DType.GEOMETRY )) {
-                var mesh:Mesh = cast event.asset;
-                loadedModels.set(assetPath, mesh);
-                // Success: Call the original callback
-                callback(event);
-            } else {
-                // Error: Trace the error AND call the original callback
-                // Add more detail to the trace:
-                trace('Error loading model: $assetPath. Asset returned: ${event.asset}, AssetType: ${event.asset?.assetType}');
-                // Still call the callback so the caller knows the operation finished.
-                // callback(event);
+            if (event.asset != null && (event.asset.assetType == Asset3DType.MESH || event.asset.assetType == Asset3DType.CONTAINER || event.asset.assetType == Asset3DType.GEOMETRY)) {
+                if (cast event.asset is Mesh) {
+                    var mesh:Mesh = cast event.asset;
+                    loadedModels.set(assetPath, mesh);
+                    callback(event);
+                } else {
+                    trace('Error: Asset is not a Mesh: $assetPath');
+                }
             }
+            
         }, texturePath, smoothTexture);
     }
 

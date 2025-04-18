@@ -10,6 +10,9 @@ on:
     branches: [ main ]
   workflow_dispatch:
 
+env:
+  Args: "-D officialBuild -D NotDeveloper"
+
 jobs:
   buildLinux:
     name: Build on Linux
@@ -34,7 +37,7 @@ jobs:
       - name: Create Version Tag
         run: echo "${{ github.run_id }}" > VERSION
       - name: Compile for Linux
-        run: haxelib run lime build Project.xml linux --app-version="4.0.0-${{ github.run_id }}" -D officialBuild
+        run: haxelib run lime build Project.xml linux --app-version="4.0.0-${{ github.run_id }}" $Args
       - name: Upload Artifact
         uses: actions/upload-artifact@v4.3.4
         with:
@@ -63,7 +66,7 @@ jobs:
       - name: Create Version Tag
         run: echo "${{ github.run_id }}" > VERSION
       - name: Compile for Windows 64-bit
-        run: haxelib run lime build windows --app-version="4.0.0-${{ github.run_id }}" -D officialBuild
+        run: haxelib run lime build windows --app-version="4.0.0-${{ github.run_id }}" $Args
       - name: Upload Artifact
         uses: actions/upload-artifact@v4.3.4
         with:
@@ -92,7 +95,7 @@ jobs:
       - name: Create Version Tag
         run: echo "${{ github.run_id }}" > VERSION
       - name: Compile for Windows 32-bit
-        run: haxelib run lime build windows -D HXCPP_M32 --app-version="4.0.0-${{ github.run_id }}" -D officialBuild
+        run: haxelib run lime build windows -32 --app-version="4.0.0-${{ github.run_id }}" $Args
       - name: Upload Artifact
         uses: actions/upload-artifact@v4.3.4
         with:
@@ -121,7 +124,7 @@ jobs:
       - name: Create Version Tag
         run: echo "${{ github.run_id }}" > VERSION
       - name: Compile for macOS Universal
-        run: haxelib run lime build mac --app-version="4.0.0-${{ github.run_id }}" -D officialBuild
+        run: haxelib run lime build mac --app-version="4.0.0-${{ github.run_id }}" $Args
       - name: Publish Artifact
         uses: actions/upload-artifact@v4.3.4
         with:
@@ -138,7 +141,6 @@ jobs:
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
-          RELEASE_URL: https://github.com/${{ github.repository }}/releases/tag/v${{ github.run_id }}
         run: |
           STATUS_LINUX="${{ needs.buildLinux.result }}"
           STATUS_WIN64="${{ needs.buildWindows.result }}"
@@ -163,7 +165,6 @@ jobs:
             COLOR=16711680
           fi
 
-          DESCRIPTION="$msg_linux\n$msg_win64\n$msg_win32\n$msg_mac\n\nRelease: [Download Builds]($RELEASE_URL)"
 
           curl -H "Content-Type: application/json" \
             -X POST \

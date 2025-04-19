@@ -1,4 +1,7 @@
 #if !macro
+// Engine Config DONT DELETE THIS OR IT WILL BREAK EVERYTHING
+import EngineConfig;
+
 //Discord API
 #if DISCORD_ALLOWED
 import backend.Discord;
@@ -63,6 +66,9 @@ import flixel.group.FlxSpriteGroup;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.addons.transition.FlxTransitionableState;
 
+import ext.*;
+import hgsl.*;
+import muun.la.*;
+
 using StringTools;
-import EngineConfig;
 #end

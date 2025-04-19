@@ -10,7 +10,7 @@ body:
   - type: dropdown
     id: eyetest
     attributes:
-      label: To test your sight, and reliability, please select the option of what should NOT be requested.
+      label: To test your sight, and reliability, Please don't ask for anything that's super difficult to do.
       options:
         - Proper credit that was forgotten
         - Thing that would not cause problems
@@ -19,5 +19,6 @@ body:
         - A good idea
         - Better LUA mod support idea
         - Code optimization that would make the game faster. (You should make a PR if this is your request, by the way.)
+        - Feature that would make the game more enjoyable
     validations:
       required: true

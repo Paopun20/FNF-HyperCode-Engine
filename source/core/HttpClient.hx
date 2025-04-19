@@ -126,6 +126,156 @@ class HttpClient {
         sendRequest(url, data, callback, true, headers, 0, "PATCH", queryParams);
     }
 
+    public static function streamRequest(
+        url: String,
+        data: Dynamic,
+        callback: (Bool, Bool, Dynamic) -> Void,
+        headers: StringMap<String> = null,
+        queryParams: StringMap<String> = null
+    ): Void {
+        sendStream(url, data, callback, headers, queryParams);
+    }
+
+    private static function sendStream(
+        url: String,
+        data: Dynamic,
+        callback: (Bool, Bool, Dynamic) -> Void,
+        headers: StringMap<String> = null,
+        queryParams: StringMap<String> = null
+    ): Void {
+        // Validate the URL
+        var parsedUrl = validateUrl(url);
+        if (parsedUrl == null) {
+            logError("Invalid URL", url);
+            safeStreamCallback(callback, false, false, { error: "Invalid URL", url: url });
+            return;
+        }
+    
+        // Append query parameters if provided
+        if (queryParams != null) {
+            parsedUrl += "?" + buildQueryString(queryParams);
+        }
+    
+        var http = new Http(parsedUrl);
+        http.cnxTimeout = DEFAULT_TIMEOUT;
+    
+        // Set headers
+        if (headers != null) {
+            for (key in headers.keys()) {
+                http.setHeader(key, headers.get(key));
+            }
+        }
+        http.setHeader("Accept", "text/event-stream");
+        http.setHeader("Cache-Control", "no-cache");
+        http.setHeader("Connection", "keep-alive");
+    
+        // Buffer for incomplete lines
+        var buffer = new StringBuf();
+        var streamClosed = false;
+    
+        http.onBytes = function(data: haxe.io.Bytes) {
+            if (streamClosed) return;
+            
+            var chunk = data.toString();
+            buffer.add(chunk);
+            
+            var content = buffer.toString();
+            var lines = content.split("\n");
+            buffer = new StringBuf();
+            
+            // Keep last incomplete line in buffer
+            if (content.charAt(content.length - 1) != '\n') {
+                buffer.add(lines.pop());
+            }
+        
+            for (line in lines) {
+                line = line.trim();
+                if (line == "") continue;
+                
+                if (line.startsWith("data: ")) {
+                    var jsonStr = line.substr(6).trim();
+                    if (jsonStr == "[DONE]") {
+                        streamClosed = true;
+                        safeStreamCallback(callback, true, true, { event: "done" });
+                        continue;
+                    }
+        
+                    try {
+                        var eventData = Json.parse(jsonStr);
+                        if (eventData.choices != null && eventData.choices.length > 0) {
+                            var choice = eventData.choices[0];
+                            
+                            if (choice.finish_reason != null) {
+                                // Stream finished
+                                streamClosed = true;
+                                safeStreamCallback(callback, true, true, {
+                                    finish_reason: choice.finish_reason,
+                                    usage: eventData.usage
+                                });
+                            } else if (choice.delta != null && choice.delta.content != null) {
+                                // Content delta
+                                safeStreamCallback(callback, true, false, {
+                                    content: choice.delta.content
+                                });
+                            }
+                        }
+                    } catch (e:Dynamic) {
+                        logError("Failed to parse event: " + e, url);
+                    }
+                }
+            }
+        };
+    
+        http.onError = function(error) {
+            if (!streamClosed) {
+                streamClosed = true;
+                logError("Stream error: " + error, url);
+                safeStreamCallback(callback, false, true, { error: error });
+            }
+        };
+    
+        // Handle status changes
+        http.onStatus = function(status:Int) {
+            if (status >= 400 && !streamClosed) {
+                streamClosed = true;
+                var errorMsg = 'HTTP error $status';
+                logError(errorMsg, url);
+                safeStreamCallback(callback, false, true, { error: errorMsg, status: status });
+            }
+        };
+    
+        try {
+            if (data != null) {
+                http.setHeader("Content-Type", "application/json");
+                http.setPostData(Json.stringify(data));
+                http.request(true); // POST
+            } else {
+                http.request(false); // GET
+            }
+        } catch (e:Dynamic) {
+            if (!streamClosed) {
+                streamClosed = true;
+                logError("Request failed: " + e, url);
+                safeStreamCallback(callback, false, true, { error: e });
+            }
+        }
+    }
+    // New helper for stream callbacks
+    private static function safeStreamCallback(
+        callback: (Bool, Bool, Dynamic) -> Void,
+        success: Bool,
+        finished: Bool,
+        data: Dynamic
+    ): Void {
+        try {
+            if (callback != null) {
+                callback(success, finished, data);
+            }
+        } catch (e:Dynamic) {
+            logError("Stream callback failed: " + e, "");
+        }
+    }
+
     /**
      * Centralized method for handling HTTP requests.
      * Includes error categorization and retry logic.

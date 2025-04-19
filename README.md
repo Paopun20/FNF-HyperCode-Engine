@@ -17,11 +17,10 @@ This engine is a fork of Psych Engine 1.0.4, but with a lot of new features and 
 ### [Psych Engine API](https://shadowmario.github.io/psychengine.lua/)
 
 ## About
-This engine is made for fun and learning purposes.
-I hope you enjoy it!
+HyPsych Engine is a fork of the Psych Engine
 
 # Psych engine fork Have be rewritten
-Rewrite until nothing remains of the original. LOL
+Rewrite until nothing remains of the original. LOL /j
 
 # Features:
 - **HScript on Lua**
@@ -48,14 +47,19 @@ Rewrite until nothing remains of the original. LOL
 
 # Haxe Code \(or .Hx file\)
 - **NDLLS SUPPORTED**
-  NdllUtil in haxe from Codename Engine. (modifier ver)
 - **3D SUPPORTED**
-  3D model support in Haxe from Codename Engine. (modifier ver)
-  flx3d and away3d models from T-Bar Engine.
 
+# saharan's libraries
+- **ext muun** from https://github.com/saharan/haxelibs
+- **hgsl** from https://github.com/saharan/HGSL
+
+# T-Bar Engine's libraries
+- **flx3d and away3d** from https://github.com/TBar09/FNF-tbarEngine/
+
+# Codename Engine's libraries
+- **3D model support** in Haxe from Codename Engine. (modifier ver)
 
 # Lua Extensions
-
 ### These extensions expand Lua’s functionality in the HyPsych Engine:
 **`BrainFuck`**
 **`GetArgs`**
@@ -68,7 +72,7 @@ Rewrite until nothing remains of the original. LOL
 
 ---
 
-## Q&A
+## Q&A Common Questions
 ### What makes HyPsych Engine different from Psych Engine?
 
 HyPsych Engine offers many new features and improvements over Psych Engine, including:

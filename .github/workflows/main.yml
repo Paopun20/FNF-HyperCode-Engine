@@ -1,7 +1,4 @@
-# GitHub Actions Workflow for Building Haxe Project
-# Now with 32-bit Windows support and fixed macOS multi-arch build
-
-name: Build
+name: Build and Notify
 
 on:
   push:
@@ -14,104 +11,86 @@ env:
   Args: "-D officialBuild -D NotDeveloper"
 
 jobs:
-  buildLinux:
-    name: Build on Linux
+  setup-haxe:
+    name: Setup and Cache Haxe Dependencies
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4.1.7
-      - name: Setup Haxe
-        uses: krdlab/setup-haxe@master
+      - uses: actions/cache@v4
+        with:
+          path: ~/.haxelib
+          key: ${{ runner.os }}-haxe-${{ hashFiles('**/*.hxml') }}
+
+  buildLinux:
+    name: 🐧 Linux (64-bit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: krdlab/setup-haxe@master
         with:
           haxe-version: 4.3.6
-      - name: Install Dependencies & Setup
-        run: |
+      - run: |
           sudo apt-get update
           sudo apt-get install -y libvlc-dev libvlccore-dev
           haxelib setup ~/haxelib
           haxelib install hxcpp --quiet
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
-      - name: Skip SScript setup mode
-        run: echo 'oy9:showMacroty8:loopCosti25y10:includeAllfg' >> ~/settings.cocoa
-      - name: Create Version Tag
-        run: echo "${{ github.run_id }}" > VERSION
-      - name: Compile for Linux
-        run: haxelib run lime build Project.xml linux --app-version="4.0.0-${{ github.run_id }}" $Args
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4.3.4
+          echo "${{ github.run_id }}" > VERSION
+          haxelib run lime build linux --app-version="4.0.0-${{ github.run_id }}" $Args
+      - uses: actions/upload-artifact@v4
         with:
           name: linuxBuild
           path: export/release/linux/bin
 
-  buildWindows:
-    name: Build on Windows (64-bit)
+  buildWindows64:
+    name: 🪟 Windows (64-bit)
     runs-on: windows-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4.1.7
-      - name: Setup Haxe
-        uses: krdlab/setup-haxe@master
+      - uses: actions/checkout@v4
+      - uses: krdlab/setup-haxe@master
         with:
           haxe-version: 4.3.6
-      - name: Install Dependencies & Setup
-        run: |
+      - run: |
           haxelib setup C:/haxelib
           haxelib install hxcpp --quiet
           setup\windows.bat
+          echo "${{ github.run_id }}" > VERSION
+          haxelib run lime build windows --app-version="4.0.0-${{ github.run_id }}" $Args
         shell: cmd
-      - name: Skip SScript setup mode
-        run: echo 'oy9:showMacroty8:loopCosti25y10:includeAllfg' >> %USERPROFILE%\settings.cocoa
-        shell: cmd
-      - name: Create Version Tag
-        run: echo "${{ github.run_id }}" > VERSION
-      - name: Compile for Windows 64-bit
-        run: haxelib run lime build windows --app-version="4.0.0-${{ github.run_id }}" $Args
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4.3.4
+      - uses: actions/upload-artifact@v4
         with:
           name: windowsBuild64
           path: export/release/windows/bin
 
   buildWindows32:
-    name: Build on Windows (32-bit)
+    name: 🪟 Windows (32-bit)
     runs-on: windows-latest
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4.1.7
-      - name: Setup Haxe
-        uses: krdlab/setup-haxe@master
+      - uses: actions/checkout@v4
+      - uses: krdlab/setup-haxe@master
         with:
           haxe-version: 4.3.6
-      - name: Install Dependencies & Setup
-        run: |
+      - run: |
           haxelib setup C:/haxelib
           haxelib install hxcpp --quiet
           setup\windows.bat
+          echo "${{ github.run_id }}" > VERSION
+          haxelib run lime build windows -32 --app-version="4.0.0-${{ github.run_id }}" $Args
         shell: cmd
-      - name: Skip SScript setup mode
-        run: echo 'oy9:showMacroty8:loopCosti25y10:includeAllfg' >> %USERPROFILE%\settings.cocoa
-        shell: cmd
-      - name: Create Version Tag
-        run: echo "${{ github.run_id }}" > VERSION
-      - name: Compile for Windows 32-bit
-        run: haxelib run lime build windows -32 --app-version="4.0.0-${{ github.run_id }}" $Args
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4.3.4
+      - uses: actions/upload-artifact@v4
         with:
           name: windowsBuild32
           path: export/release/windows/bin
 
   buildMac:
-    name: Build on macOS (Universal)
+    name: 🍎 macOS (Universal)
     runs-on: macos-13
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v4
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: 4.3.6
-      - name: Install Haxelib
-        run: |
+      - run: |
           haxelib setup ~/haxelib
           haxelib install hxcpp --quiet
           haxelib install lime --quiet
@@ -119,68 +98,119 @@ jobs:
           haxelib run lime rebuild lime mac -Dmac-catalyst -Dmac-arm64
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
-      - name: Skip SScript setup mode
-        run: echo 'oy9:showMacroty8:loopCosti25y10:includeAllfg' >> ~/settings.cocoa
-      - name: Create Version Tag
-        run: echo "${{ github.run_id }}" > VERSION
-      - name: Compile for macOS Universal
-        run: haxelib run lime build mac --app-version="4.0.0-${{ github.run_id }}" $Args
-      - name: Publish Artifact
-        uses: actions/upload-artifact@v4.3.4
+          echo "${{ github.run_id }}" > VERSION
+          haxelib run lime build mac --app-version="4.0.0-${{ github.run_id }}" $Args
+      - uses: actions/upload-artifact@v4
         with:
           name: macBuild
           path: export/release/macos/bin
+
+  buildWeb:
+    name: 🌐 Web (HTML5)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: 4.3.6
+      - run: |
+          haxelib setup ~/haxelib
+          haxelib install lime --quiet
+          haxelib install openfl --quiet
+          chmod +x ./setup/unix.sh
+          ./setup/unix.sh
+          echo "${{ github.run_id }}" > VERSION
+          haxelib run lime build html5 --app-version="4.0.0-${{ github.run_id }}" $Args
+      - uses: actions/upload-artifact@v4
+        with:
+          name: webBuild
+          path: export/release/html5/bin
+
+  buildAndroid:
+    name: 🤖 Android
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: 4.3.6
+      - run: |
+          haxelib setup ~/haxelib
+          haxelib install lime --quiet
+          haxelib install openfl --quiet
+          chmod +x ./setup/unix.sh
+          ./setup/unix.sh
+          echo "${{ github.run_id }}" > VERSION
+          haxelib run lime build android --app-version="4.0.0-${{ github.run_id }}" $Args
+      - uses: actions/upload-artifact@v4
+        with:
+          name: androidBuild
+          path: export/release/android/bin
+
+  buildiOS:
+    name: 🍏 iOS
+    runs-on: macos-13
+    steps:
+      - uses: actions/checkout@v4
+      - uses: krdlab/setup-haxe@master
+        with:
+          haxe-version: 4.3.6
+      - run: |
+          haxelib setup ~/haxelib
+          haxelib install lime --quiet
+          haxelib install openfl --quiet
+          chmod +x ./setup/unix.sh
+          ./setup/unix.sh
+          echo "${{ github.run_id }}" > VERSION
+          haxelib run lime build ios --app-version="4.0.0-${{ github.run_id }}" $Args
+      - uses: actions/upload-artifact@v4
+        with:
+          name: iosBuild
+          path: export/release/ios/bin
 
   notifyDiscord:
     name: 📣 Notify Discord
     runs-on: ubuntu-latest
     if: always()
-    needs: [buildLinux, buildWindows, buildWindows32, buildMac]
+    needs:
+      - buildLinux
+      - buildWindows64
+      - buildWindows32
+      - buildMac
+      - buildWeb
+      - buildAndroid
+      - buildiOS
     steps:
-      - name: Send Discord Notification
+      - name: Send Notification
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          STATUS_LINUX="${{ needs.buildLinux.result }}"
-          STATUS_WIN64="${{ needs.buildWindows.result }}"
-          STATUS_WIN32="${{ needs.buildWindows32.result }}"
-          STATUS_MAC="${{ needs.buildMac.result }}"
+          check() { [[ "$1" == "success" ]] && echo "✅" || echo "❎"; }
 
-          msg_linux="LINUX: ❎ Build Error"
-          msg_win64="WIN64: ❎ Build Error"
-          msg_win32="WIN32: ❎ Build Error"
-          msg_mac="MAC: ❎ Build Error"
+          TITLE="✅ Build Successful"
+          COLOR=65280
 
-          [[ "$STATUS_LINUX" == "success" ]] && msg_linux="LINUX: ✅ Build Completed"
-          [[ "$STATUS_WIN64" == "success" ]] && msg_win64="WIN64: ✅ Build Completed"
-          [[ "$STATUS_WIN32" == "success" ]] && msg_win32="WIN32: ✅ Build Completed"
-          [[ "$STATUS_MAC" == "success" ]] && msg_mac="MAC: ✅ Build Completed"
+          for status in "${{ needs.buildLinux.result }}" "${{ needs.buildWindows64.result }}" "${{ needs.buildWindows32.result }}" "${{ needs.buildMac.result }}" "${{ needs.buildWeb.result }}" "${{ needs.buildAndroid.result }}" "${{ needs.buildiOS.result }}"; do
+            [[ "$status" != "success" ]] && TITLE="❎ Build Failed" && COLOR=16711680 && break
+          done
 
-          if [[ "$STATUS_LINUX" == "success" && "$STATUS_WIN64" == "success" && "$STATUS_WIN32" == "success" && "$STATUS_MAC" == "success" ]]; then
-            TITLE="✅ Build Successful"
-            COLOR=65280
-          else
-            TITLE="❎ Build Error"
-            COLOR=16711680
-          fi
-
-
-          curl -H "Content-Type: application/json" \
-            -X POST \
-            -d "{
-              \"username\": \"Github Action Report\",
-              \"embeds\": [{
-                \"title\": \"$TITLE\",
-                \"description\": \"$DESCRIPTION\",
-                \"color\": $COLOR,
-                \"fields\": [
-                  { \"name\": \"🔗 Workflow Run\", \"value\": \"[View on GitHub]($RUN_URL)\" }
-                ],
-                \"footer\": {
-                  \"text\": \"GitHub Actions • ${{ github.repository }}\" 
-                },
-                \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
-              }]
-            }" \
-            $DISCORD_WEBHOOK
+          curl -H "Content-Type: application/json" -X POST -d "{
+            \"username\": \"Github Action Report\",
+            \"embeds\": [{
+              \"title\": \"$TITLE\",
+              \"color\": $COLOR,
+              \"fields\": [
+                { \"name\": \"Linux\", \"value\": \"$(check ${{ needs.buildLinux.result }})\", \"inline\": true },
+                { \"name\": \"Windows 64-bit\", \"value\": \"$(check ${{ needs.buildWindows64.result }})\", \"inline\": true },
+                { \"name\": \"Windows 32-bit\", \"value\": \"$(check ${{ needs.buildWindows32.result }})\", \"inline\": true },
+                { \"name\": \"macOS\", \"value\": \"$(check ${{ needs.buildMac.result }})\", \"inline\": true },
+                { \"name\": \"Web\", \"value\": \"$(check ${{ needs.buildWeb.result }})\", \"inline\": true },
+                { \"name\": \"Android\", \"value\": \"$(check ${{ needs.buildAndroid.result }})\", \"inline\": true },
+                { \"name\": \"iOS\", \"value\": \"$(check ${{ needs.buildiOS.result }})\", \"inline\": true },
+                { \"name\": \"Workflow Run\", \"value\": \"[View Run]($RUN_URL)\" }
+              ],
+              \"footer\": { \"text\": \"GitHub Actions • ${{ github.repository }}\" },
+              \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
+            }]
+          }" $DISCORD_WEBHOOK

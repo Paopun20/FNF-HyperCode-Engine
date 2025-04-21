@@ -9,6 +9,15 @@ on:
 
 env:
   Args: "-D officialBuild -D NotDeveloper"
+  JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.14-7/x64
+  JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.14-7/x64
+  NEKOPATH: /opt/hostedtoolcache/neko/2.4.0/x64
+  LD_LIBRARY_PATH: /opt/hostedtoolcache/neko/2.4.0/x64:$LD_LIBRARY_PATH
+  HAXE_STD_PATH: /opt/hostedtoolcache/haxe/4.3.6/x64/std
+  ANDROID_HOME: /usr/local/lib/android/sdk
+  ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+  ANDROID_SDK: /usr/local/lib/android/sdk
+  ANDROID_NDK_ROOT: /usr/local/lib/android/sdk/ndk/27.2.12479018
 
 jobs:
   setup-haxe:
@@ -143,6 +152,16 @@ jobs:
     name: Android
     runs-on: ubuntu-latest
     needs: setup-haxe
+    env:
+      JAVA_HOME: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.14-7/x64
+      JAVA_HOME_17_X64: /opt/hostedtoolcache/Java_Temurin-Hotspot_jdk/17.0.14-7/x64
+      NEKOPATH: /opt/hostedtoolcache/neko/2.4.0/x64
+      LD_LIBRARY_PATH: /opt/hostedtoolcache/neko/2.4.0/x64:$LD_LIBRARY_PATH
+      HAXE_STD_PATH: /opt/hostedtoolcache/haxe/4.3.6/x64/std
+      ANDROID_HOME: /usr/local/lib/android/sdk
+      ANDROID_SDK_ROOT: /usr/local/lib/android/sdk
+      ANDROID_SDK: /usr/local/lib/android/sdk
+      ANDROID_NDK_ROOT: /usr/local/lib/android/sdk/ndk/27.2.12479018
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4.1.7
@@ -158,10 +177,10 @@ jobs:
         with:
           haxe-version: 4.3.6
         
-      - name: 📱 Setup Android SDK
+      - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         
-      - name: 🔧 Install Haxe Dependencies
+      - name: Install Haxe Dependencies
         run: |
           haxelib setup ~/haxelib
           haxelib install hxcpp --quiet
@@ -175,10 +194,9 @@ jobs:
         
       - name: Build Android APK
         run: |
-          haxelib run lime setup android
           haxelib run lime build android --app-version="4.0.0-${{ github.run_id }}" $Args
         
-      - name: 📦 Upload APK Artifact
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4.3.4
         with:
           name: androidBuild

@@ -203,91 +203,46 @@ jobs:
     name: 📣 Notify Discord
     runs-on: ubuntu-latest
     if: always()
-    needs: [setup-haxe, buildLinux, buildWindows64, buildWindows32, buildMac, buildAndroid, buildiOS]
+    needs:
+      - buildLinux
+      - buildWindows64
+      - buildWindows32
+      - buildMac
+      - buildAndroid
+      - buildiOS
     steps:
-      - name: Get Commit Info
-        id: commit
-        run: |
-          MESSAGE=$(git log -1 --pretty=%B | head -n 1)
-          AUTHOR=$(git log -1 --pretty=%an)
-          echo "message=${MESSAGE}" >> $GITHUB_OUTPUT
-          echo "author=${AUTHOR}" >> $GITHUB_OUTPUT
-      - name: Send Enhanced Notification
+      - name: Send Notification
         env:
-          WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           COMMIT_URL: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
           REPO_URL: https://github.com/${{ github.repository }}
           BRANCH: ${{ github.ref_name }}
         run: |
-          # Function to generate status emoji and color
-          status_ui() {
-            case "$1" in
-              "success") echo -e "🟢 Success\n#00FF00" ;;
-              "failure") echo -e "🔴 Failed\n#FF0000" ;;
-              "cancelled") echo -e "🟡 Cancelled\n#FFFF00" ;;
-              *) echo -e "⚪ Skipped\n#AAAAAA" ;;
-            esac
-          }
-  
-          # Generate platform status fields
-          generate_fields() {
-            echo -n '"fields": ['
-            echo -n '{"name": "Platform", "value": "Linux\nWindows 64\nWindows 32\nmacOS\nWeb\nAndroid\niOS", "inline": true},'
-            echo -n '{"name": "Status", "value": "'
-            echo -n "$(status_ui ${{ needs.buildLinux.result }} | head -n 1)\n"
-            echo -n "$(status_ui ${{ needs.buildWindows64.result }} | head -n 1)\n"
-            echo -n "$(status_ui ${{ needs.buildWindows32.result }} | head -n 1)\n"
-            echo -n "$(status_ui ${{ needs.buildMac.result }} | head -n 1)\n"
-            echo -n "$(status_ui ${{ needs.buildAndroid.result }} | head -n 1)\n"
-            echo -n "$(status_ui ${{ needs.buildiOS.result }} | head -n 1)"
-            echo -n '", "inline": true},'
-            echo -n '{"name": "Details", "value": "'
-            echo -n "**Branch:** [$BRANCH]($REPO_URL/tree/$BRANCH)\n"
-            echo -n "**Commit:** [${GITHUB_SHA:0:7}]($COMMIT_URL)\n"
-            echo -n "**Author:** ${{ steps.commit.outputs.author }}\n"
-            echo -n "**Message:** ${{ steps.commit.outputs.message }}"
-            echo -n '", "inline": false}'
-            echo '],'
-          }
-  
-          # Determine overall status
-          if [[ "${{ needs.buildLinux.result }}" != "success" ]] || 
-             [[ "${{ needs.buildWindows64.result }}" != "success" ]] || 
-             [[ "${{ needs.buildWindows32.result }}" != "success" ]] ||
-             [[ "${{ needs.buildMac.result }}" != "success" ]] ||
-             [[ "${{ needs.buildAndroid.result }}" != "success" ]] ||
-             [[ "${{ needs.buildiOS.result }}" != "success" ]]; then
-            OVERALL="failure"
-            TITLE="🚨 Build Failed"
-          else
-            OVERALL="success"
-            TITLE="🎉 Build Successful"
-          fi
-  
-          COLOR=$(status_ui $OVERALL | tail -n 1)
-  
-          # Send the webhook
+          check() { [[ "$1" == "success" ]] && echo "✅" || echo "❎"; }
+
+          TITLE="✅ Build Successful"
+          COLOR=65280
+
+          for status in "${{ needs.buildLinux.result }}" "${{ needs.buildWindows64.result }}" "${{ needs.buildWindows32.result }}" "${{ needs.buildMac.result }}" "${{ needs.buildAndroid.result }}" "${{ needs.buildiOS.result }}"; do
+            [[ "$status" != "success" ]] && TITLE="❎ Build Failed" && COLOR=16711680 && break
+          done
+
           curl -H "Content-Type: application/json" -X POST -d "{
-            \"username\": \"GitHub Actions\",
-            \"avatar_url\": \"https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png\",
+            \"username\": \"Github Action Report\",
             \"embeds\": [{
-              \"title\": \"$TITLE - ${{ github.workflow }}\",
-              \"url\": \"$RUN_URL\",
-              \"color\": $(echo $COLOR | sed 's/#//g'),
-              \"thumbnail\": {\"url\": \"https://haxe.org/img/haxe-logo.svg\"},
-              $(generate_fields)
-              \"footer\": {
-                \"text\": \"Triggered by ${{ github.actor }} • $(date +'%Y-%m-%d %H:%M:%S %Z')\",
-                \"icon_url\": \"https://cdn.discordapp.com/emojis/741605543046807552.png\"
-              }
-            }],
-            \"components\": [{
-              \"type\": 1,
-              \"components\": [
-                {\"type\": 2, \"label\": \"View Workflow\", \"style\": 5, \"url\": \"$RUN_URL\"},
-                {\"type\": 2, \"label\": \"View Commit\", \"style\": 5, \"url\": \"$COMMIT_URL\"},
-                {\"type\": 2, \"label\": \"View Repository\", \"style\": 5, \"url\": \"$REPO_URL\"}
-              ]
+              \"title\": \"$TITLE\",
+              \"color\": $COLOR,
+              \"fields\": [
+                { \"name\": \"Linux\", \"value\": \"$(check ${{ needs.buildLinux.result }})\", \"inline\": true },
+                { \"name\": \"Windows 64-bit\", \"value\": \"$(check ${{ needs.buildWindows64.result }})\", \"inline\": true },
+                { \"name\": \"Windows 32-bit\", \"value\": \"$(check ${{ needs.buildWindows32.result }})\", \"inline\": true },
+                { \"name\": \"macOS\", \"value\": \"$(check ${{ needs.buildMac.result }})\", \"inline\": true },
+                { \"name\": \"Android\", \"value\": \"$(check ${{ needs.buildAndroid.result }})\", \"inline\": true },
+                { \"name\": \"iOS\", \"value\": \"$(check ${{ needs.buildiOS.result }})\", \"inline\": true },
+                { \"name\": \"Workflow Run\", \"value\": \"[View Run]($RUN_URL)\" }
+              ],
+              \"footer\": { \"text\": \"GitHub Actions • ${{ github.repository }}\" },
+              \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
             }]
-          }" $WEBHOOK
+          }" $DISCORD_WEBHOOK

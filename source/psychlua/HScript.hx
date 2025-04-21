@@ -5,6 +5,7 @@ import objects.Character;
 import psychlua.LuaUtils;
 import psychlua.CustomSubstate;
 import core.*;
+import core.utils.NdllUtil;
 
 #if LUA_ALLOWED
 import psychlua.FunkinLua;
@@ -252,6 +253,7 @@ class HScript extends Iris
 		set("ScreenInfo", ScreenInfo);
 		set("UrlGen", UrlGen);
 		set("WindowManager", WindowManager);
+		set("NdllUtil", NdllUtil);
 
         // Variable functions
         set('setVar', function(name:String, value:Dynamic) {

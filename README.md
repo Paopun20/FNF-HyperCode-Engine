@@ -58,10 +58,10 @@ Rewrite until nothing remains of the original. LOL /j
 
 # Codename Engine's libraries
 - **3D model support** in Haxe from Codename Engine. (modifier ver)
-- **D
+- **Ndll support** in Haxe from Codename Engine. (modifier ver)
 
-# Lua Extensions
-### These extensions expand Lua’s functionality in the HyPsych Engine:
+# Extensions
+## LUA AND HAXE
 **`BrainFuck`**
 **`GetArgs`**
 **`HttpClient`**
@@ -70,6 +70,10 @@ Rewrite until nothing remains of the original. LOL /j
 **`UrlGen`**
 **`WindowManager (Buggy)`**
 **`ToastNotification (Windows 10/11 Only)`**
+
+# HAXE Only
+**`NdllUtil`**
+**`Manager3D`**
 
 ---
 

@@ -7,4 +7,3 @@ while read -r line; do
 done < "setup/list.haxelib"
 
 echo "Finished!"
-read -p "Press [Enter] to continue..."

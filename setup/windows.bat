@@ -7,4 +7,3 @@ for /F "tokens=*" %%L in (setup/list.haxelib) do (
     %%L
 )
 echo Finished!
-pause > NUL

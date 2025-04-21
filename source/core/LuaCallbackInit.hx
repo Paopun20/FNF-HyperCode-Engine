@@ -8,6 +8,7 @@ import core.ScreenInfo;
 import core.UrlGen;
 #if desktop import core.WindowManager; #end
 #if windows import core.winapi.ToastNotification; #end
+import states.PlayState;
 
 import haxe.ds.IntMap;
 
@@ -40,50 +41,115 @@ class GetArgsLua {
 }
 
 class HttpClientLua {
-    private static function runSync(asyncFunc: Dynamic): Dynamic {
-        var result: Dynamic = null;
+    /**
+     * Converts async HTTP calls to synchronous ones for Lua
+     * @param asyncFunc The async function that takes (Bool,Dynamic)->Void callback
+     * @return Map<String, Dynamic> with success/result fields
+     */
+    private static function runSync(asyncFunc:((Bool, Dynamic)->Void)->Void):Map<String, Dynamic> {
+        var result:Dynamic = null;
         var completed = false;
+        var success = false;
 
-        // Execute the asynchronous function
-        asyncFunc(function(res: Dynamic) {
-            result = res;
+        asyncFunc(function(s:Bool, res:Dynamic) {
             completed = true;
+            success = s;
+            result = res;
         });
 
-        // Wait for the asynchronous operation to complete
-        while (!completed) {
-            Sys.sleep(0);  // Slight delay to prevent busy-waiting
+        while (!completed) Sys.sleep(0.01);
+
+        var response = new Map<String, Dynamic>();
+        response.set("success", success);
+        response.set("result", result);
+        trace("Response: " + response);
+        return response;
+    }
+
+    public function new(lua:State) {
+        // Helper to convert Lua tables to Map
+        function parseHeaders(headers:Dynamic):Map<String, Dynamic> {
+            if (headers == null) return null;
+            var map = new Map<String, Dynamic>();
+            for (key in Reflect.fields(headers)) {
+                map.set(key, Reflect.field(headers, key));
+            }
+            return map;
         }
 
-        return result;
-    }
+        // Standard HTTP methods
+        Lua_helper.add_callback(lua, "hasInternet", () -> 
+            return runSync(function(cb:(Bool, Dynamic)->Void) {
+                HttpClient.hasInternet(function(b:Bool) cb(b, null));
+            })
+        );
 
-    public function new(lua: State) {
-		Lua_helper.add_callback(lua, "hasInternet", function() {
-			return runSync(cb -> HttpClient.hasInternet(cb));
-		});
+        Lua_helper.add_callback(lua, "getRequest", (url:String, ?headers:Dynamic, ?queryParams:Dynamic) -> 
+            return runSync(function(cb:(Bool, Dynamic)->Void) {
+                HttpClient.getRequest(url, cb, parseHeaders(headers), parseHeaders(queryParams));
+            })
+        );
 
-		Lua_helper.add_callback(lua, "getRequest", function(url, ?headers, ?queryParams) {
-			return runSync(cb -> HttpClient.getRequest(url, cb, headers, queryParams));
-		});
+        Lua_helper.add_callback(lua, "postRequest", (url:String, data:Dynamic, ?headers:Dynamic, ?queryParams:Dynamic) -> 
+            return runSync(function(cb:(Bool, Dynamic)->Void) {
+                HttpClient.postRequest(url, data, cb, parseHeaders(headers), parseHeaders(queryParams));
+            })
+        );
 
-		Lua_helper.add_callback(lua, "postRequest", function(url, data, ?headers, ?queryParams) {
-			return runSync(cb -> HttpClient.postRequest(url, data, cb, headers, queryParams));
-		});
+        Lua_helper.add_callback(lua, "putRequest", (url:String, data:Dynamic, ?headers:Dynamic, ?queryParams:Dynamic) -> 
+            return runSync(function(cb:(Bool, Dynamic)->Void) {
+                HttpClient.putRequest(url, data, cb, parseHeaders(headers), parseHeaders(queryParams));
+            })
+        );
 
-		Lua_helper.add_callback(lua, "putRequest", function(url, data, ?headers, ?queryParams) {
-			return runSync(cb -> HttpClient.putRequest(url, data, cb, headers, queryParams));
-		});
+        Lua_helper.add_callback(lua, "deleteRequest", (url:String, ?headers:Dynamic, ?queryParams:Dynamic) -> 
+            return runSync(function(cb:(Bool, Dynamic)->Void) {
+                HttpClient.deleteRequest(url, cb, parseHeaders(headers), parseHeaders(queryParams));
+            })
+        );
 
-		Lua_helper.add_callback(lua, "deleteRequest", function(url, ?headers, ?queryParams) {
-			return runSync(cb -> HttpClient.deleteRequest(url, cb, headers, queryParams));
-		});
+        Lua_helper.add_callback(lua, "patchRequest", (url:String, data:Dynamic, ?headers:Dynamic, ?queryParams:Dynamic) -> 
+            return runSync(function(cb:(Bool, Dynamic)->Void) {
+                HttpClient.patchRequest(url, data, cb, parseHeaders(headers), parseHeaders(queryParams));
+            })
+        );
 
-		Lua_helper.add_callback(lua, "patchRequest", function(url, data, ?headers, ?queryParams) {
-			return runSync(cb -> HttpClient.patchRequest(url, data, cb, headers, queryParams));
-		});
+        // Streaming implementation
+        Lua_helper.add_callback(lua, "streamRequest", (tag:String, url:String, data:Dynamic, headers:Dynamic) -> {
+            function notifyLua(success:Bool, finished:Bool, content:Dynamic) {
+                if (content == null) content = "";
+                if (tag == null) return;
+                for (l in PlayState.instance.luaArray) {
+                    if (l != null) {
+                        l.call("onStreamEvent", [tag, success, finished, content]);
+                    }
+                }
+            }
+
+            HttpClient.streamRequest(
+                url,
+                data,
+                function(success, finished, response) {
+                    if (!success) {
+                        notifyLua(false, true, response.error);
+                        return;
+                    }
+
+                    if (finished) {
+                        notifyLua(true, true, response.finish_reason);
+                    } else {
+                        notifyLua(true, false, response.chunk);
+                    }
+                },
+                parseHeaders(headers)
+            );
+        });
     }
 }
+
+    
+
+// hasInternet getRequest postRequest putRequest deleteRequest patchRequest
 
 class JsonHelperLua {
     public function new(lua: State) {
@@ -94,8 +160,8 @@ class JsonHelperLua {
 
 class ScreenInfoLua {
     public function new(lua: State) {
-		Lua_helper.add_callback(lua, "getScreensInfo", () -> ScreenInfo.getScreensResolutions());
-		Lua_helper.add_callback(lua, "getMainScreenInfo", () -> ScreenInfo.getMainScreenResolution());
+		Lua_helper.add_callback(lua, "getScreensInfo", () -> ScreenInfo.getScreenResolutions(true));
+		Lua_helper.add_callback(lua, "getMainScreenInfo", () -> ScreenInfo.getScreenResolutions(false));
     }
 }
 
@@ -195,7 +261,7 @@ class WindowManagerLua {
 #if windows
 class ToastNotificationLua {
     public function new(lua: State) {
-        Lua_helper.add_callback(lua, "toastNotification", function(title:String, message:String, duration:Int, iconPath:String) {
+        Lua_helper.add_callback(lua, "toastNotification", function(title:String, message:String, duration:Int) {
             ToastNotification.showToast(title, message, duration);
         });
     }

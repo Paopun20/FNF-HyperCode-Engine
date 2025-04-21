@@ -26,6 +26,9 @@ Rewrite until nothing remains of the original. LOL /j
 - **HScript on Lua**
   Classic HScript syntax now runs alongside Lua! This allows for greater flexibility in scripting.
 
+- **Lua Menu [Work in Progress]**
+  Create a menu using Lua! This allows for more complex and customizable menus.
+
 - **Optimized Garbage Collection**
   Experience smoother gameplay with fewer performance hitches. Your mods won’t stutter, even during complex beats!
 
@@ -38,12 +41,9 @@ Rewrite until nothing remains of the original. LOL /j
 - **3D model support [ !! Work in Progress !! | NOT WORKING, IT TOO MUCH ERROR ]**
   Now you can use 3D models in your mods! This feature allows for more complex and visually appealing scenes.
 
-# **Gameplay**
-  I'll write it later. LOL
-
 # **Easy Modding**
   (Just like Psych Engine)
-  HyPsych Engine is designed to make modding as easy as possible and difficult to understand at the same time. With a simple and intuitive API, you can create your own mods with ease.
+  HyPsych Engine is designed to make modding as easy as possible \(and difficult to understand at the same time.\) With a simple and intuitive API, you can create your own mods with ease.
 
 # Haxe Code \(or .Hx file\)
 - **NDLLS SUPPORTED**
@@ -58,6 +58,7 @@ Rewrite until nothing remains of the original. LOL /j
 
 # Codename Engine's libraries
 - **3D model support** in Haxe from Codename Engine. (modifier ver)
+- **D
 
 # Lua Extensions
 ### These extensions expand Lua’s functionality in the HyPsych Engine:
@@ -65,10 +66,10 @@ Rewrite until nothing remains of the original. LOL /j
 **`GetArgs`**
 **`HttpClient`**
 **`JsonHelper`**
-**`ScreenInfo`** (Crash Game)
+**`ScreenInfo (Crash Game)`**
 **`UrlGen`**
-**`WindowManager`** (Buggy)
-**`ToastNotification`** (Windows 10/11 Only)
+**`WindowManager (Buggy)`**
+**`ToastNotification (Windows 10/11 Only)`**
 
 ---
 
@@ -81,7 +82,7 @@ HyPsych Engine offers many new features and improvements over Psych Engine, incl
 - C++11-based codebase, offering better performance and system compatibility.
 - New Lua Extensions.
 - New Haxe Extensions.
-- more.
+- and more.
 
 ### Is HyPsych Engine a fork of Psych Engine?
 

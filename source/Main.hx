@@ -162,6 +162,27 @@ class Main extends Sprite
 			if (PlayState.instance != null)
 				PlayState.instance.addTextToDebug('FATAL: $msgInfo', 0xFFBB0000);
 		}
+
+		if (EngineConfig.IS_DEVELOPER) {
+			Iris.print = function(x, ?pos:haxe.PosInfos) {
+				Iris.logLevel(NONE, x, pos);
+				var newPos:HScriptInfos = cast pos;
+				if (newPos.showLine == null) newPos.showLine = true;
+				var msgInfo:String = (newPos.funcName != null ? '(${newPos.funcName}) - ' : '')  + '${newPos.fileName}:';
+				#if LUA_ALLOWED
+				if (newPos.isLua == true) {
+					msgInfo += 'HScript:';
+					newPos.showLine = false;
+				}
+				#end
+				if (newPos.showLine == true) {
+					msgInfo += '${newPos.lineNumber}:';
+				}
+				msgInfo += ' $x';
+				if (PlayState.instance != null)
+					PlayState.instance.addTextToDebug('PRINT: $msgInfo', FlxColor.BLUE);
+			}
+		}
 		#end
 
 		#if LUA_ALLOWED Lua.set_callbacks_function(cpp.Callable.fromStaticFunction(psychlua.CallbackHandler.call)); #end

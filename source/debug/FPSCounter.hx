@@ -105,7 +105,7 @@ class FPSCounter extends TextField
     public dynamic function updateText():Void
     {
         text = 'FPS: $currentFPS\n'
-             + 'Memory: ${FlxStringUtil.formatBytes(memoryMegas)}';
+             + 'Memory: ${format(memoryMegas)}';
         
         // Color coding for performance issues
         textColor = 0xFFFFFFFF;
@@ -118,6 +118,15 @@ class FPSCounter extends TextField
     //======================================================
     inline function get_memoryMegas():Float
     {
-        return cpp.vm.Gc.memInfo64(cpp.vm.Gc.MEM_INFO_USAGE);
+        return getMemInfo(cpp.vm.Gc.MEM_INFO_CURRENT);
+    }
+
+    private static function getMemInfo(inWhatInfo:Int):Float
+    {
+        return cpp.vm.Gc.memInfo64(inWhatInfo);
+    }
+
+    private static function format(bytes:Float) {
+        return FlxStringUtil.formatBytes(bytes);
     }
 }

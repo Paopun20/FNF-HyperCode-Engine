@@ -11,7 +11,7 @@ class BrainfuckError extends haxe.Exception {
 class BrainFuck {
     private static inline var VALID_COMMANDS = "><+-.,[]";
     
-    public static function runBrainfuck(code: String, input: IntMap<Int>): String {
+    public static function runBrainfuck(code: String, input: Map<Int, Int>): String {
         // Pre-filter code to only valid commands for better performance
         var filteredCode = code.split("").filter(char -> VALID_COMMANDS.indexOf(char) != -1).join("");
         

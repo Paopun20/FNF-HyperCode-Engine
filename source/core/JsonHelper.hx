@@ -15,7 +15,7 @@ class JsonHelper {
     }
 
     public static function decode(json: String): Dynamic {
-        var result = new Map<String, Dynamic>();
+        var result = new Map<Any, Dynamic>();
         try {
             var decoded = Json.parse(json);
             if (Reflect.isObject(decoded)) {
@@ -29,5 +29,14 @@ class JsonHelper {
             trace("JSON decoding error for input: " + json + " - Error: " + e);
         }
         return result;
+    }
+
+    public static function isJson(string: String):Bool {
+        try {
+            Json.parse(string);
+            return true;
+        } catch (e) {
+            return false;
+        }
     }
 }

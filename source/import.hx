@@ -66,9 +66,5 @@ import flixel.group.FlxSpriteGroup;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.addons.transition.FlxTransitionableState;
 
-import ext.*;
-import hgsl.*;
-import muun.la.*;
-
 using StringTools;
 #end

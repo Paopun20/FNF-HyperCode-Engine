@@ -155,7 +155,9 @@ jobs:
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
       - run: echo "${{ github.run_id }}" > VERSION
-      - run: haxelib run lime build android --app-version="4.0.0-${{ github.run_id }}" $Args
+      - run: |
+          haxelib run lime setup android
+          haxelib run lime build android --app-version="4.0.0-${{ github.run_id }}" $Args
       - uses: actions/upload-artifact@v4.3.4
         with:
           name: androidBuild

@@ -140,69 +140,55 @@ jobs:
           path: export/release/html5/bin
 
   buildAndroid:
-    name: Build Android
+    name: Android
     runs-on: ubuntu-latest
-    needs: setup-haxe # Dependency remains, though the cache job itself might have limited direct impact here
+    needs: setup-haxe
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4.1.7
-  
-      # 1. Setup Java (Required for Android SDK tools)
-      - name: Setup Java JDK
+    
+      - name: Setup Java (JDK 17 for Android tools)
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin' # Or another distribution like 'zulu'
-          java-version: '11'     # JDK 11 is widely compatible for Android. Use '17' if needed.
-  
-      # 2. Setup Haxe
+          distribution: 'temurin'
+          java-version: '17'
+        
       - name: Setup Haxe
         uses: krdlab/setup-haxe@master
         with:
           haxe-version: 4.3.6
-  
-      # 3. Setup Android SDK & NDK
-      # This action downloads and sets up the necessary Android components
-      # and sets environment variables like ANDROID_HOME, ANDROID_SDK_ROOT
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3 # Use the latest stable version
-  
-      # 4. Install Haxe Dependencies (using your existing script)
-      - name: Install Haxe Dependencies
+        
+      - name: 📱 Setup Android SDK
+        uses: android-actions/setup-android@v3
+        
+      - name: 🔧 Install Haxe Dependencies
         run: |
           haxelib setup ~/haxelib
-          # Install core libs needed before running setup script or lime commands
-          # (Ensure these are present even if list.haxelib also lists them)
           haxelib install hxcpp --quiet
           haxelib install lime --quiet
           haxelib install openfl --quiet
-          # Run the project's specific dependency script
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
-  
-      # 5. Create Version Tag
-      - name: Create Version Tag
+        
+      - name: Write Version File
         run: echo "${{ github.run_id }}" > VERSION
-  
-      # 6. Setup Lime for Android and Build
-      # Now that JDK/SDK/NDK are present, this should work
-      - name: Setup Lime and Build Android
-        # The setup-android action usually sets necessary env vars (like ANDROID_SDK_ROOT)
+        
+      - name: Build Android APK
         run: |
           haxelib run lime setup android
           haxelib run lime build android --app-version="4.0.0-${{ github.run_id }}" $Args
-  
-      # 7. Upload Artifact
-      - name: Upload Artifact
+        
+      - name: 📦 Upload APK Artifact
         uses: actions/upload-artifact@v4.3.4
         with:
           name: androidBuild
-          # Double-check this path is correct for your project's Android output
           path: export/release/android/bin
-        
+  
   buildiOS:
-    name: Build iOS
+    name: Build iOS ( I hate this because it's a lot of trouble to set up )
     runs-on: macos-13
     needs: setup-haxe
+    if: false
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4.1.7
@@ -228,7 +214,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.4
         with:
           name: iosSimulatorBuild
-          path: export/release/ios/build/Release-iphonesimulator/*.app
+          path: export/release/ios/build/Release-iphonesimulator
 
   notifyDiscord:
     name: 📣 Notify Discord

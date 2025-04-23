@@ -149,9 +149,6 @@ jobs:
           haxelib install openfl --quiet
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
-
-          haxelib git extension-androidtools https://github.com/jigsaw-4277821/extension-androidtools
-          haxelib git extension-androidtools https://github.com/jigsaw-4277821/extension-videoview
         
       - name: Write Version File
         run: echo "${{ github.run_id }}" > VERSION
@@ -225,7 +222,7 @@ jobs:
           COLOR=65280
 
           for status in "${{ needs.buildLinux.result }}" "${{ needs.buildWindows64.result }}" "${{ needs.buildWindows32.result }}" "${{ needs.buildMac.result }}" "${{ needs.buildAndroid.result }}" "${{ needs.buildiOS.result }}"; do
-            [[ "$status" != "success" ]] && TITLE="❎ Build Failed" && COLOR=16711680 && break
+            [[ "$status" != "success" && "$status" != "skip" ]] && TITLE="❎ Build Failed" && COLOR=16711680 && break
           done
 
           curl -H "Content-Type: application/json" -X POST -d "{

@@ -1,6 +1,6 @@
 > [!Warning]
 > This engine is still in development!
-> If you encounter any bugs, please report them on GitHub Issues (https://github.com/Paopun20/FNF-HyPsych-Engine/issues).
+> If you encounter any bugs, please report them here: [GitHub Issues](https://github.com/Paopun20/FNF-HyPsych-Engine/issues)
 
 # Welcome to HyPsych engine!
 
@@ -9,8 +9,7 @@
 ---
 
 # HyPsych Enging Is next-gen of Psych Engine!
-This is a Friday Night Funkin' engine based on Psych Engine.
-This engine is a fork of Psych Engine 1.0.4, but with a lot of new features and improvements.
+This engine is a fork of Psych Engine 1.0.4, featuring new capabilities, performance upgrades, scripting improvements, and experimental 3D support, more.
 
 ## Document
 ### [HyPsych Enging Lua API](docs/HyPsychEnging/LuaAPI.md)
@@ -19,8 +18,7 @@ This engine is a fork of Psych Engine 1.0.4, but with a lot of new features and 
 ## About
 HyPsych Engine is a fork of the Psych Engine
 
-# Psych engine fork Have be rewritten
-Rewrite until nothing remains of the original. LOL /j
+> ⚠️ Not much of the original codebase remains… Rewrite until nothing remains of the original. LOL /j
 
 # Features:
 - **HScript on Lua**
@@ -41,39 +39,36 @@ Rewrite until nothing remains of the original. LOL /j
 - **3D model support [ !! Work in Progress !! | NOT WORKING, IT TOO MUCH ERROR ]**
   Now you can use 3D models in your mods! This feature allows for more complex and visually appealing scenes.
 
-# **Easy Modding**
-  (Just like Psych Engine)
-  HyPsych Engine is designed to make modding as easy as possible \(and difficult to understand at the same time.\) With a simple and intuitive API, you can create your own mods with ease.
-
-# Haxe Code \(or .Hx file\)
-- **NDLLS SUPPORTED**
-- **3D SUPPORTED**
+# **Easy Modding** (with Chaos Included)
+Just like Psych Engine, HyPsych Engine is made for modders — with a cool API and powerful features.  
+…But also probably a little confusing. Sorry not sorry.
 
 # saharan's libraries
-- **ext muun** from https://github.com/saharan/haxelibs
-- **hgsl** from https://github.com/saharan/HGSL
+- `ext muun` — [GitHub](https://github.com/saharan/haxelibs)  
+- `hgsl` — [HGSL GitHub](https://github.com/saharan/HGSL)
 
 # T-Bar Engine's libraries
-- **flx3d and away3d** from https://github.com/TBar09/FNF-tbarEngine/
+- `flx3d` and `away3d` — [GitHub](https://github.com/TBar09/FNF-tbarEngine)
 
 # Codename Engine's libraries
-- **3D model support** in Haxe from Codename Engine. (modifier ver)
-- **Ndll support** in Haxe from Codename Engine. (modifier ver)
+- 3D model + NDLL support (modified for this engine)
 
-# Extensions
-## LUA AND HAXE
-**`BrainFuck`**
-**`GetArgs`**
-**`HttpClient`**
-**`JsonHelper`**
-**`ScreenInfo (Crash Game)`**
-**`UrlGen`**
-**`WindowManager (Buggy)`**
-**`ToastNotification (Windows 10/11 Only)`**
+---
 
-# HAXE Only
-**`NdllUtil`**
-**`Manager3D`**
+## Extensions
+### Lua + Haxe
+- `BrainFuck`
+- `GetArgs`
+- `HttpClient`
+- `JsonHelper`
+- `ScreenInfo` *(Warning: May crash your game!)*
+- `UrlGen`
+- `WindowManager` *(Buggy)*
+- `ToastNotification` *(Windows 10/11 only)*
+
+### Haxe-Only
+- `NdllUtil`
+- `Manager3D`
 
 ---
 
@@ -81,12 +76,11 @@ Rewrite until nothing remains of the original. LOL /j
 ### What makes HyPsych Engine different from Psych Engine?
 
 HyPsych Engine offers many new features and improvements over Psych Engine, including:
-- HScript on Lua, allowing for more flexible scripting.
-- Optimized Garbage Collection for smoother gameplay.
-- C++11-based codebase, offering better performance and system compatibility.
-- New Lua Extensions.
-- New Haxe Extensions.
-- and more.
+- HScript on Lua
+- Faster garbage collection
+- Modern C++11 codebase
+- Lots of new extensions
+- Experimental 3D support
 
 ### Is HyPsych Engine a fork of Psych Engine?
 
@@ -100,8 +94,14 @@ Not available for installation at this time or download from [GitHub actions](ht
 
 You can report bugs or issues on GitHub Issues page: [GitHub Issues](https://github.com/Paopun20/FNF-HyPsych-Engine/issues)
 
+---
+
 ## Credits
-- **Paopun20** - Main Developer \(Sole Developer for this cool engine\)
+- **Paopun20** - Main Developer \(Solo dev to make this engine\)
+- **saharan** - For the awesome libraries.
+- **T-Bar Engine** - For the 3D libraries and some code.
+- **Codename Engine** - For the 3D model support and some code.
+- **Shadow Mario** - For the original Psych Engine.
 
 ## Special Thanks
 - **You** - For using this engine!

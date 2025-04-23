@@ -1,20 +1,36 @@
 name: Build and Notify
-description: Build the project for different platforms and notify via Discord
+
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Confirm to proceed with the build?"
+        required: true
+        default: false
+        type: boolean
+      includeMobile:
+        description: "Include Android and iOS builds?"
+        required: false
+        default: "false"
 
 env:
   ARGS: "-D officialBuild -D NotDeveloper"
-  HAXE_VERSION : 4.3.6
+  HAXE_VERSION: 4.3.6
 
 jobs:
+  confirm:
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.confirm == 'true' }}
+    name: Confirm Build
+    runs-on: ubuntu-latest
+
   setup-haxe:
     name: Setup and Cache Haxe Dependencies
     runs-on: ubuntu-latest
+    needs: confirm
     steps:
       - uses: actions/cache@v4
         with:
@@ -26,34 +42,31 @@ jobs:
     runs-on: ubuntu-latest
     needs: setup-haxe
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4.1.7
-      - name: Setup Haxe
-        uses: krdlab/setup-haxe@master
+      - uses: actions/checkout@v4.1.7
+      - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
-      - name: Install Dependencies & Setup
-        run: |
+      - run: |
           sudo apt-get update
           sudo apt-get install -y libvlc-dev libvlccore-dev
           haxelib setup ~/haxelib
           haxelib install hxcpp --quiet
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
-      - name: Create Version Tag
-        run: echo "${{ github.run_id }}" > VERSION
-      - name: Compile for Linux
-        run: haxelib run lime build Project.xml linux --app-version="4.0.0-${{ github.run_id }}" $ARGS
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4.3.4
+      - run: echo "${{ github.run_id }}" > VERSION
+      - run: haxelib run lime build Project.xml linux --app-version="4.0.0-${{ github.run_id }}" $ARGS
+      - uses: actions/upload-artifact@v4
         with:
-          name: linuxBuild
-          path: export/release/linux/bin
+          name: Linux Build
+          path: export/release/linux/bin/**/*
 
-  buildWindows64:
-    name: Build on Windows (64-bit)
+  buildWindows:
+    name: Build on Windows (64 & 32)
     runs-on: windows-latest
     needs: setup-haxe
+    strategy:
+      matrix:
+        arch: [64, 32]
     steps:
       - uses: actions/checkout@v4.1.7
       - uses: krdlab/setup-haxe@master
@@ -66,33 +79,12 @@ jobs:
         shell: cmd
       - run: echo "${{ github.run_id }}" > VERSION
         shell: bash
-      - run: haxelib run lime build windows --app-version="4.0.0-${{ github.run_id }}" $ARGS
-      - uses: actions/upload-artifact@v4.3.4
-        with:
-          name: windowsBuild64
-          path: export/release/windows/bin
-
-  buildWindows32:
-    name: Build on Windows (32-bit)
-    runs-on: windows-latest
-    needs: setup-haxe
-    steps:
-      - uses: actions/checkout@v4.1.7
-      - uses: krdlab/setup-haxe@master
-        with:
-          haxe-version: ${{ env.HAXE_VERSION }}
       - run: |
-          haxelib setup C:/haxelib
-          haxelib install hxcpp --quiet
-          setup\windows.bat
-        shell: cmd
-      - run: echo "${{ github.run_id }}" > VERSION
-        shell: bash
-      - run: haxelib run lime build windows -32 --app-version="4.0.0-${{ github.run_id }}" $ARGS
-      - uses: actions/upload-artifact@v4.3.4
+          haxelib run lime build windows${{ matrix.arch == 32 && ' -32' || '' }} --app-version="4.0.0-${{ github.run_id }}" $ARGS
+      - uses: actions/upload-artifact@v4
         with:
-          name: windowsBuild32
-          path: export/release/windows/bin
+          name: Windows Build (x${{ matrix.arch }})
+          path: export/release/windows${{ matrix.arch }}/bin/**/*
 
   buildMac:
     name: Build on macOS (Universal)
@@ -113,88 +105,65 @@ jobs:
           ./setup/unix.sh
       - run: echo "${{ github.run_id }}" > VERSION
       - run: haxelib run lime build mac --app-version="4.0.0-${{ github.run_id }}" $ARGS
-      - uses: actions/upload-artifact@v4.3.4
+      - uses: actions/upload-artifact@v4
         with:
-          name: macBuild
-          path: export/release/macos/bin
+          name: macOS Build
+          path: export/release/mac/bin/**/*
 
   buildAndroid:
-    name: Android
+    name: Build Android
     runs-on: ubuntu-latest
     needs: setup-haxe
-    if: false
+    if: ${{ github.event.inputs.includeMobile == 'true' }}
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4.1.7
-    
-      - name: Setup Java (JDK 17 for Android tools)
-        uses: actions/setup-java@v4
+      - uses: actions/checkout@v4.1.7
+      - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
-        
-      - name: Setup Haxe
-        uses: krdlab/setup-haxe@master
+      - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
-        
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-        
-      - name: Install Haxe Dependencies
-        run: |
+      - uses: android-actions/setup-android@v3
+      - run: |
           haxelib setup ~/haxelib
           haxelib install hxcpp --quiet
           haxelib install lime --quiet
           haxelib install openfl --quiet
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
-        
-      - name: Write Version File
-        run: echo "${{ github.run_id }}" > VERSION
-        
-      - name: Build Android APK
-        run: |
+      - run: echo "${{ github.run_id }}" > VERSION
+      - run: |
           lime setup android
           haxelib run lime build android --app-version="4.0.0-${{ github.run_id }}" $ARGS
-        
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4.3.4
+      - uses: actions/upload-artifact@v4
         with:
-          name: androidBuild
-          path: export/release/android/bin
-  
+          name: Android Build
+          path: export/release/android/bin/**/*
+
   buildiOS:
-    name: Build iOS ( I hate this because it's a lot of trouble to set up )
+    name: Build iOS
     runs-on: macos-13
     needs: setup-haxe
-    if: false
+    if: ${{ github.event.inputs.includeMobile == 'true' }}
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4.1.7
-      - name: Setup Haxe
-        uses: krdlab/setup-haxe@master
+      - uses: actions/checkout@v4.1.7
+      - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
-      - name: Install Haxe Dependencies
-        run: |
+      - run: |
           haxelib setup ~/haxelib
-          # Ensure core libs needed for iOS build are present
-          haxelib install hxcpp --quiet # Often needed by Lime targets
+          haxelib install hxcpp --quiet
           haxelib install lime --quiet
           haxelib install openfl --quiet
-          # Run the project's specific dependency script
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
-      - name: Create Version Tag
-        run: echo "${{ github.run_id }}" > VERSION
-      - name: Build for iOS Simulator
-        run: haxelib run lime build ios --app-version="4.0.0-${{ github.run_id }}" $ARGS
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4.3.4
+      - run: echo "${{ github.run_id }}" > VERSION
+      - run: haxelib run lime build ios --app-version="4.0.0-${{ github.run_id }}" $ARGS
+      - uses: actions/upload-artifact@v4
         with:
-          name: iosSimulatorBuild
-          path: export/release/ios/build/Release-iphonesimulator
+          name: iOS Build
+          path: export/release/ios/bin/**/*
 
   notifyDiscord:
     name: 📣 Notify Discord
@@ -202,8 +171,7 @@ jobs:
     if: always()
     needs:
       - buildLinux
-      - buildWindows64
-      - buildWindows32
+      - buildWindows
       - buildMac
       - buildAndroid
       - buildiOS
@@ -217,14 +185,11 @@ jobs:
           BRANCH: ${{ github.ref_name }}
         run: |
           check() { [[ "$1" == "success" ]] && echo "✅" || echo "❎"; }
-
           TITLE="✅ Build Successful"
           COLOR=65280
-
-          for status in "${{ needs.buildLinux.result }}" "${{ needs.buildWindows64.result }}" "${{ needs.buildWindows32.result }}" "${{ needs.buildMac.result }}" "${{ needs.buildAndroid.result }}" "${{ needs.buildiOS.result }}"; do
-            [[ "$status" != "success" && "$status" != "skip" ]] && TITLE="❎ Build Failed" && COLOR=16711680 && break
+          for status in "${{ needs.buildLinux.result }}" "${{ needs.buildWindows.result }}" "${{ needs.buildMac.result }}" "${{ needs.buildAndroid.result }}" "${{ needs.buildiOS.result }}"; do
+            [[ "$status" != "success" && "$status" != "skipped" ]] && TITLE="❎ Build Failed" && COLOR=16711680 && break
           done
-
           curl -H "Content-Type: application/json" -X POST -d "{
             \"username\": \"Github Action Report\",
             \"embeds\": [{
@@ -232,8 +197,7 @@ jobs:
               \"color\": $COLOR,
               \"fields\": [
                 { \"name\": \"Linux\", \"value\": \"$(check ${{ needs.buildLinux.result }})\", \"inline\": true },
-                { \"name\": \"Windows 64-bit\", \"value\": \"$(check ${{ needs.buildWindows64.result }})\", \"inline\": true },
-                { \"name\": \"Windows 32-bit\", \"value\": \"$(check ${{ needs.buildWindows32.result }})\", \"inline\": true },
+                { \"name\": \"Windows\", \"value\": \"$(check ${{ needs.buildWindows.result }})\", \"inline\": true },
                 { \"name\": \"macOS\", \"value\": \"$(check ${{ needs.buildMac.result }})\", \"inline\": true },
                 { \"name\": \"Android\", \"value\": \"$(check ${{ needs.buildAndroid.result }})\", \"inline\": true },
                 { \"name\": \"iOS\", \"value\": \"$(check ${{ needs.buildiOS.result }})\", \"inline\": true },

@@ -26,6 +26,9 @@ jobs:
     if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.confirm == 'true' }}
     name: Confirm Build
     runs-on: ubuntu-latest
+    steps:
+      - name: Confirm Build
+        run: echo "Build confirmed. Proceeding with the build."
 
   setup-haxe:
     name: Setup and Cache Haxe Dependencies

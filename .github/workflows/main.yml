@@ -60,10 +60,10 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Linux Build
-          path: export/release/linux/bin/*
+          path: export/release/linux/bin
 
   buildWindows:
-    name: Build on Windows (64 & 32)
+    name: Build on Windows
     runs-on: windows-latest
     needs: setup-haxe
     strategy:
@@ -82,11 +82,11 @@ jobs:
       - run: echo "${{ github.run_id }}" > VERSION
         shell: bash
       - run: |
-          haxelib run lime build windows${{ matrix.arch == 32 && ' -32' || '' }} --app-version="4.0.0-${{ github.run_id }}" $ARGS
+          haxelib run lime build windows${{ matrix.arch == 32 && ' -32' || '-64' }} --app-version="4.0.0-${{ github.run_id }}" $ARGS
       - uses: actions/upload-artifact@v4
         with:
           name: Windows Build (x${{ matrix.arch }})
-          path: ${{ matrix.arch == 64 && 'export/release/windows/bin/*' || 'export/32bit/windows/bin/*' }}
+          path: export/${{ matrix.arch == 64 && 'release' || '32bit' }}/windows/bin
 
   buildMac:
     name: Build on macOS (Universal)
@@ -110,7 +110,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: macOS Build
-          path: export/release/mac/bin/*
+          path: export/release/mac/bin
 
   buildAndroid:
     name: Build Android
@@ -141,7 +141,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Android Build
-          path: export/release/android/bin/*
+          path: export/release/android/bin
 
   buildiOS:
     name: Build iOS

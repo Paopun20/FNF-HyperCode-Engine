@@ -39,7 +39,7 @@ jobs:
           path: ~/.haxelib
           key: ${{ runner.os }}-haxe-${{ hashFiles('**/*.hxml') }}
   Computer:
-    name: Setup Computer
+    name: Computer
     runs-on: ubuntu-latest
     needs: setup-haxe
     steps:
@@ -122,7 +122,7 @@ jobs:
           path: export/release/macos/bin
   
   Mobile:
-    name: Include Mobile Builds
+    name: Mobile
     runs-on: ubuntu-latest
     needs: setup-haxe
     if: ${{ github.event.inputs.Mobile == 'true' }}
@@ -198,32 +198,45 @@ jobs:
       - buildAndroid
       - buildiOS
     steps:
-      - name: Send Notification
+      - name: Send Discord Notification
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           COMMIT_URL: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
-          REPO_URL: https://github.com/${{ github.repository }}
           BRANCH: ${{ github.ref_name }}
         run: |
-          check() { [[ "$1" == "success" ]] && echo "✅" || echo "❎"; }
+          check() {
+            case "$1" in
+              success) echo "✅ Passed";;
+              skipped) echo "⚪ Skipped";;
+              *) echo "❌ Failed";;
+            esac
+          }
+
+          STATUS_LINUX=$(check ${{ needs.buildLinux.result }})
+          STATUS_WIN=$(check ${{ needs.buildWindows.result }})
+          STATUS_MAC=$(check ${{ needs.buildMac.result }})
+          STATUS_ANDROID=$(check ${{ needs.buildAndroid.result }})
+          STATUS_IOS=$(check ${{ needs.buildiOS.result }})
+
           TITLE="✅ Build Successful"
           COLOR=65280
-          for status in "${{ needs.buildLinux.result }}" "${{ needs.buildWindows.result }}" "${{ needs.buildMac.result }}" "${{ needs.buildAndroid.result }}" "${{ needs.buildiOS.result }}"; do
-            [[ "$status" != "success" && "$status" != "skipped" ]] && TITLE="❎ Build Failed" && COLOR=16711680 && break
+          for status in "$STATUS_LINUX" "$STATUS_WIN" "$STATUS_MAC" "$STATUS_ANDROID" "$STATUS_IOS"; do
+            [[ "$status" == "❌ Failed" ]] && TITLE="❌ Build Failed" && COLOR=16711680 && break
           done
+
+          CONTENT="**Linux**: $STATUS_LINUX\n**Windows**: $STATUS_WIN\n**macOS**: $STATUS_MAC\n**Android**: $STATUS_ANDROID\n**iOS**: $STATUS_IOS"
+
           curl -H "Content-Type: application/json" -X POST -d "{
-            \"username\": \"Github Action Report\",
+            \"username\": \"GitHub Build Report\",
             \"embeds\": [{
               \"title\": \"$TITLE\",
+              \"description\": \"$CONTENT\",
               \"color\": $COLOR,
               \"fields\": [
-                { \"name\": \"Linux\", \"value\": \"$(check ${{ needs.buildLinux.result }})\", \"inline\": true },
-                { \"name\": \"Windows\", \"value\": \"$(check ${{ needs.buildWindows.result }})\", \"inline\": true },
-                { \"name\": \"macOS\", \"value\": \"$(check ${{ needs.buildMac.result }})\", \"inline\": true },
-                { \"name\": \"Android\", \"value\": \"$(check ${{ needs.buildAndroid.result }})\", \"inline\": true },
-                { \"name\": \"iOS\", \"value\": \"$(check ${{ needs.buildiOS.result }})\", \"inline\": true },
-                { \"name\": \"Workflow Run\", \"value\": \"[View Run]($RUN_URL)\" }
+                { \"name\": \"🔗 Workflow Run\", \"value\": \"[View Run]($RUN_URL)\" },
+                { \"name\": \"📦 Branch\", \"value\": \"$BRANCH\", \"inline\": true },
+                { \"name\": \"🔖 Commit\", \"value\": \"[View Commit]($COMMIT_URL)\", \"inline\": true }
               ],
               \"footer\": { \"text\": \"GitHub Actions • ${{ github.repository }}\" },
               \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"

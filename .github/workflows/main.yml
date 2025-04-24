@@ -10,11 +10,10 @@ on:
       confirm:
         description: "Confirm to proceed with the build?"
         required: true
-        default: false
         type: boolean
       includeMobile:
         description: "Include Android and iOS builds?"
-        required: false
+        required: true
         default: "false"
 
 env:
@@ -61,7 +60,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Linux Build
-          path: export/release/linux/bin/**/*
+          path: export/release/linux/bin/*
 
   buildWindows:
     name: Build on Windows (64 & 32)
@@ -87,7 +86,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Windows Build (x${{ matrix.arch }})
-          path: export/release/windows${{ matrix.arch }}/bin/**/*
+          path: ${{ matrix.arch == 64 && 'export/release/windows/bin/*' || 'export/32bit/windows/bin/*' }}
 
   buildMac:
     name: Build on macOS (Universal)
@@ -111,7 +110,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: macOS Build
-          path: export/release/mac/bin/**/*
+          path: export/release/mac/bin/*
 
   buildAndroid:
     name: Build Android
@@ -142,7 +141,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Android Build
-          path: export/release/android/bin/**/*
+          path: export/release/android/bin/*
 
   buildiOS:
     name: Build iOS
@@ -166,7 +165,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: iOS Build
-          path: export/release/ios/bin/**/*
+          path: export/release/ios/bin/
 
   notifyDiscord:
     name: 📣 Notify Discord

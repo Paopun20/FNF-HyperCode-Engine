@@ -1,3 +1,4 @@
+
 package away3d.core.managers;
 
 import away3d.debug.Debug;

@@ -5,6 +5,7 @@ import backend.StageData;
 import backend.WeekData;
 import backend.Song;
 import backend.Rating;
+import backend.Subprocess;
 
 import flixel.FlxBasic;
 import flixel.FlxObject;
@@ -640,6 +641,15 @@ class PlayState extends MusicBeatState
 		cachePopUpScore();
 
 		if(eventNotes.length < 1) checkEventNote();
+	}
+
+	function quickDebug(varName, value): Void
+	{
+		#if debug
+		Subprocess.run(() -> {
+			FlxG.watch.addQuick(varName, value);
+		});
+		#end
 	}
 
 	function set_songSpeed(value:Float):Float
@@ -1759,9 +1769,9 @@ class PlayState extends MusicBeatState
 			camHUD.zoom = FlxMath.lerp(1, camHUD.zoom, Math.exp(-elapsed * 3.125 * camZoomingDecay * playbackRate));
 		}
 
-		FlxG.watch.addQuick("secShit", curSection);
-		FlxG.watch.addQuick("beatShit", curBeat);
-		FlxG.watch.addQuick("stepShit", curStep);
+		quickDebug("secShit", curSection);
+		quickDebug("beatShit", curBeat);
+		quickDebug("stepShit", curStep);
 
 		// RESET = Quick Game Over Screen
 		if (!ClientPrefs.data.noReset && controls.RESET && canReset && !inCutscene && startedCountdown && !endingSong)

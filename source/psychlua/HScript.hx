@@ -628,173 +628,64 @@ class CustomFlxColor {
     public static var CYAN(default, null):Int = FlxColor.CYAN;
 
     // Color creation methods
-    public static function fromInt(Value:Int):Int 
-        return cast FlxColor.fromInt(Value);
-
-    public static function fromRGB(Red:Int, Green:Int, Blue:Int, Alpha:Int = 255):Int
-        return cast FlxColor.fromRGB(Red, Green, Blue, Alpha);
-
-    public static function fromRGBFloat(Red:Float, Green:Float, Blue:Float, Alpha:Float = 1):Int
-        return cast FlxColor.fromRGBFloat(Red, Green, Blue, Alpha);
-
-    public static inline function fromCMYK(Cyan:Float, Magenta:Float, Yellow:Float, Black:Float, Alpha:Float = 1):Int
-        return cast FlxColor.fromCMYK(Cyan, Magenta, Yellow, Black, Alpha);
-
-    public static function fromHSB(Hue:Float, Sat:Float, Brt:Float, Alpha:Float = 1):Int
-        return cast FlxColor.fromHSB(Hue, Sat, Brt, Alpha);
-
-    public static function fromHSL(Hue:Float, Sat:Float, Light:Float, Alpha:Float = 1):Int
-        return cast FlxColor.fromHSL(Hue, Sat, Light, Alpha);
-
-    public static function fromString(str:String):Int
-        return cast FlxColor.fromString(str);
+    public static function fromInt(Value:Int):Int return cast FlxColor.fromInt(Value);
+    public static function fromRGB(Red:Int, Green:Int, Blue:Int, Alpha:Int = 255):Int return cast FlxColor.fromRGB(Red, Green, Blue, Alpha);
+    public static function fromRGBFloat(Red:Float, Green:Float, Blue:Float, Alpha:Float = 1):Int return cast FlxColor.fromRGBFloat(Red, Green, Blue, Alpha);
+    public static inline function fromCMYK(Cyan:Float, Magenta:Float, Yellow:Float, Black:Float, Alpha:Float = 1):Int return cast FlxColor.fromCMYK(Cyan, Magenta, Yellow, Black, Alpha);
+    public static function fromHSB(Hue:Float, Sat:Float, Brt:Float, Alpha:Float = 1):Int return cast FlxColor.fromHSB(Hue, Sat, Brt, Alpha);
+    public static function fromHSL(Hue:Float, Sat:Float, Light:Float, Alpha:Float = 1):Int return cast FlxColor.fromHSL(Hue, Sat, Light, Alpha);
+    public static function fromString(str:String):Int return cast FlxColor.fromString(str);
 }
 
 /**
  * Custom interpreter with parent instance access
  */
-class CustomInterp extends crowplexus.hscript.Interp
-{
-    public var parentInstance(default, set):Dynamic = [];
+ class CustomInterp extends crowplexus.hscript.Interp {
+    public var parentInstance(default, set):Dynamic;
     private var _instanceFields:Array<String>;
     
-    function set_parentInstance(inst:Dynamic):Dynamic {
-        parentInstance = inst;
-        if(parentInstance == null) {
-            _instanceFields = [];
-            return inst;
-        }
-        _instanceFields = Type.getInstanceFields(Type.getClass(inst));
-        return inst;
-    }
-
     public function new() {
         super();
     }
 
-    /**
-     * Call a function with error handling
-     */
-    override function fcall(o:Dynamic, funcToRun:String, args:Array<Dynamic>):Dynamic {
-        for (_using in usings) {
-            var v = _using.call(o, funcToRun, args);
-            if (v != null)
-                return v;
-        }
-
-        var f = get(o, funcToRun);
-
-        if (f == null) {
-            Iris.error('Tried to call null function $funcToRun', posInfos());
-            return null;
-        }
-
-        return Reflect.callMethod(o, f, args);
+    function set_parentInstance(inst:Dynamic):Dynamic {
+        parentInstance = inst;
+        _instanceFields = (inst != null) ? Type.getInstanceFields(Type.getClass(inst)) : [];
+        return inst;
     }
 
-    /**
-     * Resolve variables with parent instance access
-     */
-    override function resolve(id: String): Dynamic {
-        if (locals.exists(id)) {
-            return locals.get(id).r;
-        }
-
-        if (variables.exists(id)) {
-            return variables.get(id);
-        }
-
-        if (imports.exists(id)) {
-            return imports.get(id);
-        }
-
-        if(parentInstance != null && _instanceFields.contains(id)) {
+    override function resolve(id:String):Dynamic {
+        if (locals.exists(id)) return locals.get(id).r;
+        if (variables.exists(id)) return variables.get(id);
+        if (imports.exists(id)) return imports.get(id);
+        if (parentInstance != null && _instanceFields.contains(id)) {
             return Reflect.getProperty(parentInstance, id);
         }
-
         error(EUnknownVariable(id));
         return null;
     }
 }
 #else
-/**
- * Empty HScript implementation when HSCRIPT_ALLOWED is false
- */
-class HScript extends Iris
-{
-	#if LUA_ALLOWED
-	public static function implement(funk:FunkinLua) {
-		funk.addLocalCallback("runHaxeCode", function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic {
-			#if HSCRIPT_ALLOWED
-			initHaxeModuleCode(funk, codeToRun, varsToBring);
-			try
-			{
-				final retVal:IrisCall = funk.hscript.executeCode(funcToRun, funcArgs);
-				if (retVal != null)
-				{
-					return (retVal.returnValue == null || LuaUtils.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
-				}
-			}
-			catch(e:Dynamic)
-			{
-				FunkinLua.luaTrace('ERROR (${funk.hscript.origin}: $funcToRun) - $e', false, false, FlxColor.RED);
-			}
+// Fallback implementation when HSCRIPT_ALLOWED is false
 
-			#else
-			FunkinLua.luaTrace("runHaxeCode: HScript isn't supported on this platform!", false, false, FlxColor.RED);
-			#end
-			return null;
-		});
-		
-		funk.addLocalCallback("runHaxeFunction", function(funcToRun:String, ?funcArgs:Array<Dynamic> = null) {
-			#if HSCRIPT_ALLOWED
-			try
-			{
-				final retVal:IrisCall = funk.hscript.call(funcToRun, funcArgs);
-				if (retVal != null)
-				{
-					return (retVal.returnValue == null || LuaUtils.isOfTypes(retVal.returnValue, [Bool, Int, Float, String, Array])) ? retVal.returnValue : null;
-				}
-			}
-			catch(e:Dynamic)
-			{
-				FunkinLua.luaTrace('ERROR (${funk.hscript.origin}: $funcToRun) - $e', false, false, FlxColor.RED);
-			}
-			return null;
-			#else
-			FunkinLua.luaTrace("runHaxeFunction: HScript isn't supported on this platform!", false, false, FlxColor.RED);
-			return null;
-			#end
-		});
-		// This function is unnecessary because import already exists in HScript as a native feature
-		funk.addLocalCallback("addHaxeLibrary", function(libName:String, ?libPackage:String = '') {
-			var str:String = '';
-			if(libPackage.length > 0)
-				str = libPackage + '.';
-			else if(libName == null)
-				libName = '';
-
-			var c:Dynamic = Type.resolveClass(str + libName);
-			if (c == null)
-				c = Type.resolveEnum(str + libName);
-
-			#if HSCRIPT_ALLOWED
-			if (funk.hscript != null)
-			{
-				try {
-					if (c != null)
-						funk.hscript.set(libName, c);
-				}
-				catch (e:Dynamic) {
-					FunkinLua.luaTrace(funk.hscript.origin + ":" + funk.lastCalledFunction + " - " + e, false, false, FlxColor.RED);
-				}
-			}
-			FunkinLua.luaTrace("addHaxeLibrary is deprecated! Import classes through \"import\" in HScript!", false, true);
-			#else
-			FunkinLua.luaTrace("addHaxeLibrary: HScript isn't supported on this platform!", false, false, FlxColor.RED);
-			#end
-		});
-	}
-	#end
+class HScript extends Iris {
+    #if LUA_ALLOWED
+    public static function implement(funk:FunkinLua) {
+        funk.addLocalCallback("runHaxeCode", function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic {
+            FunkinLua.luaTrace("runHaxeCode: HScript not supported on this platform", false, false, FlxColor.RED);
+            return null;
+        });
+        
+        funk.addLocalCallback("runHaxeFunction", function(funcToRun:String, ?funcArgs:Array<Dynamic> = null) {
+            FunkinLua.luaTrace("runHaxeFunction: HScript not supported on this platform", false, false, FlxColor.RED);
+            return null;
+        });
+        
+        funk.addLocalCallback("addHaxeLibrary", function(libName:String, ?libPackage:String = '') {
+            FunkinLua.luaTrace("addHaxeLibrary: HScript not supported on this platform", false, false, FlxColor.RED);
+            return null;
+        });
+    }
+    #end
 }
 #end

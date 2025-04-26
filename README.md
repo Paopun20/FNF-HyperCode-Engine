@@ -21,11 +21,8 @@ HyPsych Engine is a fork of the Psych Engine
 > ⚠️ Not much of the original codebase remains… Rewrite until nothing remains of the original. LOL /j
 
 # Features:
-- **HScript on Lua**
-  Classic HScript syntax now runs alongside Lua! This allows for greater flexibility in scripting.
-
-- **Lua Menu [Work in Progress]**
-  Create a menu using Lua! This allows for more complex and customizable menus.
+- **Custom Menu [Work in Progress]**
+  Create a menu using HScript! This allows for more complex and customizable menus.
 
 - **Optimized Garbage Collection**
   Experience smoother gameplay with fewer performance hitches. Your mods won’t stutter, even during complex beats!

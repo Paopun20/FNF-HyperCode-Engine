@@ -1,7 +1,25 @@
 package core;
-import core.utils.*;
-import core.system.macros.*;
-import core.system.*;
+import core.BrainFuck;
+import core.Buffer;
+import core.Format;
+import core.GetArgs;
+import core.HttpClient;
+import core.ImportCore;
+import core.JsonHelper;
+import core.LuaCallbackInit;
+import core.ScreenInfo;
+import core.UrlGen;
+import core.WindowManager;
+import core.system.macros.Utils;
+import core.utils.NdllUtil;
+import core.winapi.ToastNotification;
+
+import flx3d.ImportAway3D;
+import away3d.extrusions.PathExtrude;
+import away3d.materials.TextureMaterial;
+import away3d.materials.methods.LightMapMethod;
+import away3d.utils.Cast;
+import away3d.utils.Utils;
 
 import muun.la.ImMat2;
 import muun.la.ImMat3;
@@ -68,6 +86,10 @@ import hgsl.macro.constant.MatBase;
 import hgsl.macro.constant.Tools;
 import hgsl.macro.constant.Types;
 import hgsl.macro.constant.VecBase;
+
+//
+import core._import.Import_lime;
+import core._import.Import_openfl;
 
 using Lambda;
 using StringTools;

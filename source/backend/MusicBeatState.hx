@@ -144,6 +144,76 @@ class MusicBeatState extends FlxState
 		FlxTransitionableState.skipNextTransIn = false;
 	}
 
+	
+	public static function switchStateByName(nextStateName:String = null, modsAllowed:Bool = true):Void
+	{
+		trace('have Custom Stage ' + states.CustomStage.haveCustomStage(nextStateName));
+		trace('Switching to state: ' + nextStateName);
+		trace("Load " + nextStateName);
+		var nextState:FlxState = null;
+
+		if (FlxG.state is states.CustomStage)
+		{
+			var curStage:states.CustomStage = cast FlxG.state;
+			if (curStage.stageName == nextStateName)
+			{
+				MusicBeatState.switchState(new states.CustomStage(nextStateName));
+				return;
+			}
+		}
+
+		#if MODS_ALLOWED
+		if (modsAllowed)
+		{
+			if (states.CustomStage.haveCustomStage(nextStateName))
+			{
+				MusicBeatState.switchState(new states.CustomStage(nextStateName));
+				return;
+			}
+		}
+		#end
+
+		try
+		{
+			var nextState:FlxState = null;
+
+			switch (nextStateName)
+			{
+				case "MainMenuState":
+					nextState = new states.MainMenuState();
+				case "TitleState":
+					nextState = new states.TitleState();
+				case "StoryMenuState":
+					nextState = new states.StoryMenuState();
+				case "AchievementsMenuState":
+					nextState = new states.AchievementsMenuState();
+				case "CreditsState":
+					nextState = new states.CreditsState();
+				case "ModsMenuState":
+					nextState = new states.ModsMenuState();
+				default:
+					// **** ตรงนี้แก้ให้ new ข้างใน try-catch ****
+					if (states.CustomStage.haveCustomStage(nextStateName))
+					{
+						nextState = new states.CustomStage(nextStateName);
+					}
+					else
+					{
+						throw new haxe.Exception("State '" + nextStateName + "' not found!");
+					}
+			}
+
+			MusicBeatState.switchState(nextState);
+		}
+		catch (e:haxe.Exception)
+		{
+			trace('[switchStateByName ERROR] ' + e.message);
+			FlxG.sound.play(Paths.sound('cancelMenu'));
+			MusicBeatState.switchState(new states.MainMenuState());
+		}
+	}
+	
+	
 	public static function resetState() {
 		if(FlxTransitionableState.skipNextTransIn) FlxG.resetState();
 		else startTransition();
@@ -156,7 +226,7 @@ class MusicBeatState extends FlxState
 		if(nextState == null)
 			nextState = FlxG.state;
 
-		FlxG.state.openSubState(new CustomFadeTransition(0.5, false));
+		switchState(new CustomFadeTransition(0.5, false));
 		if(nextState == FlxG.state)
 			CustomFadeTransition.finishCallback = function() FlxG.resetState();
 		else

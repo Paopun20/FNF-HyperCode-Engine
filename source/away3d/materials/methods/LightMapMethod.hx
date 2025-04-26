@@ -1,3 +1,4 @@
+
 package away3d.materials.methods;
 
 import away3d.core.managers.Stage3DProxy;

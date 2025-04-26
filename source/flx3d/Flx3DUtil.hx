@@ -1,9 +1,23 @@
 package flx3d;
 
-#if THREE_D_SUPPORT
 import away3d.core.managers.Stage3DManager;
 import away3d.library.assets.IAsset;
 import flixel.FlxG;
+
+//This is just for adding the classes to the game
+#if away3d
+#if IMPORT_AWAY3D import flx3d.ImportAway3D; #end
+import away3d.materials.methods.OutlineMethod;
+import away3d.animators.transitions.CrossfadeTransition;
+import away3d.events.AnimationStateEvent;
+import away3d.core.base.Geometry;
+//import away3d.animators.*;
+
+//import away3d.animators.data.*;
+//import away3d.animators.nodes.*;
+//import away3d.animators.states.*;
+//import away3d.animators.transitions.*;
+//import away3d.animators.utils.*;
 #end
 
 /**
@@ -16,7 +30,6 @@ import flixel.FlxG;
 @:access(away3d.core.managers.Stage3DManager)
 class Flx3DUtil
 {
-	#if THREE_D_SUPPORT
 	/**
 	 * Returns the total amount of 3D stages (not excluding the ones in use)
 	 * @return Int
@@ -59,5 +72,4 @@ class Flx3DUtil
 
 		return null;
 	}
-	#end
 }

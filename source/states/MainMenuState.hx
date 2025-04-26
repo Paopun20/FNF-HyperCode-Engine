@@ -43,6 +43,7 @@ class MainMenuState extends MusicBeatState
 		super.create();
 		if (EngineConfig.IS_DEVELOPER) {
 			// optionShit.push('TEST');
+			optionShit.push('TEST2');
 		}
 
 		#if MODS_ALLOWED
@@ -97,7 +98,7 @@ class MainMenuState extends MusicBeatState
 			rightItem.x -= rightItem.width;
 		}
 
-		var psychVer:FlxText = new FlxText(12, FlxG.height - 44, 0, EngineConfig.ENGINR_NAME+" Engine v" + psychEngineVersion, 12);
+		var psychVer:FlxText = new FlxText(12, FlxG.height - 44, 0, EngineConfig.ENGINR_NAME+" Engine v " + psychEngineVersion, 12);
 		psychVer.scrollFactor.set();
 		psychVer.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(psychVer);
@@ -205,7 +206,9 @@ class MainMenuState extends MusicBeatState
 						var memb:FlxSprite = menuItems.members[i];
 						if(FlxG.mouse.overlaps(memb))
 						{
-							var distance:Float = Math.sqrt(Math.pow(memb.getGraphicMidpoint().x - FlxG.mouse.screenX, 2) + Math.pow(memb.getGraphicMidpoint().y - FlxG.mouse.screenY, 2));
+							var distance:Float = Math.sqrt(
+								Math.pow(memb.getGraphicMidpoint().x - FlxG.mouse.screenX, 2) + Math.pow(memb.getGraphicMidpoint().y - FlxG.mouse.screenY, 2)
+							);
 							if (dist < 0 || distance < dist)
 							{
 								dist = distance;
@@ -324,7 +327,8 @@ class MainMenuState extends MusicBeatState
 							}
 						case 'TEST':
 							// MusicBeatState.switchState(new TestState());
-
+						case 'TEST2':
+							MusicBeatState.switchState(new CustomStage("testmenu"));
 						case 'donate':
 							CoolUtil.browserLoad('https://ninja-muffin24.itch.io/funkin');
 							selectedSomethin = false;

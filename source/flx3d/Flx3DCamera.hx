@@ -1,6 +1,5 @@
 package flx3d;
 
-#if THREE_D_SUPPORT
 import away3d.entities.SegmentSet;
 import away3d.cameras.Camera3D;
 import away3d.entities.TextureProjector;
@@ -11,7 +10,6 @@ import away3d.library.Asset3DLibraryBundle;
 import away3d.events.LoaderEvent;
 import away3d.loaders.AssetLoader;
 import away3d.loaders.misc.AssetLoaderToken;
-import funkin.backend.system.Logs;
 import flixel.FlxG;
 import flx3d.Flx3DUtil;
 import away3d.library.assets.Asset3DType;
@@ -25,13 +23,11 @@ import away3d.loaders.misc.AssetLoaderContext;
 import openfl.Assets;
 import away3d.entities.Mesh;
 import away3d.loaders.Loader3D;
-import funkin.backend.utils.NativeAPI.ConsoleColor;
 import away3d.containers.View3D;
-#end
+import flixel.graphics.FlxGraphic;
 import flixel.FlxCamera;
 
 class Flx3DCamera extends FlxCamera {
-	#if THREE_D_SUPPORT
 	private static var __3DIDS:Int = 0;
 
 	public var view:View3D;
@@ -67,11 +63,14 @@ class Flx3DCamera extends FlxCamera {
 		view.render();
 	}
 
-	public function addModel(assetPath:String, callback:Asset3DEvent->Void, ?texturePath:String, smoothTexture:Bool = true) {
+	public function addModel(assetPath:String, callback:Asset3DEvent->Void, #if sys ?texturePath:FlxGraphic #else ?texturePath:String #end, smoothTexture:Bool = true) {
 
+		#if sys
+		var model = openfl.utils.ByteArray.fromBytes(sys.io.File.getBytes(assetPath));
+		#else
 		var model = Assets.getBytes(assetPath);
-		if (model == null)
-			throw 'Model at ${assetPath} was not found.';
+		#end
+		if (model == null) throw 'Model at ${assetPath} was not found.';
 
 		var context = new AssetLoaderContext();
 		var noExt = Path.withoutExtension(assetPath);
@@ -79,8 +78,11 @@ class Flx3DCamera extends FlxCamera {
 		context.mapUrlToData('${Path.withoutDirectory(noExt)}.mtl', '$noExt.mtl');
 
 		var material:TextureMaterial = null;
-		if (texturePath != null)
-			material = new TextureMaterial(Cast.bitmapTexture(Assets.getBitmapData(texturePath, true, false)), smoothTexture);
+		#if sys
+		if (texturePath != null) material = new TextureMaterial(Cast.bitmapTexture(texturePath.bitmap), smoothTexture);
+		#else
+		if (texturePath != null) material = new TextureMaterial(Cast.bitmapTexture(backend.BitmapAssets.getBitmapData(texturePath, true, false)), smoothTexture);
+		#end
 
 		return loadData(model, context, switch(Path.extension(assetPath).toLowerCase()) {
 			case "dae": new DAEParser();
@@ -174,5 +176,4 @@ class Flx3DCamera extends FlxCamera {
 
 	public function addChild(c)
 		view.scene.addChild(c);
-	#end
 }

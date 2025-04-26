@@ -286,6 +286,11 @@ class Paths
 	inline static public function ndll(key:String) return getPath('ndlls/$key', BINARY);
 	inline static public function ndllPath(key:String) return getPath('$key', BINARY);
 
+	static public function customStagePath(key:String)
+	{
+		return getPath('custom_stages/$key', TEXT);
+	}
+
 	// video
 	static public function video(key:String)
 	{

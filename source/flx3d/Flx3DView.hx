@@ -1,6 +1,6 @@
+
 package flx3d;
 
-#if THREE_D_SUPPORT
 import away3d.entities.SegmentSet;
 import away3d.cameras.Camera3D;
 import away3d.entities.TextureProjector;
@@ -11,7 +11,6 @@ import away3d.library.Asset3DLibraryBundle;
 import away3d.events.LoaderEvent;
 import away3d.loaders.AssetLoader;
 import away3d.loaders.misc.AssetLoaderToken;
-import funkin.backend.system.Logs;
 import flixel.FlxG;
 import flx3d.Flx3DUtil;
 import away3d.library.assets.Asset3DType;
@@ -25,12 +24,10 @@ import away3d.loaders.misc.AssetLoaderContext;
 import openfl.Assets;
 import away3d.entities.Mesh;
 import away3d.loaders.Loader3D;
-import funkin.backend.utils.NativeAPI.ConsoleColor;
-#end
+import flixel.graphics.FlxGraphic;
 
 // FlxView3D with helpers for easier updating
 class Flx3DView extends FlxView3D {
-	#if THREE_D_SUPPORT
 	private static var __3DIDS:Int = 0;
 
 	var meshes:Array<Mesh> = [];
@@ -40,12 +37,16 @@ class Flx3DView extends FlxView3D {
 		super(x, y, width, height);
 		__cur3DStageID = __3DIDS++;
 	}
-
-	public function addModel(assetPath:String, callback:Asset3DEvent->Void, ?texturePath:String, smoothTexture:Bool = true) {
-
-		var model = Assets.getBytes(assetPath);
-		if (model == null)
-			throw 'Model at ${assetPath} was not found.';
+	
+	//public function addModel(assetPath:String, callback:Asset3DEvent->Void, ?texturePath:String, smoothTexture:Bool = true) {
+	public function addModel(assetPath:String, callback:Asset3DEvent->Void, #if sys ?texturePath:FlxGraphic #else ?texturePath:String #end, smoothTexture:Bool = true) {
+		#if sys
+		var model = openfl.utils.ByteArray.fromBytes(sys.io.File.getBytes(assetPath)); //Lets you add model files without having to recompile
+		#else
+		var model = Assets.getBytes(assetPath); //Works with stuff like html, but you need to recompile in order to register the model file.
+		#end
+		
+		if (model == null) throw 'Model at ${assetPath} was not found.';
 
 		var context = new AssetLoaderContext();
 		var noExt = Path.withoutExtension(assetPath);
@@ -53,9 +54,12 @@ class Flx3DView extends FlxView3D {
 		context.mapUrlToData('${Path.withoutDirectory(noExt)}.mtl', '$noExt.mtl');
 
 		var material:TextureMaterial = null;
-		if (texturePath != null)
-			material = new TextureMaterial(Cast.bitmapTexture(Assets.getBitmapData(texturePath, true, false)), smoothTexture);
-
+		#if sys
+		if (texturePath != null) material = new TextureMaterial(Cast.bitmapTexture(texturePath.bitmap), smoothTexture);
+		#else
+		if (texturePath != null) material = new TextureMaterial(Cast.bitmapTexture(backend.BitmapAssets.getBitmapData(texturePath, true, false)), smoothTexture);
+		#end
+		
 		return loadData(model, context, switch(Path.extension(assetPath).toLowerCase()) {
 			case "dae": new DAEParser();
 			case "md2": new MD2Parser();
@@ -142,5 +146,4 @@ class Flx3DView extends FlxView3D {
 
 	public function addChild(c)
 		view.scene.addChild(c);
-	#end
 }

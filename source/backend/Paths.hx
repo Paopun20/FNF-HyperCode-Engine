@@ -204,87 +204,41 @@ class Paths
 	inline static public function awd(key:String) return getModelPath(key, "awd");
 
 	static public function getModelPath(key:String='', ext:String='')
-		{
-			if (StringTools.trim(key) == '' || StringTools.trim(ext) == '')
-				return null;
-			
-			return 'models/$key.$ext'; // Changed this line
-		}
-		
-	#if MODS_ALLOWED
-	inline static public function modsModel(key:String, type:String) {
-		return modFolders('models/$key.$type');
+	{
+		getPath('models/$key.$ext')
 	}
-	#end
 
 	// 3D Model Texture Handling
 	inline static public function modelTexture(key:String, ?extension:String = "png") {
-		#if MODS_ALLOWED
-		var file:String = modsModelTexture(key, extension);
-		if(FileSystem.exists(file)) {
-			return file;
-		}
-		#end
-		return 'assets/images/$key.$extension'; // Or a dedicated folder like 'assets/textures/'
+		return getPath('models/textures/$key.$extension');
 	}
-
-	#if MODS_ALLOWED
-	inline static public function modsModelTexture(key:String, type:String) {
-		return modFolders('textures/$key.$type');
-	}
-	#end
 
 	// 3D Model Material Handling
 	inline static public function modelMaterial(key:String) {
-		#if MODS_ALLOWED
-		var file:String = modsModelMaterial(key);
-		if(FileSystem.exists(file)) {
-			return file;
+		return getPath('models/$key.mtl'); // Or a dedicated folder
+	}
+
+	inline static public function join(paths:Array<String> = []):String
+		{
+			if (paths == null || paths.length == 0)
+				return "";
+		
+			var result = paths[0];
+			for (i in 1...paths.length)
+			{
+				var part = paths[i];
+				if (part == null || part.length == 0)
+					continue;
+				
+				if (!result.endsWith("/") && !result.endsWith("\\"))
+					result += "/";
+				result += part;
+			}
+			return result;
 		}
-		#end
-		return 'assets/models/$key.mtl'; // Or a dedicated folder
-	}
-
-	#if MODS_ALLOWED
-	inline static public function modsModelMaterial(key:String) {
-		return modFolders('models/$key.mtl');
-	}
-	#end
-
-	// 3D Model Shader Handling
-	inline static public function modelFragmentShader(key:String) {
-		#if MODS_ALLOWED
-		var file:String = modsModelShaderFragment(key);
-		if(FileSystem.exists(file)) {
-			return file;
-		}
-		#end
-		return 'assets/shaders/model/$key.frag';
-	}
-
-	inline static public function modelVertexShader(key:String) {
-		#if MODS_ALLOWED
-		var file:String = modsModelShaderVertex(key);
-		if(FileSystem.exists(file)) {
-			return file;
-		}
-		#end
-		return 'assets/shaders/model/$key.vert';
-	}
-
-	#if MODS_ALLOWED
-	inline static public function modsModelShaderFragment(key:String) {
-		return modFolders('shaders/model/$key.frag');
-	}
-
-	inline static public function modsModelShaderVertex(key:String) {
-		return modFolders('shaders/model/$key.vert');
-	}
-	#end
-
+	
 	// ndll
 	inline static public function ndll(key:String) return getPath('ndlls/$key', BINARY);
-	inline static public function ndllPath(key:String) return getPath('$key', BINARY);
 
 	static public function customStagePath(key:String)
 	{

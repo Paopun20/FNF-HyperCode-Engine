@@ -131,28 +131,24 @@ class CustomStage extends MusicBeatState
 	}
 
 	public function initHScript(file:String)
-	{
-		var newScript:HScript = null;
-		try
 		{
-			newScript = new HScript(null, file);
-			if (newScript.exists('onCreate'))
-				newScript.call('onCreate');
-			trace('initialized hscript interp successfully: $file');
-			hscriptArray.push(newScript);
-			stageAPI(newScript);
-		}
-		catch (e:IrisError)
-		{
-			var pos:HScriptInfos = cast {fileName: file, showLine: false};
-			Iris.error(Printer.errorToString(e, false), pos);
-			var newScript:HScript = cast(Iris.instances.get(file), HScript);
-			if (newScript != null)
-				newScript.destroy();
-
-			trace("HScript has be don't run because have error in file: " + file + "(" + e + ")");
-		}
-	}
+			var newScript:HScript = null;
+			try
+			{
+				newScript = new HScript(null, file);
+				stageAPI(newScript); // Inject API ก่อน
+				if (newScript.exists('onCreate'))
+					newScript.call('onCreate');
+				hscriptArray.push(newScript);
+				trace('Initialized HScript successfully: $file');
+			}
+			catch (e:IrisError)
+			{
+				trace('[HScript Error] $file: ' + Printer.errorToString(e, false));
+				var brokenScript:HScript = cast Iris.instances.get(file), HScript;
+				if (brokenScript != null) brokenScript.destroy();
+			}
+		}		
 	#end
 
 	public static function haveCustomStage(stateName):Bool

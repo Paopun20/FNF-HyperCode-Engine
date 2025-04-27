@@ -12,7 +12,7 @@ import core.UrlGen;
 import core.WindowManager;
 import core.system.macros.Utils;
 import core.utils.NdllUtil;
-import core.winapi.ToastNotification;
+#if windows import core.winapi.ToastNotification; #end
 
 import flx3d.ImportAway3D;
 import away3d.extrusions.PathExtrude;

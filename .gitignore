@@ -28,3 +28,4 @@ art/build_html-debug.bat
 source/core/httpbackup.hx
 
 mods/*
+hxlinker.ps1

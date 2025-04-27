@@ -205,7 +205,7 @@ class Paths
 
 	static public function getModelPath(key:String='', ext:String='')
 	{
-		getPath('models/$key.$ext');
+		return getPath('models/$key.$ext');
 	}
 
 	// 3D Model Texture Handling
@@ -219,25 +219,25 @@ class Paths
 	}
 
 	inline static public function join(paths:Array<String> = null):String
+	{
+		if (paths == null)
+			paths = [];
+		if (paths.length == 0)
+			return "";
+
+		var result = paths[0];
+		for (i in 1...paths.length)
 		{
-			if (paths == null)
-				paths = [];
-			if (paths.length == 0)
-				return "";
-		
-			var result = paths[0];
-			for (i in 1...paths.length)
-			{
-				var part = paths[i];
-				if (part == null || part.length == 0)
-					continue;
-				
-				if (!result.endsWith("/") && !result.endsWith("\\"))
-					result += "/";
-				result += part;
-			}
-			return result;
+			var part = paths[i];
+			if (part == null || part.length == 0)
+				continue;
+
+			if (!result.endsWith("/") && !result.endsWith("\\"))
+				result += "/";
+			result += part;
 		}
+		return result;
+	}
 	
 	// ndll
 	inline static public function ndll(key:String) return getPath('ndlls/$key', BINARY);

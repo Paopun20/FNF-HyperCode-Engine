@@ -1,4 +1,4 @@
-#if (windows && desktop)
+#if windows
 package core.winapi;
 
 import sys.io.Process;

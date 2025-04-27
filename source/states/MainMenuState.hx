@@ -266,7 +266,7 @@ class MainMenuState extends MusicBeatState
 				selectedSomethin = true;
 				FlxG.mouse.visible = false;
 				FlxG.sound.play(Paths.sound('cancelMenu'));
-				MusicBeatState.switchState(new TitleState());
+				MusicBeatState.switchStateByName("TitleState");
 			}
 
 			if (controls.ACCEPT || (FlxG.mouse.justPressed && allowMouse))
@@ -300,9 +300,9 @@ class MainMenuState extends MusicBeatState
 					switch (option)
 					{
 						case 'story_mode':
-							MusicBeatState.switchState(new StoryMenuState());
+							MusicBeatState.switchStateByName("StoryMenuState");
 						case 'freeplay':
-							MusicBeatState.switchState(new FreeplayState());
+							MusicBeatState.switchStateByName("FreeplayState");
 
 						#if MODS_ALLOWED
 						case 'mods':
@@ -311,11 +311,11 @@ class MainMenuState extends MusicBeatState
 
 						#if ACHIEVEMENTS_ALLOWED
 						case 'achievements':
-							MusicBeatState.switchState(new AchievementsMenuState());
+							MusicBeatState.switchStateByName("AchievementsMenuState");
 						#end
 
 						case 'credits':
-							MusicBeatState.switchState(new CreditsState());
+							MusicBeatState.switchStateByName("CreditsState");
 						case 'options':
 							MusicBeatState.switchState(new OptionsState());
 							OptionsState.onPlayState = false;
@@ -328,7 +328,7 @@ class MainMenuState extends MusicBeatState
 						case 'TEST':
 							// MusicBeatState.switchState(new TestState());
 						case 'TEST2':
-							MusicBeatState.switchState(new CustomStage("testmenu"));
+							MusicBeatState.switchStateByName("testmenu");
 						case 'donate':
 							CoolUtil.browserLoad('https://ninja-muffin24.itch.io/funkin');
 							selectedSomethin = false;

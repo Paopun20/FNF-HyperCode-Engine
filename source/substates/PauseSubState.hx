@@ -323,9 +323,9 @@ class PauseSubState extends MusicBeatSubstate
 					PlayState.instance.canResync = false;
 					Mods.loadTopMod();
 					if(PlayState.isStoryMode)
-						MusicBeatState.switchState(new StoryMenuState());
+						MusicBeatState.switchStateByName("StoryMenuState");
 					else 
-						MusicBeatState.switchState(new FreeplayState());
+						MusicBeatState.switchStateByName("FreeplayState");
 
 					FlxG.sound.playMusic(Paths.music('freakyMenu'));
 					PlayState.changedDifficulty = false;

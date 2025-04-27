@@ -14,7 +14,7 @@ import states.PlayState;
 import backend.WeekData;
 #end
 
-import debug.FPSCounter;
+import gui.FPSCounter;
 import EngineConfig;
 
 import core.ImportCore;
@@ -29,7 +29,7 @@ import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.display.StageScaleMode;
 import lime.app.Application;
-import states.TitleState;
+import states.EngineLoadingStage;
 
 #if HSCRIPT_ALLOWED
 import crowplexus.iris.Iris;
@@ -64,12 +64,12 @@ import flixel.util.FlxStringUtil; // Added import
 class Main extends Sprite
 {
 	public static final game = {
-		width: 1280, // WINDOW width
-		height: 720, // WINDOW height
-		initialState: TitleState, // initial game state
-		framerate: 60, // default framerate
-		skipSplash: true, // if the default flixel splash screen should be skipped
-		startFullscreen: false // if the game should start at fullscreen mode
+		width: 1280,                           // WINDOW width
+		height: 720,                           // WINDOW height
+		initialState: EngineLoadingStage,      // initial game state
+		framerate: 60,                         // default framerate
+		skipSplash: true,                      // if the default flixel splash screen should be skipped
+		startFullscreen: false                 // if the game should start at fullscreen mode
 	};
 
 	public static var fpsVar:FPSCounter;

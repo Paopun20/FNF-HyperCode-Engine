@@ -118,7 +118,7 @@ class FreeplayState extends MusicBeatState
             MusicBeatState.switchState(new states.ErrorState(
                 "NO WEEKS ADDED FOR FREEPLAY\n\nPress ACCEPT to go to the Week Editor Menu.\nPress BACK to return to Main Menu.",
                 function() MusicBeatState.switchState(new states.editors.WeekEditorState()),
-                function() MusicBeatState.switchState(new states.MainMenuState())
+                function() MusicBeatState.switchStateByName("MainMenuState")
             ));
         }
     }
@@ -443,7 +443,7 @@ class FreeplayState extends MusicBeatState
             {
                 persistentUpdate = false;
                 FlxG.sound.play(Paths.sound('cancelMenu'));
-                MusicBeatState.switchState(new MainMenuState());
+                MusicBeatState.switchStateByName("MainMenuState");
             }
         }
     }

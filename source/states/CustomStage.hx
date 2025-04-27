@@ -42,6 +42,7 @@ class CustomStage extends MusicBeatState
 {
 	public var stagePath:String = null;
 	public var stageName:String = null;
+
 	public static var instance:CustomStage = null;
 
 	#if HSCRIPT_ALLOWED
@@ -156,7 +157,9 @@ class CustomStage extends MusicBeatState
 
 	public static function haveCustomStage(stateName):Bool
 	{
-		Mods.loadTopMod();
+		if (Mods.currentModDirectory != null && Mods.currentModDirectory.length > 0) {
+			Mods.loadTopMod();
+		}
 		var stagePath = Paths.customStagePath(stateName);
 		if (FileSystem.exists(stagePath) && FileSystem.isDirectory(stagePath))
 		{
@@ -228,13 +231,20 @@ class CustomStage extends MusicBeatState
 				trace('[ERROR] onUpdate(): ${e.message}');
 			}
 		}
-		
-		if (controls.justPressed('debug_1'))
+
+		if (controls.pressed('debug_1') && controls.pressed("reset"))
 		{
 			holding = true;
 			holdtime += elapsed;
 		}
-		else if (holding)
+		else
+		{
+			holding = false;
+			holdtime = 0.0;
+		}
+		trace("holding: " + holding + ", holdtime: " + holdtime);
+
+		if (holding)
 		{
 			if (holdtime >= 0.5)
 			{

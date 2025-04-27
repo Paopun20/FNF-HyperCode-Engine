@@ -144,14 +144,16 @@ class MusicBeatState extends FlxState
 		FlxTransitionableState.skipNextTransIn = false;
 	}
 
-	
 	public static function switchStateByName(nextStateName:String = null, modsAllowed:Bool = true):Void
 	{
+		if ( Mods.currentModDirectory == null || Mods.currentModDirectory.length == 0 || Mods.currentModDirectory == '' ) {
+			Mods.loadTopMod();
+		}
+
 		trace('have Custom Stage ' + states.CustomStage.haveCustomStage(nextStateName));
 		trace('Switching to state: ' + nextStateName);
 		trace("Load " + nextStateName);
 		var nextState:FlxState = null;
-
 		if (FlxG.state is states.CustomStage)
 		{
 			var curStage:states.CustomStage = cast FlxG.state;
@@ -161,7 +163,6 @@ class MusicBeatState extends FlxState
 				return;
 			}
 		}
-
 		#if MODS_ALLOWED
 		if (modsAllowed)
 		{
@@ -172,11 +173,9 @@ class MusicBeatState extends FlxState
 			}
 		}
 		#end
-
 		try
 		{
 			var nextState:FlxState = null;
-
 			switch (nextStateName)
 			{
 				case "MainMenuState":
@@ -191,18 +190,11 @@ class MusicBeatState extends FlxState
 					nextState = new states.CreditsState();
 				case "ModsMenuState":
 					nextState = new states.ModsMenuState();
-				default:
-					// **** ตรงนี้แก้ให้ new ข้างใน try-catch ****
-					if (states.CustomStage.haveCustomStage(nextStateName))
-					{
-						nextState = new states.CustomStage(nextStateName);
-					}
-					else
-					{
-						throw new haxe.Exception("State '" + nextStateName + "' not found!");
-					}
+				case "OptionsState":
+					nextState = new options.OptionsState();
+				case "FreeplayState":
+					nextState = new states.FreeplayState();
 			}
-
 			MusicBeatState.switchState(nextState);
 		}
 		catch (e:haxe.Exception)
@@ -212,8 +204,7 @@ class MusicBeatState extends FlxState
 			MusicBeatState.switchState(new states.MainMenuState());
 		}
 	}
-	
-	
+
 	public static function resetState() {
 		if(FlxTransitionableState.skipNextTransIn) FlxG.resetState();
 		else startTransition();
@@ -226,7 +217,7 @@ class MusicBeatState extends FlxState
 		if(nextState == null)
 			nextState = FlxG.state;
 
-		switchState(new CustomFadeTransition(0.5, false));
+		FlxG.state.openSubState(new CustomFadeTransition(0.5, false));
 		if(nextState == FlxG.state)
 			CustomFadeTransition.finishCallback = function() FlxG.resetState();
 		else

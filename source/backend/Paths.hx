@@ -218,9 +218,11 @@ class Paths
 		return getPath('models/$key.mtl'); // Or a dedicated folder
 	}
 
-	inline static public function join(paths:Array<String> = []):String
+	inline static public function join(paths:Array<String> = null):String
 		{
-			if (paths == null || paths.length == 0)
+			if (paths == null)
+				paths = [];
+			if (paths.length == 0)
 				return "";
 		
 			var result = paths[0];

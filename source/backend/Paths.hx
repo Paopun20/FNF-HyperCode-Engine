@@ -205,7 +205,7 @@ class Paths
 
 	static public function getModelPath(key:String='', ext:String='')
 	{
-		getPath('models/$key.$ext')
+		getPath('models/$key.$ext');
 	}
 
 	// 3D Model Texture Handling

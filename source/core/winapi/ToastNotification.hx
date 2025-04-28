@@ -8,7 +8,7 @@ import cpp.Lib;
 #include "./external/wintoastlib.cpp"
 ')
 class ToastNotification {
-    public static function show(title:String, message:String, duration:String = "Short"):Void {
+    public static function showToast(title:String, message:String, duration:String = "Short"):Void {
         untyped __cpp__('
             static WinToast* toast = WinToast::instance();
             if (!toast->isInitialized()) {

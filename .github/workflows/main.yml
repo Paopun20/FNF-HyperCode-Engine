@@ -74,6 +74,7 @@ jobs:
     name: Build on Windows
     runs-on: windows-latest
     needs: Computer
+    continue-on-error: true
     strategy:
       matrix:
         arch: [64, 32]

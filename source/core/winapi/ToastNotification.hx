@@ -8,7 +8,7 @@ import cpp.Lib;
 #include "./external/wintoastlib.cpp"
 ')
 class ToastNotification {
-    public static function showToast(title:String, message:String):Void {
+    public static function show(title:String, message:String, duration:String = "Short"):Void {
         untyped __cpp__('
             static WinToast* toast = WinToast::instance();
             if (!toast->isInitialized()) {
@@ -25,11 +25,20 @@ class ToastNotification {
             WinToastTemplate templ(WinToastTemplate::Text02);
             templ.setTextField(std::wstring({0}.c_str()), WinToastTemplate::FirstLine);
             templ.setTextField(std::wstring({1}.c_str()), WinToastTemplate::SecondLine);
+            
+            // Set the toast duration based on input
+            if ({2} == "Short") {
+                templ.setDuration(WinToastTemplate::Short);  // Short duration (5 seconds)
+            } else if ({2} == "Long") {
+                templ.setDuration(WinToastTemplate::Long);   // Long duration (25 seconds)
+            } else {
+                templ.setDuration(WinToastTemplate::Short);  // Default to Short if invalid value
+            }
 
             if (toast->showToast(templ, nullptr) == -1L) {
                 printf("Failed to show toast\\n");
             }
-        ', title, message);
+        ', title, message, duration);
     }
 }
 #end

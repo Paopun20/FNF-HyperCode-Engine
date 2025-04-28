@@ -18,13 +18,13 @@ import cpp.Lib;
 #pragma comment(lib, "user32")
 
 #ifdef NDEBUG
-#    define DEBUG_MSG(str)                                                                                                                 \
-        do {                                                                                                                               \
+#    define DEBUG_MSG(str)                                                                                                                 
+        do {                                                                                                                               
         } while (false)
 #else
-#    define DEBUG_MSG(str)                                                                                                                 \
-        do {                                                                                                                               \
-            std::wcout << str << std::endl;                                                                                                \
+#    define DEBUG_MSG(str)                                                                                                                 
+        do {                                                                                                                               
+            std::wcout << str << std::endl;                                                                                                
         } while (false)
 #endif
 
@@ -236,7 +236,7 @@ namespace Util {
     inline std::wstring parentDirectory(WCHAR* path, DWORD size) {
         size_t lastSeparator = 0;
         for (size_t i = 0; i < size; i++) {
-            if (path[i] == L'\\' || path[i] == L'/') {
+            if (path[i] == L"\\" || path[i] == L"/") {
                 lastSeparator = i;
             }
         }
@@ -588,7 +588,7 @@ std::wstring const& WinToast::appUserModelId() const {
 }
 
 HRESULT WinToast::validateShellLinkHelper(_Out_ bool& wasChanged) {
-    WCHAR path[MAX_PATH] = {L'\0'};
+    WCHAR path[MAX_PATH] = {L"0"};
     Util::defaultShellLinkPath(_appName, path);
     // Check if the file exist
     DWORD attr = GetFileAttributesW(path);
@@ -647,8 +647,8 @@ HRESULT WinToast::createShellLinkHelper() {
         return E_FAIL;
     }
 
-    WCHAR exePath[MAX_PATH]{L'\0'};
-    WCHAR slPath[MAX_PATH]{L'\0'};
+    WCHAR exePath[MAX_PATH]{L"0"};
+    WCHAR slPath[MAX_PATH]{L"0"};
     Util::defaultShellLinkPath(_appName, slPath);
     Util::defaultExecutablePath(exePath);
     std::wstring exeDir = Util::parentDirectory(exePath, sizeof(exePath) / sizeof(exePath[0]));
@@ -726,8 +726,6 @@ INT64 WinToast::showToast(_In_ WinToastTemplate const& toast, _In_ IWinToastHand
 
                     // Modern feature are supported Windows > Windows 10
                     if (SUCCEEDED(hr) && isSupportingModernFeatures()) {
-                        // Note that we do this *after* using toast.textFieldsCount() to
-                        // iterate/fill the template's text fields, since we're adding yet another text field.
                         if (SUCCEEDED(hr) && !toast.attributionText().empty()) {
                             hr = setAttributionTextFieldHelper(xmlDocument.Get(), toast.attributionText());
                         }
@@ -1454,7 +1452,6 @@ bool WinToastTemplate::isCropHintCircle() const {
 bool WinToastTemplate::isInput() const{
     return _hasInput;
 }')
-
 @:cppFileCode('#define WinToastLib')
 #end
 class ToastNotification {

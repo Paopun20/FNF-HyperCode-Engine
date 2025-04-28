@@ -96,9 +96,9 @@ class TitleState extends MusicBeatState
 
 		FlxG.mouse.visible = false;
 		#if FREEPLAY
-		MusicBeatState.switchStateByName("FreeplayState");
+		MusicBeatState.switchCustomStage("FreeplayState");
 		#elseif CHARTING
-		MusicBeatState.switchStateByName("ChartingState");
+		MusicBeatState.switchCustomStage("ChartingState");
 		#else
 		if(FlxG.save.data.flashing == null && !FlashingState.leftState)
 		{
@@ -387,7 +387,7 @@ class TitleState extends MusicBeatState
 
 				new FlxTimer().start(1, function(tmr:FlxTimer)
 				{
-					MusicBeatState.switchStateByName("MainMenuState");
+					MusicBeatState.switchCustomStage("MainMenuState");
 					closedState = true;
 				});
 				// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
@@ -426,7 +426,7 @@ class TitleState extends MusicBeatState
 								function(twn:FlxTween) {
 									FlxTransitionableState.skipNextTransIn = true;
 									FlxTransitionableState.skipNextTransOut = true;
-									MusicBeatState.switchStateByName("TitleState");
+									MusicBeatState.switchCustomStage("TitleState");
 								}
 							});
 							FlxG.sound.music.fadeOut();

@@ -99,7 +99,7 @@ class MasterEditorMenu extends MusicBeatState
 
 		if (controls.BACK)
 		{
-			MusicBeatState.switchStateByName("MainMenuState");
+			MusicBeatState.switchCustomStage("MainMenuState");
 		}
 
 		if (controls.ACCEPT)

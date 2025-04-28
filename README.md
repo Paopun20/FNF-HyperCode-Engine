@@ -48,7 +48,7 @@ Just like Psych Engine, HyPsych Engine is made for modders — with a cool API a
 - `flx3d` and `away3d` — [GitHub](https://github.com/TBar09/FNF-tbarEngine)
 
 # Codename Engine's libraries
-- 3D model + NDLL support (modified for this engine)
+- 3D model + NDLL support + hscript-improved (modified for this engine)
 
 ---
 

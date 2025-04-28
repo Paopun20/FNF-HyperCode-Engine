@@ -7,7 +7,7 @@ import core.JsonHelper;
 import core.ScreenInfo;
 import core.UrlGen;
 #if desktop import core.WindowManager; #end
-#if windows import core.winapi.ToastNotification; #end
+#if (windows && cpp) import core.winapi.ToastNotification; #end
 import states.PlayState;
 
 import haxe.ds.IntMap;
@@ -258,7 +258,7 @@ class WindowManagerLua {
 }
 #end
 
-#if windows
+#if (windows && cpp)
 class ToastNotificationLua {
     public function new(lua: State) {
         Lua_helper.add_callback(lua, "toastNotification", function(title:String, message:String, duration:Int) {
@@ -281,6 +281,6 @@ class LuaCallbackInit {
         new ScreenInfoLua(lua);
         new UrlGenLua(lua);
         #if desktop new WindowManagerLua(lua); #end
-        #if windows new ToastNotificationLua(lua); #end
+        #if (windows && cpp) new ToastNotificationLua(lua); #end
     }
 }

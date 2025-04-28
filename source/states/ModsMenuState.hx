@@ -314,7 +314,7 @@ class ModsMenuState extends MusicBeatState
 			FlxG.sound.play(Paths.sound('cancelMenu'));
 			if(waitingToRestart)
 			{
-				//MusicBeatState.switchStateByName("TitleState");
+				//MusicBeatState.switchCustomStage("TitleState");
 				TitleState.initialized = false;
 				TitleState.closedState = false;
 				FlxG.sound.music.fadeOut(0.3);
@@ -325,7 +325,7 @@ class ModsMenuState extends MusicBeatState
 				}
 				FlxG.camera.fade(FlxColor.BLACK, 0.5, false, FlxG.resetGame, false);
 			}
-			else MusicBeatState.switchStateByName("MainMenuState");
+			else MusicBeatState.switchCustomStage("MainMenuState");
 
 			persistentUpdate = false;
 			FlxG.autoPause = ClientPrefs.data.autoPause;

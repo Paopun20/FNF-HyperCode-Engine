@@ -3,10 +3,11 @@ package core.winapi;
 
 import cpp.Lib;
 
+#if cpp
 @:cppInclude("./external/wintoastlib.h")
-@:cppFileCode('
-#include "./external/wintoastlib.cpp"
-')
+@:cppInclude("./external/wintoastlib.cpp")
+@:cppFileCode('#define WinToastLib')
+#end
 class ToastNotification {
     public static function showToast(title:String, message:String, duration:String = "Short"):Void {
         untyped __cpp__('

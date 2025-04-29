@@ -19,7 +19,7 @@ HyperCode Engine is a fork of the Psych Engine
 > ⚠️ Not much of the original codebase remains… Rewrite until nothing remains of the original. LOL /j
 
 # Features:
-- **Custom Menu [Bata]**
+- **Custom Menu [It should be stable now, right?]**
   Create a menu using HScript! This allows for more complex and customizable menus.
 
 - **Optimized Garbage Collection**

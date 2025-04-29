@@ -4,8 +4,6 @@
 
 # Welcome to HyperCode engine!
 
-![HyperCode Engine](docs/GHREADMEFile/HPE_Loop.gif)
-
 ---
 
 # HyperCode Enging Is next-gen of Psych Engine!

@@ -1,8 +1,9 @@
-# HyPsych Engine Lua API
+# HyperCode Engine Lua API
 
 ---
 
-This document outlines the Lua API extensions available in the HyPsych Engine. These extensions provide additional functionality beyond standard Lua, allowing for more complex and powerful modding capabilities.
+This document outlines the Lua API extensions available in the HyperCode Engine. These extensions provide additional functionality beyond standard Lua, allowing for more complex and powerful modding capabilities.
+WAIT FOR 2.0 Document.
 
 ---
 

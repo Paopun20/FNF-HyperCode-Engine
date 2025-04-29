@@ -246,7 +246,7 @@ class Main extends Sprite
 
 	function saveCrashReport(content:String):String
 		{
-			var path = "./crash/HyPsychEngine_" + Date.now().toString().replace(" ", "_").replace(":", "'") + ".txt";
+			var path = "./crash/HyperCodeEngine_" + Date.now().toString().replace(" ", "_").replace(":", "'") + ".txt";
 			
 			if (!FileSystem.exists("./crash/")) {
 				FileSystem.createDirectory("./crash/");
@@ -362,7 +362,7 @@ class Main extends Sprite
 		errMsg += "Include the crash log and steps to reproduce if possible.\n";
 		#end
 
-		errMsg += "\n> Crash Handler written by: sqirra-rng (Psych Engine Modified Crash Handler by Paopun20 for HyPsychEngine)";
+		errMsg += "\n> Crash Handler written by: sqirra-rng (Psych Engine Modified Crash Handler by Paopun20 for HyperCodeEngine)";
 
 		// Show error message
         var displayMsg = "The game crashed!\n";

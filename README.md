@@ -1,22 +1,22 @@
 > [!Warning]
 > This engine is still in development!
-> If you encounter any bugs, please report them here: [GitHub Issues](https://github.com/Paopun20/FNF-HyPsych-Engine/issues)
+> If you encounter any bugs, please report them here: [GitHub Issues](https://github.com/Paopun20/FNF-HyperCode-Engine/issues)
 
-# Welcome to HyPsych engine!
+# Welcome to HyperCode engine!
 
-![HyPsych Engine](docs/GHREADMEFile/HPE_Loop.gif)
+![HyperCode Engine](docs/GHREADMEFile/HPE_Loop.gif)
 
 ---
 
-# HyPsych Enging Is next-gen of Psych Engine!
+# HyperCode Enging Is next-gen of Psych Engine!
 This engine is a fork of Psych Engine 1.0.4, featuring new capabilities, performance upgrades, scripting improvements, and experimental 3D support, more.
 
 ## Document
-### [HyPsych Enging Lua API](docs/HyPsychEnging/LuaAPI.md)
+### [HyperCode Enging Lua API](docs/HyperCodeEnging/LuaAPI.md)
 ### [Psych Engine API](https://shadowmario.github.io/psychengine.lua/)
 
 ## About
-HyPsych Engine is a fork of the Psych Engine
+HyperCode Engine is a fork of the Psych Engine
 
 > ⚠️ Not much of the original codebase remains… Rewrite until nothing remains of the original. LOL /j
 
@@ -37,7 +37,7 @@ HyPsych Engine is a fork of the Psych Engine
   Now you can use 3D models in your mods! This feature allows for more complex and visually appealing scenes.
 
 # **Easy Modding** (with Chaos Included)
-Just like Psych Engine, HyPsych Engine is made for modders — with a cool API and powerful features.  
+Just like Psych Engine, HyperCode Engine is made for modders — with a cool API and powerful features.  
 …But also probably a little confusing. Sorry not sorry.
 
 # saharan's libraries
@@ -70,26 +70,25 @@ Just like Psych Engine, HyPsych Engine is made for modders — with a cool API a
 ---
 
 ## Q&A Common Questions
-### What makes HyPsych Engine different from Psych Engine?
+### What makes HyperCode Engine different from Psych Engine?
 
-HyPsych Engine offers many new features and improvements over Psych Engine, including:
-- HScript on Lua
+HyperCode Engine offers many new features and improvements over Psych Engine, including:
 - Faster garbage collection
 - Modern C++11 codebase
 - Lots of new extensions
 - Experimental 3D support
 
-### Is HyPsych Engine a fork of Psych Engine?
+### Is HyperCode Engine a fork of Psych Engine?
 
-Yes, HyPsych Engine is a fork of Psych Engine, but with many new features and improvements.
+Yes, HyperCode Engine is a fork of Psych Engine, but with many new features and improvements.
 
-### How do I install HyPsych Engine?
+### How do I install HyperCode Engine?
 
-Not available for installation at this time or download from [GitHub actions](https://github.com/Paopun20/FNF-HyPsych-Engine/actions)!
+Not available for installation at this time or download from [GitHub actions](https://github.com/Paopun20/FNF-HyperCode-Engine/actions)!
 
 ### How can I report bugs or issues?
 
-You can report bugs or issues on GitHub Issues page: [GitHub Issues](https://github.com/Paopun20/FNF-HyPsych-Engine/issues)
+You can report bugs or issues on GitHub Issues page: [GitHub Issues](https://github.com/Paopun20/FNF-HyperCode-Engine/issues)
 
 ---
 

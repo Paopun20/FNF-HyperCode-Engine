@@ -1,58 +1,35 @@
 package states;
 
 import flixel.FlxG;
-import flixel.FlxState;
-import flixel.util.FlxColor;
-import flixel.FlxBasic;
 import backend.MusicBeatState;
 import backend.Paths;
 import backend.Mods;
-import states.AchievementsMenuState;
-import states.CreditsState;
-import states.MainMenuState;
-import states.ModsMenuState;
-import states.StoryMenuState;
-import states.TitleState;
-import states.CustomStage;
+import states.*;
 import objects.Character;
-import psychlua.LuaUtils;
 import psychlua.CustomSubstate;
 #if HSCRIPT_ALLOWED
 import psychlua.HScript;
-import crowplexus.iris.Iris;
 import crowplexus.hscript.Expr.Error as IrisError;
-import crowplexus.hscript.Printer;
 #end
-import core.BrainFuck;
-import core.Buffer;
-import core.Format;
-import core.GetArgs;
-import core.HttpClient;
-import core.ImportCore;
-import core.JsonHelper;
-import core.LuaCallbackInit;
-import core.ScreenInfo;
-import core.UrlGen;
-import core.WindowManager;
-import core.system.macros.Utils;
-import core.utils.NdllUtil;
+import core.*;
+
 #if windows import core.winapi.ToastNotification; #end
 
-class CustomStage extends MusicBeatState
-{
+class CustomStage extends MusicBeatState {
 	public var stagePath:String = null;
 	public var stageName:String = null;
 
 	public static var instance:CustomStage = null;
 
+	public var errorlist:Array<Map<String, String>> = [];
+
 	#if HSCRIPT_ALLOWED
 	public var hscriptArray:Array<HScript> = [];
 
-	private function stageAPI(script:HScript)
-	{
+	private function stageAPI(script:HScript) {
 		var set = script.set;
 
-		// 🎮 Game States
+		// Game States
 		set("MusicBeatState", MusicBeatState);
 		set("MainMenuState", MainMenuState);
 		set("StoryMenuState", StoryMenuState);
@@ -62,252 +39,140 @@ class CustomStage extends MusicBeatState
 		set("TitleState", TitleState);
 		set("CustomStage", CustomStage);
 
-		// ⚙️ Core Haxe + System
-		set("Type", Type);
-		set("Math", Math);
-		set("Std", Std);
-		set("StringTools", StringTools);
-
-		#if sys
-		set("File", sys.io.File);
-		set("FileSystem", sys.FileSystem);
-		set("Path", haxe.io.Path);
-		#end
-
-		// 📦 Flixel Essentials
-		set("FlxG", flixel.FlxG);
-		set("FlxSprite", flixel.FlxSprite);
-		set("FlxText", flixel.text.FlxText);
-		set("FlxObject", flixel.FlxObject);
-		set("FlxGroup", flixel.group.FlxGroup);
-		set("FlxTypedGroup", flixel.group.FlxGroup.FlxTypedGroup);
-		set("FlxCamera", flixel.FlxCamera);
-		set("FlxMath", flixel.math.FlxMath);
-		set("FlxRect", flixel.math.FlxRect);
-		// set("FlxPoint", flixel.math.FlxPoint);
-		set("FlxTimer", flixel.util.FlxTimer);
-		set("FlxEase", flixel.tweens.FlxEase);
-		set("FlxTween", flixel.tweens.FlxTween);
-		// set("FlxColor", flixel.util.FlxColor);
-
-		// 🧪 Psych Engine & Backend
-		set("ClientPrefs", ClientPrefs);
-		set("PlayState", PlayState);
-		set("Character", Character);
-		set("Note", objects.Note);
-		set("Paths", Paths);
-		set("Conductor", Conductor);
-		set("CustomSubstate", CustomSubstate);
-		set("Alphabet", Alphabet);
-
-		#if ACHIEVEMENTS_ALLOWED
-		set("Achievements", Achievements);
-		#end
-
-		// ✨ Shaders (non-Flash)
-		#if (!flash && sys)
-		set("FlxRuntimeShader", flixel.addons.display.FlxRuntimeShader);
-		set("ShaderFilter", openfl.filters.ShaderFilter);
-		set("ErrorHandledRuntimeShader", shaders.ErrorHandledShader.ErrorHandledRuntimeShader);
-		#end
-
-		// 🧰 Utils / Custom Classes
-		set("BrainFuck", BrainFuck);
-		set("GetArgs", GetArgs);
-		set("HttpClient", HttpClient);
-		set("JsonHelper", JsonHelper);
-		set("ScreenInfo", ScreenInfo);
-		set("WindowManager", WindowManager);
-		set("UrlGen", UrlGen);
-		set("NdllUtil", NdllUtil);
-
-		#if flxanimate
-		set("FlxAnimate", FlxAnimate);
-		#end
-
-		set("Mathf", flixel.math.FlxMath);
-
 		trace("[CustomStage] Script API injected successfully for " + script.name + ".");
 	}
 
-	public function initHScript(file:String)
-		{
-			var newScript:HScript = null;
-			try
-			{
-				newScript = new HScript(null, file);
-				stageAPI(newScript); // Inject API ก่อน
-				if (newScript.exists('onCreate'))
-					newScript.call('onCreate');
-				hscriptArray.push(newScript);
-				trace('Initialized HScript successfully: $file');
+	private function tryCall(script:HScript, func:String, args:Array<Dynamic> = null):Void {
+		if (script.exists(func)) {
+			try {
+				script.call(func, args);
+			} catch (e:haxe.Exception) {
+				trace('[${script.name}] Error in $func(): ${e.message}');
 			}
-			catch (e:IrisError)
-			{
-				trace('[HScript Error] $file: ' + Printer.errorToString(e, false));
-				var brokenScript:HScript = cast Iris.instances.get(file), HScript;
-				if (brokenScript != null) brokenScript.destroy();
-			}
-		}		
+		}
+	}
+
+	public function initHScript(file:String) {
+		var newScript:HScript = null;
+		try {
+			newScript = new HScript(null, file);
+			stageAPI(newScript);
+			tryCall(newScript, "onCreate");
+			hscriptArray.push(newScript);
+			trace('Initialized HScript successfully: $file');
+		} catch (e:IrisError) {
+			var map = new Map<String, String>();
+			map.set("file", file);
+			map.set("error", e.toString());
+			errorlist.push(map);
+			return;
+		}
+	}
 	#end
 
-	public static function haveCustomStage(stateName):Bool
-	{
+	public static function haveCustomStage(stateName:String):Bool {
 		if (Mods.currentModDirectory != null && Mods.currentModDirectory.length > 0) {
 			Mods.loadTopMod();
 		}
 		var stagePath = Paths.customStagePath(stateName);
-		if (FileSystem.exists(stagePath) && FileSystem.isDirectory(stagePath))
-		{
-			var fileList:Array<String> = FileSystem.readDirectory(stagePath);
-
-			for (file in fileList)
-			{
-				if (file.endsWith(".hx"))
-				{
-					return true;
-				}
+		if (FileSystem.exists(stagePath) && FileSystem.isDirectory(stagePath)) {
+			for (file in FileSystem.readDirectory(stagePath)) {
+				if (file.endsWith(".hx")) return true;
 			}
 		}
-
 		return false;
 	}
 
-	public function new(stateName:String)
-	{
+	public function new(stateName:String) {
 		super();
 		Mods.loadTopMod();
 		instance = this;
 		stageName = stateName;
 		stagePath = Paths.customStagePath(stateName);
 		trace("Loading custom stage: " + stagePath);
-		if (stagePath == null || stagePath.length == 0 || stagePath == "null")
-		{
+		if (stagePath == null || stagePath.trim() == "") {
 			throw new haxe.Exception("Invalid stage path: " + stagePath);
 		}
 	}
 
-	override public function create():Void
-	{
-		super.create();
-		if (FileSystem.exists(stagePath) && FileSystem.isDirectory(stagePath))
-		{
-			var fileList:Array<String> = FileSystem.readDirectory(stagePath);
+	public function reload() {
+		MusicBeatState.switchState(new CustomStage(stageName));
+	}
 
-			for (file in fileList)
-			{
-				if (file.endsWith(".hx"))
-				{
+	override public function create():Void {
+		super.create();
+		if (FileSystem.exists(stagePath) && FileSystem.isDirectory(stagePath)) {
+			for (file in FileSystem.readDirectory(stagePath)) {
+				if (file.endsWith(".hx")) {
 					trace('Found .hx file: $stagePath/$file');
 					initHScript(stagePath + "/" + file);
 				}
 			}
-		}
-		else
-		{
+		} else {
 			trace('Stage path is invalid or not a directory: $stagePath');
+		}
+
+		if (errorlist.length > 0) {
+			var combinedError = "";
+			for (e in errorlist) {
+				trace("Error in file: " + e.get("file"));
+				trace("Error message: " + e.get("error"));
+				combinedError += e.get("error") + "\n";
+			}
+			if (combinedError != "") {
+				MusicBeatState.switchState(new states.ErrorState(
+					"HMM, you got some error in your code:\n" + combinedError + "\n\nPress ACCEPT to reload CustomStage.",
+					function() reload()
+				));
+			}
 		}
 	}
 
 	var holding:Bool = false;
 	var holdtime:Float = 0.0;
 
-	override public function update(elapsed:Float):Void
-	{
+	override public function update(elapsed:Float):Void {
 		super.update(elapsed);
-		for (script in hscriptArray)
-		{
-			try
-			{
-				if (script.exists('onUpdate'))
-					script.call('onUpdate', [elapsed]);
-			}
-			catch (e:haxe.Exception)
-			{
-				trace('[ERROR] onUpdate(): ${e.message}');
-			}
+		for (script in hscriptArray) {
+			tryCall(script, "onUpdate", [elapsed]);
 		}
 
-		if (controls.pressed('debug_1') && controls.pressed("reset"))
-		{
+		if (controls.pressed('debug_1') && controls.pressed("reset")) {
 			holding = true;
 			holdtime += elapsed;
-		}
-		else
-		{
+		} else {
 			holding = false;
 			holdtime = 0.0;
 		}
-		trace("holding: " + holding + ", holdtime: " + holdtime);
 
-		if (holding)
-		{
-			if (holdtime >= 0.5)
-			{
-				// Reload the stage
-				trace("Reloading stage: " + stagePath);
-				MusicBeatState.switchState(new CustomStage(stageName));
-				holding = false;
-				holdtime = 0.0;
-			}
-		}
-		else
-		{
+		if (holding && holdtime >= 0.5) {
+			trace("Reloading stage: " + stagePath);
+			reload();
 			holding = false;
 			holdtime = 0.0;
 		}
 	}
 
-	override public function destroy():Void
-	{
+	override public function destroy():Void {
 		super.destroy();
-		for (script in hscriptArray)
-		{
-			try
-			{
-				if (script.exists('onDestroy'))
-					script.call('onDestroy');
-				script.destroy();
-			}
-			catch (e:haxe.Exception)
-			{
-				trace('[ERROR] onDestroy(): ${e.message}');
-			}
-			hscriptArray.remove(script);
+		for (script in hscriptArray) {
+			tryCall(script, "onDestroy");
+			script.destroy();
 		}
+		hscriptArray = [];
 	}
 
-	override function beatHit():Void
-	{
+	override function beatHit():Void {
 		super.beatHit();
-		for (script in hscriptArray)
-		{
-			try
-			{
-				if (script.exists('onBeatHit'))
-					script.call('onBeatHit');
-			}
-			catch (e:haxe.Exception)
-			{
-				trace('[ERROR] onBeatHit(): ${e.message}');
-			}
+		for (script in hscriptArray) {
+			tryCall(script, "onBeatHit");
 		}
 	}
 
-	override function stepHit():Void
-	{
+	override function stepHit():Void {
 		super.stepHit();
-		for (script in hscriptArray)
-		{
-			try
-			{
-				if (script.exists('onStepHit'))
-					script.call('onStepHit');
-			}
-			catch (e:haxe.Exception)
-			{
-				trace('[ERROR] onStepHit(): ${e.message}');
-			}
+		for (script in hscriptArray) {
+			tryCall(script, "onStepHit");
 		}
 	}
 }

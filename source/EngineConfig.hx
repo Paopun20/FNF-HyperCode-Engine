@@ -9,10 +9,10 @@ class EngineConfig {
     // Version Information
     //======================
     
-    public static inline final ENGINR_NAME:String = "HyPsych";
+    public static inline final ENGINR_NAME:String = "HyperCode";
     public static inline final VERSION:String = "Indev 27042025";
-    public static inline final ENGINE_URL:String = "https://github.com/Paopun20/FNF-HyPsych-Engine";
-    public static inline final GITVERSION:String = "https://raw.githubusercontent.com/Paopun20/FNF-HyPsych-Engine/main/gitVersion.txt";
+    public static inline final ENGINE_URL:String = "https://github.com/Paopun20/FNF-HyperCode-Engine";
+    public static inline final GITVERSION:String = "https://raw.githubusercontent.com/Paopun20/FNF-HyperCode-Engine/main/gitVersion.txt";
 
     //======================
     // Integration IDs

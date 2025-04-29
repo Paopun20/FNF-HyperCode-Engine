@@ -4,20 +4,8 @@ package core.winapi;
 import sys.io.Process;
 import sys.io.File;
 import sys.FileSystem;
-
-class GUID {
-    public static function generate():String {
-        var template = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx';
-        return template.split('').map(function(c) {
-            var r = Std.random(16);
-            return switch (c) {
-                case 'x': StringTools.hex(r, 1);
-                case 'y': StringTools.hex((r & 0x3) | 0x8, 1);
-                default: c;
-            }
-        }).join('');
-    }
-}
+import core.UUID;
+import backend.Subprocess;
 
 class ToastNotification {
     public static function showToast(title:String, message:String, duration:Int):Void {
@@ -37,13 +25,15 @@ class ToastNotification {
         ";
 
         // Use GUID
-        var tempFile = 'toast_' + GUID.generate() + '.ps1';
+        var tempFile = 'toast_' + UUID.generate() + '.ps1';
         File.saveContent(tempFile, script);
 
         // Run PowerShell
         try {
-            var p = new Process('powershell', ['-ExecutionPolicy', 'Bypass', '-NoProfile', '-File', tempFile]);
-            p.close();
+            Subprocess.run(() -> {
+                var p = new Process('powershell', ['-ExecutionPolicy', 'Bypass', '-NoProfile', '-File', tempFile]);
+                p.close();
+            });
         } catch(e) {
             trace('Failed to show toast: ' + e);
         }

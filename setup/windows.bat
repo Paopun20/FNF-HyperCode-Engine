@@ -26,6 +26,5 @@ haxelib git hscript-improved https://github.com/FNF-CNE-Devs/hscript-improved.gi
 haxelib install hxcpp-debug-server
 haxelib install hscript
 haxelib install hxp
-haxelib install uuid
 
 echo Finished!

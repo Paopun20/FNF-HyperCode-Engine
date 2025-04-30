@@ -16,8 +16,6 @@ This engine is a fork of Psych Engine 1.0.4, featuring new capabilities, perform
 ## About
 HyperCode Engine is a fork of the Psych Engine
 
-> ⚠️ Not much of the original codebase remains… Rewrite until nothing remains of the original. LOL /j
-
 # Features:
 - **Custom Menu [It should be stable now, right?]**
   Create a menu using HScript! This allows for more complex and customizable menus.
@@ -56,7 +54,7 @@ Just like Psych Engine, HyperCode Engine is made for modders — with a cool API
 - `GetArgs`
 - `HttpClient`
 - `JsonHelper`
-- `ScreenInfo` *(Warning: May crash your game!)*
+- `ScreenInfo`
 - `UrlGen`
 - `WindowManager` *(Buggy)*
 - `ToastNotification` *(Windows 10/11 only)*
@@ -82,7 +80,8 @@ Yes, HyperCode Engine is a fork of Psych Engine, but with many new features and 
 
 ### How do I install HyperCode Engine?
 
-Not available for installation at this time or download from [GitHub actions](https://github.com/Paopun20/FNF-HyperCode-Engine/actions)!
+You can download the latest stable version from the [GitHub Releases page](https://github.com/Paopun20/FNF-HyperCode-Engine/releases)
+For early access to the newest builds, check out the [GitHub Actions page](https://github.com/Paopun20/FNF-HyperCode-Engine/actions)
 
 ### How can I report bugs or issues?
 

@@ -160,19 +160,6 @@ class CustomStage extends MusicBeatState {
 			script.destroy();
 		}
 		hscriptArray = [];
-	}
-
-	override function beatHit():Void {
-		super.beatHit();
-		for (script in hscriptArray) {
-			tryCall(script, "onBeatHit");
-		}
-	}
-
-	override function stepHit():Void {
-		super.stepHit();
-		for (script in hscriptArray) {
-			tryCall(script, "onStepHit");
-		}
+		hscriptArray.clear();
 	}
 }

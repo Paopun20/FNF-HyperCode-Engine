@@ -29,7 +29,7 @@ HyperCode Engine is a fork of the Psych Engine
 - **Buffer [Work in Progress]**
   Buffers temporarily store data in memory for more efficient data handling, improving overall performance.
 
-- **3D model support [ !! Work in Progress !! | NOT WORKING, IT TOO MUCH ERROR ]**
+- **3D model support**
   Now you can use 3D models in your mods! This feature allows for more complex and visually appealing scenes.
 
 # **Easy Modding** (with Chaos Included)
@@ -61,7 +61,6 @@ Just like Psych Engine, HyperCode Engine is made for modders — with a cool API
 
 ### Haxe-Only
 - `NdllUtil`
-- `Manager3D`
 
 ---
 

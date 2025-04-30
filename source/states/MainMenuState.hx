@@ -42,7 +42,6 @@ class MainMenuState extends MusicBeatState
 	{
 		super.create();
 		if (EngineConfig.IS_DEVELOPER) {
-			// optionShit.push('TEST');
 			optionShit.push('TEST2');
 		}
 
@@ -325,8 +324,6 @@ class MainMenuState extends MusicBeatState
 								PlayState.SONG.splashSkin = null;
 								PlayState.stageUI = 'normal';
 							}
-						case 'TEST':
-							// MusicBeatState.switchState(new TestState());
 						case 'TEST2':
 							MusicBeatState.switchCustomStage("testmenu");
 						case 'donate':

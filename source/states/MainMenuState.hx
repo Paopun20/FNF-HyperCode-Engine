@@ -97,7 +97,7 @@ class MainMenuState extends MusicBeatState
 			rightItem.x -= rightItem.width;
 		}
 
-		var text:String = EngineConfig.ENGINR_NAME+" Engine v " + psychEngineVersion
+		var text:String = EngineConfig.ENGINR_NAME+" Engine v " + psychEngineVersion;
 		if (EngineConfig.THISTESTBUILD) {
 			text = text + " [Early Access Edition] // This is Test Build, Please report any bugs!"
 		}

@@ -11,6 +11,7 @@ class EngineConfig {
     
     public static inline final ENGINR_NAME:String = "HyperCode";
     public static inline final VERSION:String = "Indev 30042025";
+    public static inline final THISTESTBUILD:BOOL = true;
     public static inline final ENGINE_URL:String = "https://github.com/Paopun20/FNF-HyperCode-Engine";
     public static inline final GITVERSION:String = "https://raw.githubusercontent.com/Paopun20/FNF-HyperCode-Engine/main/gitVersion.txt";
 

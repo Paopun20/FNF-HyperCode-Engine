@@ -159,7 +159,8 @@ class CustomStage extends MusicBeatState {
 			tryCall(script, "onDestroy");
 			script.destroy();
 		}
-		hscriptArray = [];
-		hscriptArray.clear();
+		
+		while (array.length > 0)
+			hscriptArray.pop();
 	}
 }

@@ -97,7 +97,12 @@ class MainMenuState extends MusicBeatState
 			rightItem.x -= rightItem.width;
 		}
 
-		var psychVer:FlxText = new FlxText(12, FlxG.height - 44, 0, EngineConfig.ENGINR_NAME+" Engine v " + psychEngineVersion, 12);
+		var text:String = EngineConfig.ENGINR_NAME+" Engine v " + psychEngineVersion
+		if (EngineConfig.THISTESTBUILD) {
+			text = text + " [Early Access Edition] // This is Test Build, Please report any bugs!"
+		}
+
+		var psychVer:FlxText = new FlxText(12, FlxG.height - 44, 0, text, 12);
 		psychVer.scrollFactor.set();
 		psychVer.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(psychVer);
@@ -119,10 +124,12 @@ class MainMenuState extends MusicBeatState
 		#end
 
 		#if CHECK_FOR_UPDATES
-		if (showOutdatedWarning && ClientPrefs.data.checkForUpdates && substates.OutdatedSubState.updateVersion != psychEngineVersion) {
-			persistentUpdate = false;
-			showOutdatedWarning = false;
-			openSubState(new substates.OutdatedSubState());
+		if (EngineConfig.THISTESTBUILD) {
+			if (showOutdatedWarning && ClientPrefs.data.checkForUpdates && substates.OutdatedSubState.updateVersion != psychEngineVersion) {
+				persistentUpdate = false;
+				showOutdatedWarning = false;
+				openSubState(new substates.OutdatedSubState());
+			}
 		}
 		#end
 

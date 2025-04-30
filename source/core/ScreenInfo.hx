@@ -1,89 +1,66 @@
 package core;
 
 import openfl.display.Screen;
-import lime.system.System;
-import haxe.ds.IntMap;
+import haxe.ds.Map;
 
-// Define a proper type for screen resolution data
+// Define a type for screen resolution data
 typedef ScreenResolution = {
+    index:Int,
     width:Float,
     height:Float
 }
 
-@:privateAccess
 class ScreenInfo {
+    public static function getScreenResolutions(getall:Bool): Array<ScreenResolution> {
+        var screenList: Array<ScreenResolution> = [];
 
-    // Unified screen information retrieval
-    public static function getScreenResolutions(includeAll:Bool = true):IntMap<ScreenResolution> {
-        var resolutions = new IntMap<ScreenResolution>();
-        
-        #if desktop
-        if (includeAll) {
+        if (getall == true) {
+            #if desktop
+            // Attempt to handle multi-screen setups
             try {
-                final screens = Screen.screens;
+                var screens = Reflect.field(Screen, "get_screens");
                 if (screens != null) {
-                    for (screen in screens) {
-                        final id = getDisplayIndex(screen);
-                        if (id != -1) {
-                            resolutions.set(id, getScreenResolution(screen));
+                    var screenArray: Array<Screen> = cast screens();
+                    for (screen in screenArray) {
+                        @:privateAccess {
+                            screenList.insert(
+                                screen.__displayIndex,
+                                {
+                                    "index": screen.__displayIndex,
+                                    "width": screen.bounds.width,
+                                    "height": screen.bounds.height
+                                }
+                            );
                         }
                     }
-                    return resolutions;
+                    return screenList;
                 }
-            } catch (e:Dynamic) {
-                log("Multi-screen detection failed, falling back to main screen", Warn);
+            } catch (e: Dynamic) {
+                // Handle platforms without multi-screen support
+                trace("Multi-screen support is not available. Falling back to primary screen.");
             }
-        }
-        #end
-
-        // Fallback to main screen
-        final mainScreen = Screen.mainScreen;
-        if (mainScreen != null) {
-            resolutions.set(0, getScreenResolution(mainScreen));
-        } else {
-            log("Failed to retrieve any screen information", Error);
+            #end
         }
 
-        return resolutions;
+        // Fallback to primary screen resolution
+        var primaryScreen = Screen.mainScreen;
+        screenList.push({
+            "index": 0,
+            "width": primaryScreen.bounds.width,
+            "height": primaryScreen.bounds.height
+        });
+
+        return screenList;
     }
 
-    // Helper to safely extract display index
-    private static function getDisplayIndex(screen:Screen):Int {
-        try {
-            // Safer reflection-based approach
-            final dynamicScreen:Dynamic = screen;
-            return (Reflect.hasField(dynamicScreen, "displayIndex"))
-                ? dynamicScreen.displayIndex
-                : -1;
-        } catch (e:Dynamic) {
-            log('Failed to get screen ID: ${e}', Warn);
-            return -1;
-        }
-    }
-
-    // Unified resolution extraction
     private static function getScreenResolution(screen:Screen):ScreenResolution {
+        var width:Float = screen.visibleBounds.width;
+        var height:Float = screen.visibleBounds.height;
+
         return {
-            width: screen.bounds.width,
-            height: screen.bounds.height
+            index: 0,
+            width: width,
+            height: height
         };
     }
-
-    // Logging utility
-    private static function log(message:String, level:LogLevel = Info) {
-        #if debug
-        final prefix = switch(level) {
-            case Error: "[ERROR]";
-            case Warn: "[WARN]";
-            case Info: "[INFO]";
-        };
-        trace('$prefix $message');
-        #end
-    }
-}
-
-enum LogLevel {
-    Error;
-    Warn;
-    Info;
 }

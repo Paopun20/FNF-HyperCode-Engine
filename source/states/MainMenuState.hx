@@ -98,7 +98,13 @@ class MainMenuState extends MusicBeatState
 			rightItem.x -= rightItem.width;
 		}
 
-		var psychVer:FlxText = new FlxText(12, FlxG.height - 44, 0, EngineConfig.ENGINR_NAME+" Engine v " + psychEngineVersion, 12);
+		var text:String = EngineConfig.ENGINE_NAME + " Engine v" + psychEngineVersion;
+
+		if (EngineConfig.THIS_IS_TEST_BUILD) {
+		    text += " [Early Access Edition] // This is a test build! Please report any bugs.";
+		}
+
+		var psychVer:FlxText = new FlxText(12, FlxG.height - 44, 0, text, 12);
 		psychVer.scrollFactor.set();
 		psychVer.setFormat(Paths.font("vcr.ttf"), 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
 		add(psychVer);

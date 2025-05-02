@@ -36,21 +36,17 @@ jobs:
     steps:
       - uses: actions/cache@v4
         with:
-          path: ~/.haxelib
-          key: ${{ runner.os }}-haxe-${{ hashFiles('**/*.hxml') }}
-  Computer:
-    name: Computer
-    runs-on: ubuntu-latest
-    needs: setup-haxe
-    steps:
-      - name: Setup Computer
-        run: echo "Computer setup complete."
-        shell: bash
+          path: |
+            ~/.haxelib
+            ~/.lime
+          key: ${{ runner.os }}-haxe-${{ hashFiles('Project.xml', '**/*.hxml', '**/haxelib.json') }}
+          restore-keys: |
+            ${{ runner.os }}-haxe-
 
   buildLinux:
     name: Build on Linux
     runs-on: ubuntu-latest
-    needs: Computer
+    needs: setup-haxe
     steps:
       - uses: actions/checkout@v4.1.7
       - uses: krdlab/setup-haxe@master
@@ -60,7 +56,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libvlc-dev libvlccore-dev
           haxelib setup ~/haxelib
-          haxelib install hxcpp --quiet
+          haxelib list | grep -q hxcpp || haxelib install hxcpp --quiet
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
       - run: echo "${{ github.run_id }}" > VERSION
@@ -68,17 +64,18 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Linux Build
-          path: 'export/release/linux/bin'
+          path: export/release/linux/bin
+          if-no-files-found: warn
+          compression-level: 9
 
   buildWindows:
     name: Build on Windows
     runs-on: windows-latest
-    needs: Computer
+    needs: setup-haxe
     continue-on-error: true
     strategy:
       matrix:
         arch: [64, 32]
-    
     steps:
       - uses: actions/checkout@v4.1.7
       - uses: krdlab/setup-haxe@master
@@ -86,7 +83,7 @@ jobs:
           haxe-version: ${{ env.HAXE_VERSION }}
       - run: |
           haxelib setup C:/haxelib
-          haxelib install hxcpp --quiet
+          haxelib list | findstr hxcpp || haxelib install hxcpp --quiet
           setup\windows.bat
         shell: cmd
       - run: echo "${{ github.run_id }}" > VERSION
@@ -97,11 +94,13 @@ jobs:
         with:
           name: Windows Build (x${{ matrix.arch }})
           path: export/${{ matrix.arch == 64 && 'release' || '32bit' }}/windows/bin
+          if-no-files-found: warn
+          compression-level: 9
 
   buildMac:
     name: Build on macOS (Universal)
     runs-on: macos-13
-    needs: Computer
+    needs: setup-haxe
     steps:
       - uses: actions/checkout@v4.1.7
       - uses: krdlab/setup-haxe@master
@@ -109,8 +108,8 @@ jobs:
           haxe-version: ${{ env.HAXE_VERSION }}
       - run: |
           haxelib setup ~/haxelib
-          haxelib install hxcpp --quiet
-          haxelib install lime --quiet
+          haxelib list | grep -q hxcpp || haxelib install hxcpp --quiet
+          haxelib list | grep -q lime || haxelib install lime --quiet
           haxelib run lime rebuild lime mac -64
           haxelib run lime rebuild lime mac -Dmac-catalyst -Dmac-arm64
           chmod +x ./setup/unix.sh
@@ -121,7 +120,9 @@ jobs:
         with:
           name: macOS Build
           path: export/release/macos/bin
-  
+          if-no-files-found: warn
+          compression-level: 9
+
   Mobile:
     name: Mobile
     runs-on: ubuntu-latest
@@ -130,8 +131,6 @@ jobs:
     steps:
       - name: Include Mobile Builds
         run: echo "Mobile builds are included."
-        shell: bash
-    
 
   buildAndroid:
     name: Build Android
@@ -148,11 +147,18 @@ jobs:
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
       - uses: android-actions/setup-android@v3
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
       - run: |
           haxelib setup ~/haxelib
-          haxelib install hxcpp --quiet
-          haxelib install lime --quiet
-          haxelib install openfl --quiet
+          haxelib list | grep -q hxcpp || haxelib install hxcpp --quiet
+          haxelib list | grep -q lime || haxelib install lime --quiet
+          haxelib list | grep -q openfl || haxelib install openfl --quiet
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
       - run: echo "${{ github.run_id }}" > VERSION
@@ -163,6 +169,8 @@ jobs:
         with:
           name: Android Build
           path: export/release/android/bin
+          if-no-files-found: warn
+          compression-level: 9
 
   buildiOS:
     name: Build iOS
@@ -176,9 +184,9 @@ jobs:
           haxe-version: ${{ env.HAXE_VERSION }}
       - run: |
           haxelib setup ~/haxelib
-          haxelib install hxcpp --quiet
-          haxelib install lime --quiet
-          haxelib install openfl --quiet
+          haxelib list | grep -q hxcpp || haxelib install hxcpp --quiet
+          haxelib list | grep -q lime || haxelib install lime --quiet
+          haxelib list | grep -q openfl || haxelib install openfl --quiet
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
       - run: echo "${{ github.run_id }}" > VERSION
@@ -187,6 +195,8 @@ jobs:
         with:
           name: iOS Build
           path: export/release/ios/bin/
+          if-no-files-found: warn
+          compression-level: 9
 
   notifyDiscord:
     name: 📣 Notify Discord
@@ -236,7 +246,7 @@ jobs:
               \"color\": $COLOR,
               \"fields\": [
                 { \"name\": \"🔗 Workflow Run\", \"value\": \"[View Run]($RUN_URL)\" },
-                { \"name\": \"📦 Branch\", \"value\": \"$BRANCH\", \"inline\": true },
+                { \"name\": \"📆 Branch\", \"value\": \"$BRANCH\", \"inline\": true },
                 { \"name\": \"🔖 Commit\", \"value\": \"[View Commit]($COMMIT_URL)\", \"inline\": true }
               ],
               \"footer\": { \"text\": \"GitHub Actions • ${{ github.repository }}\" },

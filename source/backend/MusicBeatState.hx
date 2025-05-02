@@ -220,12 +220,12 @@ class MusicBeatState extends FlxState
 			if (classType != null)
 				MusicBeatState.switchState(Type.createInstance(classType, []));
 			else
-				MusicBeatState.switchState(new states.MainMenuState());
+				MusicBeatState.switchCustomStage("MainMenuState");
 		}
 		catch (e:haxe.Exception)
 		{
-			trace('[switchCustomStage ERROR] ' + e);
-			MusicBeatState.switchState(new states.MainMenuState());
+			trace('[CustomStage API ERROR] ' + e);
+			MusicBeatState.switchCustomStage("MainMenuState");
 		}
 	}
 	public static function resetState()

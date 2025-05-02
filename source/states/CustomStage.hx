@@ -74,7 +74,7 @@ class CustomStage extends MusicBeatState {
 		if (Mods.currentModDirectory != null && Mods.currentModDirectory.length > 0) {
 			Mods.loadTopMod();
 		}
-		var stagePath = Paths.customStagePath(stateName);
+		var stagePath = Paths.customStage(stateName);
 		if (FileSystem.exists(stagePath) && FileSystem.isDirectory(stagePath)) {
 			for (file in FileSystem.readDirectory(stagePath)) {
 				if (file.endsWith(".hx")) return true;
@@ -88,7 +88,7 @@ class CustomStage extends MusicBeatState {
 		Mods.loadTopMod();
 		instance = this;
 		stageName = stateName;
-		stagePath = Paths.customStagePath(stateName);
+		stagePath = Paths.customStage(stateName);
 		trace("Loading custom stage: " + stagePath);
 		if (stagePath == null || stagePath.trim() == "") {
 			throw new haxe.Exception("Invalid stage path: " + stagePath);
@@ -160,7 +160,6 @@ class CustomStage extends MusicBeatState {
 			script.destroy();
 		}
 		
-		while (hscriptArray.length > 0)
-			hscriptArray.pop();
+		while (hscriptArray.length > 0) hscriptArray.pop(); // Fast
 	}
 }

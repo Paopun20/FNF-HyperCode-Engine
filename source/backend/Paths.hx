@@ -196,27 +196,31 @@ class Paths
 	inline static public function lua(key:String, ?folder:String)
 		return getPath('$key.lua', TEXT, folder, true);
 
-	//AWAY3D PATHS
+	// AWAY3D PATHS
+	inline static public function getModelPath(key:String='', ext:String='') return getPath('models/$key.$ext');
+
     inline static public function obj(key:String) return getModelPath(key, "obj");
 	inline static public function dae(key:String) return getModelPath(key, "dae");
 	inline static public function md2(key:String) return getModelPath(key, "md2");
 	inline static public function md5(key:String) return getModelPath(key, "md5");
 	inline static public function awd(key:String) return getModelPath(key, "awd");
 
-	static public function getModelPath(key:String='', ext:String='')
-	{
-		return getPath('models/$key.$ext');
-	}
-
 	// 3D Model Texture Handling
-	inline static public function modelTexture(key:String, ?extension:String = "png") {
-		return getPath('models/textures/$key.$extension');
-	}
+	inline static public function modelTexture(key:String, ?extension:String = "png") return getPath('models/textures/$key.$extension');
 
 	// 3D Model Material Handling
-	inline static public function modelMaterial(key:String) {
-		return getPath('models/$key.mtl'); // Or a dedicated folder
-	}
+	inline static public function modelMaterial(key:String) return getModelPath('$key.mtl'); // Or a dedicated folder
+
+	// 3D Model Shader Handling
+	inline static public function modelFragmentShader(key:String) return getModelPath('shaders/$key', 'frag');
+	inline static public function modelVertexShader(key:String) return getModelPath('shaders/$key', 'vert');
+	inline static public function modelGeometryShader(key:String) return getModelPath('shaders/$key', 'geom');
+
+	// ndll
+	inline static public function ndll(key:String) return getPath('ndlls/$key.ndll');
+	
+	// Custom Stage
+	inline static public function customStage(key:String) return getPath('custom_stages/$key');
 
 	inline static public function join(paths:Array<String> = null):String
 	{
@@ -237,14 +241,6 @@ class Paths
 			result += part;
 		}
 		return result;
-	}
-	
-	// ndll
-	inline static public function ndll(key:String) return getPath('ndlls/$key', BINARY);
-
-	static public function customStagePath(key:String)
-	{
-		return getPath('custom_stages/$key', TEXT);
 	}
 
 	// video

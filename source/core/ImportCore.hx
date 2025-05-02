@@ -91,6 +91,8 @@ import hgsl.macro.constant.VecBase;
 import core._import.Import_lime;
 import core._import.Import_openfl;
 
+using tink.CoreApi;
+import tink.await.*;
 using Lambda;
 using StringTools;
 

@@ -1,4 +1,4 @@
-package core._import;
+package _import;
 import openfl.Assets;
 import openfl.Lib;
 import openfl.Memory;

@@ -1,8 +1,8 @@
-package core.utils;
+package utils;
 
 import lime.app.Application;
 import haxe.Log;
-import core.system.macros.Utils as SysUtils;
+import system.macros.Utils as SysUtils;
 import lime.utils.Assets;
 import backend.Paths;
 import haxe.Log;

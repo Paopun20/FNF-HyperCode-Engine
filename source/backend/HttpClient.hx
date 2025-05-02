@@ -1,4 +1,4 @@
-package core;
+package backend;
 
 import haxe.Http;
 import haxe.http.HttpStatus;

@@ -1,4 +1,4 @@
-package core;
+package backend;
 
 class UUID {
 	public static function generate() {

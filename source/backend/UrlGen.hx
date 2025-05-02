@@ -1,4 +1,4 @@
-package core;
+package backend;
 
 class UrlGen {
     private static final URL_REGEX = ~/^(https?):\/\/([a-zA-Z0-9.-]+)(:[0-9]+)?(\/.*)?$/;

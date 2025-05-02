@@ -1,13 +1,13 @@
 package core;
 
-import core.BrainFuck;
-import core.GetArgs;
-import core.HttpClient;
-import core.JsonHelper;
-import core.ScreenInfo;
-import core.UrlGen;
-#if desktop import core.WindowManager; #end
-#if (windows) import core.winapi.ToastNotification; #end
+import backend.BrainFuck;
+import backend.GetArgs;
+import backend.HttpClient;
+import backend.JsonHelper;
+import backend.ScreenInfo;
+import backend.UrlGen;
+#if desktop import backend.WindowManager; #end
+#if (windows) import winapi.ToastNotification; #end
 import states.PlayState;
 
 import haxe.ds.IntMap;

@@ -11,7 +11,7 @@ import sys.io.FileInput;
 
 
 import haxe.ds.StringMap;
-import core.JsonHelper;
+import backend.JsonHelper;
 import haxe.ds.Map;
 
 class Replay {

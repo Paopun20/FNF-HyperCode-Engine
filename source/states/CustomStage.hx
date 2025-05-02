@@ -11,9 +11,6 @@ import psychlua.CustomSubstate;
 import psychlua.HScript;
 import crowplexus.hscript.Expr.Error as IrisError;
 #end
-import core.*;
-
-#if windows import core.winapi.ToastNotification; #end
 
 class CustomStage extends MusicBeatState {
 	public var stagePath:String = null;

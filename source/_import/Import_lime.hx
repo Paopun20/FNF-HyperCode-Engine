@@ -1,4 +1,4 @@
-package core._import;
+package _import;
 
 import lime.app.Application;
 import lime.app.Event;

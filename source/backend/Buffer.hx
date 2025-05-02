@@ -1,4 +1,4 @@
-package core;
+package backend;
 
 import haxe.io.Bytes;
 import haxe.io.BytesBuffer;

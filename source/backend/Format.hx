@@ -1,4 +1,4 @@
-package core;
+package backend;
 
 class FormatHelper {
     private static final SUFFIXES = ["","K", "M", "B", "T", "Q"];

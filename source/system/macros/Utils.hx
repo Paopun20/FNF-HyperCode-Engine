@@ -1,4 +1,4 @@
-package core.system.macros;
+package system.macros;
 
 #if macro
 import haxe.macro.Context;

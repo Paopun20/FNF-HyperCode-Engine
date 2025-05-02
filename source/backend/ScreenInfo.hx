@@ -1,4 +1,4 @@
-package core;
+package backend;
 
 import openfl.display.Screen;
 import haxe.ds.Map;

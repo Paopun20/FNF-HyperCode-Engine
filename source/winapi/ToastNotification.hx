@@ -1,10 +1,10 @@
 #if (windows)
-package core.winapi;
+package winapi;
 
 import sys.io.Process;
 import sys.io.File;
 import sys.FileSystem;
-import core.UUID;
+import backend.UUID;
 import backend.Subprocess;
 
 class ToastNotification {

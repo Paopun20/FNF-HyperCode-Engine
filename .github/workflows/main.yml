@@ -215,41 +215,48 @@ jobs:
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           COMMIT_URL: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
           BRANCH: ${{ github.ref_name }}
+          COMMIT_MESSAGE: >-
+            ${{ github.event.head_commit.message || github.event.pull_request.title || 'Manual Trigger' }}
         run: |
           check() {
             case "$1" in
-              success) echo "✅ Passed";;
+              success) echo "✅ Success";;
               skipped) echo "⚪ Skipped";;
               *) echo "❌ Failed";;
             esac
           }
 
-          STATUS_LINUX=$(check ${{ needs.buildLinux.result }})
-          STATUS_WIN=$(check ${{ needs.buildWindows.result }})
-          STATUS_MAC=$(check ${{ needs.buildMac.result }})
-          STATUS_ANDROID=$(check ${{ needs.buildAndroid.result }})
-          STATUS_IOS=$(check ${{ needs.buildiOS.result }})
+          STATUS_LINUX=$(check "${{ needs.buildLinux.result }}")
+          STATUS_WIN=$(check "${{ needs.buildWindows.result }}")
+          STATUS_MAC=$(check "${{ needs.buildMac.result }}")
+          STATUS_ANDROID=$(check "${{ needs.buildAndroid.result }}")
+          STATUS_IOS=$(check "${{ needs.buildiOS.result }}")
 
-          TITLE="✅ Build Successful"
+          TITLE="✅ All Builds Succeeded"
           COLOR=65280
           for status in "$STATUS_LINUX" "$STATUS_WIN" "$STATUS_MAC" "$STATUS_ANDROID" "$STATUS_IOS"; do
-            [[ "$status" == "❌ Failed" ]] && TITLE="❌ Build Failed" && COLOR=16711680 && break
+            if [[ "$status" == "❌ Failed" ]]; then
+              TITLE="❌ Build Failure Detected"
+              COLOR=16711680
+              break
+            fi
           done
 
-          CONTENT="**Linux**: $STATUS_LINUX\n**Windows**: $STATUS_WIN\n**macOS**: $STATUS_MAC\n**Android**: $STATUS_ANDROID\n**iOS**: $STATUS_IOS"
+          CONTENT="🖥️ **Desktop Builds**\n• Linux: $STATUS_LINUX\n• Windows: $STATUS_WIN\n• macOS: $STATUS_MAC\n\n📱 **Mobile Builds**\n• Android: $STATUS_ANDROID\n• iOS: $STATUS_IOS"
 
           curl -H "Content-Type: application/json" -X POST -d "{
-            \"username\": \"GitHub Build Report\",
+            \"username\": \"🚀 Haxe Build Bot\",
             \"embeds\": [{
               \"title\": \"$TITLE\",
               \"description\": \"$CONTENT\",
               \"color\": $COLOR,
               \"fields\": [
-                { \"name\": \"🔗 Workflow Run\", \"value\": \"[View Run]($RUN_URL)\" },
-                { \"name\": \"📆 Branch\", \"value\": \"$BRANCH\", \"inline\": true },
-                { \"name\": \"🔖 Commit\", \"value\": \"[View Commit]($COMMIT_URL)\", \"inline\": true }
+                { \"name\": \"📝 Commit Message\", \"value\": \"${COMMIT_MESSAGE}\" },
+                { \"name\": \"📦 Branch\", \"value\": \"$BRANCH\", \"inline\": true },
+                { \"name\": \"🔖 Commit\", \"value\": \"[View Commit]($COMMIT_URL)\", \"inline\": true },
+                { \"name\": \"🔗 Workflow Run\", \"value\": \"[Click Here]($RUN_URL)\" }
               ],
-              \"footer\": { \"text\": \"GitHub Actions • ${{ github.repository }}\" },
+              \"footer\": { \"text\": \"Haxe CI • ${{ github.repository }}\" },
               \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
             }]
-          }" $DISCORD_WEBHOOK
+          }" "$DISCORD_WEBHOOK"        

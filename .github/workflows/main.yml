@@ -15,6 +15,7 @@ on:
         description: "Include Android and iOS builds?"
         required: true
         type: boolean
+        default: true
 
 env:
   ARGS: "-D officialBuild -D NotDeveloper"

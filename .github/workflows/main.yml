@@ -176,6 +176,8 @@ jobs:
           haxelib list | grep -q openfl || haxelib install openfl --quiet || true
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
+          openfl setup android
+          flixel-tools setup android
       - run: lime setup android
       - run: haxelib run lime build android --app-version="$(cat VERSION)" "$ARGS"
       - uses: actions/upload-artifact@v4
@@ -204,6 +206,8 @@ jobs:
           haxelib list | grep -q openfl || haxelib install openfl --quiet || true
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
+          openfl setup ios
+          flixel-tools setup ios
       - run: haxelib run lime build ios --app-version="$(cat VERSION)" "$ARGS"
       - uses: actions/upload-artifact@v4
         with:

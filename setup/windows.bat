@@ -11,7 +11,7 @@ REM -- Core Libraries --
 haxelib install lime 8.2.2
 haxelib install openfl 9.4.1
 haxelib install flixel 5.6.1
-haxelib install flixel-addons 3.3.2
+haxelib install flixel-addons 3.2.2
 haxelib install flixel-tools 1.5.1
 
 REM -- Script & Tools --

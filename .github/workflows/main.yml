@@ -23,14 +23,11 @@ env:
 jobs:
   confirm:
     if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.confirm == 'true' }}
-    name: Confirm Build
     runs-on: ubuntu-latest
     steps:
-      - name: Confirm Build
-        run: echo "Build confirmed. Proceeding with the build."
+      - run: echo "Build confirmed. Proceeding with the build."
 
   setup-haxe:
-    name: Setup and Cache Haxe Dependencies
     runs-on: ubuntu-latest
     needs: confirm
     steps:
@@ -43,24 +40,40 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-haxe-
 
-  buildLinux:
-    name: Build on Linux
+  version:
+    name: Define Version
     runs-on: ubuntu-latest
     needs: setup-haxe
+    outputs:
+      version_tag: ${{ steps.setver.outputs.version }}
     steps:
-      - uses: actions/checkout@v4.1.7
+      - id: setver
+        run: echo "version=4.0.0-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
+      - run: echo "4.0.0-${{ github.run_id }}" > VERSION
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Version
+          path: VERSION
+
+  buildLinux:
+    runs-on: ubuntu-latest
+    needs: version
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Version
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
       - run: |
-          sudo apt-get update
-          sudo apt-get install -y libvlc-dev libvlccore-dev
           haxelib setup ~/haxelib
           haxelib list | grep -q hxcpp || haxelib install hxcpp --quiet
+          haxelib list | grep -q lime || haxelib install lime --quiet
+          haxelib list | grep -q openfl || haxelib install openfl --quiet || true
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
-      - run: echo "${{ github.run_id }}" > VERSION
-      - run: haxelib run lime build Project.xml linux --app-version="4.0.0-${{ github.run_id }}" $ARGS
+      - run: haxelib run lime build Project.xml linux --app-version="$(cat VERSION)" "$ARGS"
       - uses: actions/upload-artifact@v4
         with:
           name: Linux Build
@@ -69,15 +82,17 @@ jobs:
           compression-level: 9
 
   buildWindows:
-    name: Build on Windows
     runs-on: windows-latest
-    needs: setup-haxe
+    needs: version
     continue-on-error: true
     strategy:
       matrix:
         arch: [64, 32]
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Version
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
@@ -86,10 +101,8 @@ jobs:
           haxelib list | findstr hxcpp || haxelib install hxcpp --quiet
           setup\windows.bat
         shell: cmd
-      - run: echo "${{ github.run_id }}" > VERSION
+      - run: haxelib run lime build windows ${{ matrix.arch == 32 && '-32 -D 32bits' || '' }} --app-version="$(cat VERSION)" "$ARGS"
         shell: bash
-      - run: |
-          haxelib run lime build windows ${{ matrix.arch == 32 && '-32 -D 32bits' || '' }} --app-version="4.0.0-${{ github.run_id }}" $ARGS
       - uses: actions/upload-artifact@v4
         with:
           name: Windows Build (x${{ matrix.arch }})
@@ -98,11 +111,13 @@ jobs:
           compression-level: 9
 
   buildMac:
-    name: Build on macOS (Universal)
     runs-on: macos-13
-    needs: setup-haxe
+    needs: version
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Version
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
@@ -110,12 +125,12 @@ jobs:
           haxelib setup ~/haxelib
           haxelib list | grep -q hxcpp || haxelib install hxcpp --quiet
           haxelib list | grep -q lime || haxelib install lime --quiet
+          haxelib list | grep -q openfl || haxelib install openfl --quiet || true
           haxelib run lime rebuild lime mac -64
           haxelib run lime rebuild lime mac -Dmac-catalyst -Dmac-arm64
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
-      - run: echo "${{ github.run_id }}" > VERSION
-      - run: haxelib run lime build mac --app-version="4.0.0-${{ github.run_id }}" $ARGS
+      - run: haxelib run lime build mac --app-version="$(cat VERSION)" "$ARGS"
       - uses: actions/upload-artifact@v4
         with:
           name: macOS Build
@@ -124,21 +139,21 @@ jobs:
           compression-level: 9
 
   Mobile:
-    name: Mobile
     runs-on: ubuntu-latest
-    needs: setup-haxe
-    if: ${{ github.event.inputs.Mobile == 'true' }}
+    needs: version
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.Mobile == 'true' }}
     steps:
-      - name: Include Mobile Builds
-        run: echo "Mobile builds are included."
+      - run: echo "Mobile builds are included."
 
   buildAndroid:
-    name: Build Android
     runs-on: ubuntu-latest
     needs: Mobile
     if: ${{ github.event.inputs.Mobile == 'true' }}
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Version
       - uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
@@ -158,13 +173,11 @@ jobs:
           haxelib setup ~/haxelib
           haxelib list | grep -q hxcpp || haxelib install hxcpp --quiet
           haxelib list | grep -q lime || haxelib install lime --quiet
-          haxelib list | grep -q openfl || haxelib install openfl --quiet
+          haxelib list | grep -q openfl || haxelib install openfl --quiet || true
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
-      - run: echo "${{ github.run_id }}" > VERSION
-      - run: |
-          lime setup android
-          haxelib run lime build android --app-version="4.0.0-${{ github.run_id }}" $ARGS
+      - run: lime setup android
+      - run: haxelib run lime build android --app-version="$(cat VERSION)" "$ARGS"
       - uses: actions/upload-artifact@v4
         with:
           name: Android Build
@@ -173,12 +186,14 @@ jobs:
           compression-level: 9
 
   buildiOS:
-    name: Build iOS
     runs-on: macos-13
     needs: Mobile
     if: ${{ github.event.inputs.Mobile == 'true' }}
     steps:
-      - uses: actions/checkout@v4.1.7
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Version
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
@@ -186,11 +201,10 @@ jobs:
           haxelib setup ~/haxelib
           haxelib list | grep -q hxcpp || haxelib install hxcpp --quiet
           haxelib list | grep -q lime || haxelib install lime --quiet
-          haxelib list | grep -q openfl || haxelib install openfl --quiet
+          haxelib list | grep -q openfl || haxelib install openfl --quiet || true
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
-      - run: echo "${{ github.run_id }}" > VERSION
-      - run: haxelib run lime build ios --app-version="4.0.0-${{ github.run_id }}" $ARGS
+      - run: haxelib run lime build ios --app-version="$(cat VERSION)" "$ARGS"
       - uses: actions/upload-artifact@v4
         with:
           name: iOS Build
@@ -199,7 +213,6 @@ jobs:
           compression-level: 9
 
   notifyDiscord:
-    name: 📣 Notify Discord
     runs-on: ubuntu-latest
     if: always()
     needs:
@@ -208,15 +221,16 @@ jobs:
       - buildMac
       - buildAndroid
       - buildiOS
+      - version
     steps:
-      - name: Send Discord Notification
+      - name: Notify Discord
         env:
           DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
           COMMIT_URL: https://github.com/${{ github.repository }}/commit/${{ github.sha }}
           BRANCH: ${{ github.ref_name }}
-          COMMIT_MESSAGE: >-
-            ${{ github.event.head_commit.message || github.event.pull_request.title || 'Manual Trigger' }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message || github.event.pull_request.title || 'Manual Trigger' }}
+          VERSION: ${{ needs.version.outputs.version_tag }}
         run: |
           check() {
             case "$1" in
@@ -254,9 +268,10 @@ jobs:
                 { \"name\": \"📝 Commit Message\", \"value\": \"${COMMIT_MESSAGE}\" },
                 { \"name\": \"📦 Branch\", \"value\": \"$BRANCH\", \"inline\": true },
                 { \"name\": \"🔖 Commit\", \"value\": \"[View Commit]($COMMIT_URL)\", \"inline\": true },
-                { \"name\": \"🔗 Workflow Run\", \"value\": \"[Click Here]($RUN_URL)\" }
+                { \"name\": \"🔗 Workflow Run\", \"value\": \"[Click Here]($RUN_URL)\" },
+                { \"name\": \"🧾 Version\", \"value\": \"$VERSION\" }
               ],
               \"footer\": { \"text\": \"Haxe CI • ${{ github.repository }}\" },
               \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
             }]
-          }" "$DISCORD_WEBHOOK"        
+          }" "$DISCORD_WEBHOOK"

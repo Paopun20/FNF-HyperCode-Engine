@@ -1,6 +1,6 @@
 > [!Warning]  
 > **This engine is still under development!**  
-> If you encounter any bugs, please report them here: [GitHub Issues](issues)
+> If you encounter any bugs, please report them here: [GitHub Issues](https://github.com/Paopun20/FNF-HyperCode-Engine/issues)
 
 # Welcome to HyperCode Engine! 🎉
 

@@ -166,10 +166,14 @@ class VideoSprite extends FlxSpriteGroup {
 	public function play() videoSprite?.play();
 	public function resume() videoSprite?.resume();
 	public function pause() videoSprite?.pause();
-	public function mute() videoSprite?.bitmap.volume = 0;
-	public function unmute() videoSprite?.bitmap.volume = 100;
-	public function get_volume():Float return videoSprite?.bitmap.volume;
-	public function set_volume(value:Float) videoSprite.bitmap.volume = value;
 	
+	// plus volume stuff
+	public function get_volume():Float {
+		return Reflect.field(videoSprite.bitmap, "volume");
+	}
+	
+	public function set_volume(value:Float) {
+		Reflect.setField(videoSprite.bitmap, "volume", value);
+	}
 	#end
 }

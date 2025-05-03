@@ -5,6 +5,7 @@ import objects.Character;
 import psychlua.LuaUtils;
 import psychlua.CustomSubstate;
 import backend.*;
+import hscript.Classes;
 import utils.NdllUtil;
 
 #if LUA_ALLOWED
@@ -246,14 +247,7 @@ class HScript extends Iris
         #end
 
 		// Custom classes
-		set("BrainFuck", BrainFuck);
-		set("GetArgs", GetArgs);
-		set("HttpClient", HttpClient);
-		set("JsonHelper", JsonHelper);
-		set("ScreenInfo", ScreenInfo);
-		set("UrlGen", UrlGen);
-		set("WindowManager", WindowManager);
-		set("NdllUtil", NdllUtil);
+        for (classe in Classes.loadMap.keys()) set(classe, Classes.loadMap.get(classe));
 
         // Variable functions
         set('setVar', function(name:String, value:Dynamic) {

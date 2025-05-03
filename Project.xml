@@ -140,6 +140,7 @@
 	<haxelib name="away3d" />
 	<define name="IMPORT_AWAY3D" />
 	<define name="THREE_D_SUPPORT" />
+	<define name="SOFTCODED_STATES" />
 	<define name="CUSTOM_CLASSES" />
 	<haxedef name="NDLLS_SUPPORTED" unless="web || iphonesim || hl" />
 	

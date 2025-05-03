@@ -165,6 +165,12 @@ class CoolUtil
 		// #end
 	}
 
+	/**
+	 * Gets the macro class created by hscript-improved for an abstract / enum
+	 */
+	@:noUsing public static inline function getMacroAbstractClass(className:String)
+		return Type.resolveClass('${className}_HSC');
+
 	public static function setTextBorderFromString(text:FlxText, border:String)
 	{
 		switch(border.toLowerCase().trim())

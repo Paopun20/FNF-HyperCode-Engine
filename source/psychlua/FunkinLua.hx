@@ -1599,7 +1599,7 @@ class FunkinLua {
 			trace(e);
 			return;
 		}
-		trace('lua file loaded succesfully:' + scriptName);
+		trace('lua file loaded succesfully: ' + scriptName);
 
 		call('onCreate', []);
 	}

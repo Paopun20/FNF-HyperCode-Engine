@@ -40,6 +40,8 @@ class CreditsState extends MusicBeatState
 		var defaultList:Array<Array<String>> = [ //Name - Icon name - Description - Link - BG Color
 			["HyperCode Engine"],
 			["Paopun20",		"missing_icon",		"Solo Dev :skull:",					"https://www.youtube.com/@Paopun20",	"FFD700"],
+			// ["Asset"], 
+			// ["saharan", "missing_icon", "For the cool libraries", ] 
 			[""],
 			["Funkin' Crew"],
 			["ninjamuffin99",		"ninjamuffin99",	"Programmer of Friday Night Funkin'",						"https://x.com/ninja_muffin99",		"CF2D2D"],

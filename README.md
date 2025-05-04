@@ -100,7 +100,7 @@ Please report any bugs or issues on the [GitHub Issues page](https://github.com/
 ## **Credits**
 
 - **Paopun20** - Main Developer (Solo Developer)
-- **saharan** - For the awesome libraries
+- **saharan** - For the cool libraries
 - **T-Bar Engine** - For the 3D libraries and some code
 - **Codename Engine** - For the 3D model support and code improvements
 - **Shadow Mario** - For the original Psych Engine

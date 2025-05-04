@@ -43,4 +43,6 @@ haxelib git grig.audio https://gitlab.com/haxe-grig/grig.audio.git cbf91e2180fd2
 haxelib git away3d https://github.com/CodenameCrew/away3d
 haxelib git hscript-improved https://github.com/FNF-CNE-Devs/hscript-improved.git
 
+sudo apt-get install -y  vlc libvlc-dev libvlccore-dev vlc-bin
+
 echo -e "${GREEN}All dependencies installed successfully!${RESET}"

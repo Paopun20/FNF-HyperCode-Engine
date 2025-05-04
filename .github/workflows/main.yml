@@ -63,6 +63,13 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: Version
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.haxelib
+            ~/.lime
+          key: ${{ runner.os }}-haxe-${{ hashFiles('Project.xml', '**/*.hxml', '**/haxelib.json') }}
+          restore-keys: ${{ runner.os }}-haxe-
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
@@ -92,6 +99,12 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: Version
+      - uses: actions/cache@v4
+        with:
+          path: |
+            C:\\haxelib
+          key: windows-haxe-${{ hashFiles('Project.xml', '**/*.hxml', '**/haxelib.json') }}
+          restore-keys: windows-haxe-
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
@@ -117,6 +130,13 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: Version
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.haxelib
+            ~/.lime
+          key: macos-haxe-${{ hashFiles('Project.xml', '**/*.hxml', '**/haxelib.json') }}
+          restore-keys: macos-haxe-
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
@@ -161,6 +181,13 @@ jobs:
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: ${{ runner.os }}-gradle-
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.haxelib
+            ~/.lime
+          key: ${{ runner.os }}-haxe-${{ hashFiles('Project.xml', '**/*.hxml', '**/haxelib.json') }}
+          restore-keys: ${{ runner.os }}-haxe-
       - run: |
           haxelib setup ~/haxelib
           haxelib install hxcpp --quiet
@@ -189,6 +216,13 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: Version
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.haxelib
+            ~/.lime
+          key: macos-haxe-${{ hashFiles('Project.xml', '**/*.hxml', '**/haxelib.json') }}
+          restore-keys: macos-haxe-
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}

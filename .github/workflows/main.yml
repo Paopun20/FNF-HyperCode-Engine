@@ -38,8 +38,7 @@ jobs:
             ~/.haxelib
             ~/.lime
           key: ${{ runner.os }}-haxe-${{ hashFiles('Project.xml', '**/*.hxml', '**/haxelib.json') }}
-          restore-keys: |
-            ${{ runner.os }}-haxe-
+          restore-keys: ${{ runner.os }}-haxe-
 
   version:
     name: Define Version
@@ -69,9 +68,9 @@ jobs:
           haxe-version: ${{ env.HAXE_VERSION }}
       - run: |
           haxelib setup ~/haxelib
-          haxelib list | grep -q hxcpp || haxelib install hxcpp --quiet
-          haxelib list | grep -q lime || haxelib install lime --quiet
-          haxelib list | grep -q openfl || haxelib install openfl --quiet || true
+          haxelib install hxcpp --quiet
+          haxelib install lime --quiet
+          haxelib install openfl --quiet || true
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
       - run: haxelib run lime build Project.xml linux --app-version="$(cat VERSION)" "$ARGS"
@@ -85,7 +84,6 @@ jobs:
   buildWindows:
     runs-on: windows-latest
     needs: version
-    continue-on-error: true
     strategy:
       matrix:
         arch: [64, 32]
@@ -99,7 +97,7 @@ jobs:
           haxe-version: ${{ env.HAXE_VERSION }}
       - run: |
           haxelib setup C:/haxelib
-          haxelib list | findstr hxcpp || haxelib install hxcpp --quiet
+          haxelib install hxcpp --quiet
           setup\windows.bat
         shell: cmd
       - run: haxelib run lime build windows ${{ matrix.arch == 32 && '-32 -D 32bits' || '' }} --app-version="$(cat VERSION)" "$ARGS"
@@ -124,9 +122,9 @@ jobs:
           haxe-version: ${{ env.HAXE_VERSION }}
       - run: |
           haxelib setup ~/haxelib
-          haxelib list | grep -q hxcpp || haxelib install hxcpp --quiet
-          haxelib list | grep -q lime || haxelib install lime --quiet
-          haxelib list | grep -q openfl || haxelib install openfl --quiet || true
+          haxelib install hxcpp --quiet
+          haxelib install lime --quiet
+          haxelib install openfl --quiet || true
           haxelib run lime rebuild lime mac -64
           haxelib run lime rebuild lime mac -Dmac-catalyst -Dmac-arm64
           chmod +x ./setup/unix.sh
@@ -139,15 +137,10 @@ jobs:
           if-no-files-found: warn
           compression-level: 9
 
-  Mobile:
+  buildAndroid:
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.Mobile == 'true' }}
     runs-on: ubuntu-latest
     needs: version
-    steps:
-      - run: echo "Mobile builds are included."
-
-  buildAndroid:
-    runs-on: ubuntu-latest
-    needs: Mobile
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -170,13 +163,14 @@ jobs:
           restore-keys: ${{ runner.os }}-gradle-
       - run: |
           haxelib setup ~/haxelib
-          haxelib list | grep -q hxcpp || haxelib install hxcpp --quiet
-          haxelib list | grep -q lime || haxelib install lime --quiet
-          haxelib list | grep -q openfl || haxelib install openfl --quiet || true
+          haxelib install hxcpp --quiet
+          haxelib install lime --quiet
+          haxelib install openfl --quiet || true
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
           openfl setup android
           flixel-tools setup android
+          haxelib run lime setup android
       - run: lime setup android
       - run: haxelib run lime build android --app-version="$(cat VERSION)" "$ARGS"
       - uses: actions/upload-artifact@v4
@@ -187,8 +181,9 @@ jobs:
           compression-level: 9
 
   buildiOS:
+    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.Mobile == 'true' }}
     runs-on: macos-13
-    needs: Mobile
+    needs: version
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -199,13 +194,14 @@ jobs:
           haxe-version: ${{ env.HAXE_VERSION }}
       - run: |
           haxelib setup ~/haxelib
-          haxelib list | grep -q hxcpp || haxelib install hxcpp --quiet
-          haxelib list | grep -q lime || haxelib install lime --quiet
-          haxelib list | grep -q openfl || haxelib install openfl --quiet || true
+          haxelib install hxcpp --quiet
+          haxelib install lime --quiet
+          haxelib install openfl --quiet || true
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
           openfl setup ios
           flixel-tools setup ios
+          haxelib run lime setup ios
       - run: haxelib run lime build ios --app-version="$(cat VERSION)" "$ARGS"
       - uses: actions/upload-artifact@v4
         with:
@@ -261,7 +257,6 @@ jobs:
           CONTENT="🖥️ **Desktop Builds**\n• Linux: $STATUS_LINUX\n• Windows: $STATUS_WIN\n• macOS: $STATUS_MAC\n\n📱 **Mobile Builds**\n• Android: $STATUS_ANDROID\n• iOS: $STATUS_IOS"
 
           curl -H "Content-Type: application/json" -X POST -d "{
-            \"username\": \"🚀 Haxe Build Bot\",
             \"embeds\": [{
               \"title\": \"$TITLE\",
               \"description\": \"$CONTENT\",

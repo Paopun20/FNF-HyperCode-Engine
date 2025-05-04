@@ -7,6 +7,7 @@ import backend.Mods;
 import states.*;
 import objects.Character;
 import psychlua.CustomSubstate;
+import backend.Subprocess;
 #if HSCRIPT_ALLOWED
 import psychlua.HScript;
 import crowplexus.hscript.Expr.Error as IrisError;
@@ -41,11 +42,13 @@ class CustomStage extends MusicBeatState {
 
 	private function tryCall(script:HScript, func:String, args:Array<Dynamic> = null):Void {
 		if (script.exists(func)) {
-			try {
-				script.call(func, args);
-			} catch (e:haxe.Exception) {
-				trace('[${script.name}] Error in $func(): ${e.message}');
-			}
+			Subprocess.run(() -> {
+				try {
+					script.call(func, args);
+				} catch (e:haxe.Exception) {
+					trace('[${script.name}] Error in $func(): ${e.message}');
+				}
+			});
 		}
 	}
 
@@ -102,7 +105,9 @@ class CustomStage extends MusicBeatState {
 			for (file in FileSystem.readDirectory(stagePath)) {
 				if (file.endsWith(".hx")) {
 					trace('Found .hx file: $stagePath/$file');
-					initHScript(stagePath + "/" + file);
+					Subprocess.run(() -> {
+						initHScript(Sys.systemName() == "Windows" ? stagePath + "\\" + file : stagePath + "/" + file);
+					});
 				}
 			}
 		} else {
@@ -122,6 +127,10 @@ class CustomStage extends MusicBeatState {
 					function() reload()
 				));
 			}
+		}
+
+		for (script in hscriptArray) {
+			tryCall(script, "onCreatePost");
 		}
 	}
 
@@ -147,6 +156,10 @@ class CustomStage extends MusicBeatState {
 			reload();
 			holding = false;
 			holdtime = 0.0;
+		}
+
+		for (script in hscriptArray) {
+			tryCall(script, "onUpdatePost", [elapsed]);
 		}
 	}
 

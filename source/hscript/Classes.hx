@@ -66,11 +66,6 @@ class Classes {
 		"FlxRuntimeShader" => flixel.addons.display.FlxRuntimeShader, 
 		#end
 		"ShaderFilter"	=> openfl.filters.ShaderFilter,
-
-
-		//Extras with abstracts/enums
-		"FlxPoint" => CoolUtil.getMacroAbstractClass("flixel.math.FlxPoint"),
-		"FlxAxes" => CoolUtil.getMacroAbstractClass("flixel.util.FlxAxes"),
-		"FlxColor" => CoolUtil.getMacroAbstractClass("flixel.util.FlxColor")
+		
     ];
 }

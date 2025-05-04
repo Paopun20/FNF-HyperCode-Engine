@@ -77,7 +77,7 @@ jobs:
           haxelib setup ~/haxelib
           haxelib install hxcpp --quiet
           haxelib install lime --quiet
-          haxelib install openfl --quiet || true
+          haxelib install openfl --quiet
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
       - run: haxelib run lime build Project.xml linux --app-version="$(cat VERSION)" "$ARGS"
@@ -195,7 +195,7 @@ jobs:
           haxelib install openfl --quiet || true
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
-          openfl setup android
+          haxelib run openfl setup android
           flixel-tools setup android
           haxelib run lime setup android
       - run: lime setup android
@@ -230,10 +230,10 @@ jobs:
           haxelib setup ~/haxelib
           haxelib install hxcpp --quiet
           haxelib install lime --quiet
-          haxelib install openfl --quiet || true
+          haxelib install openfl --quiet
           chmod +x ./setup/unix.sh
           ./setup/unix.sh
-          openfl setup ios
+          haxelib run openfl setup ios
           flixel-tools setup ios
           haxelib run lime setup ios
       - run: haxelib run lime build ios --app-version="$(cat VERSION)" "$ARGS"

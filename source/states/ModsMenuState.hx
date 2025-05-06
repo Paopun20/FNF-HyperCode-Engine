@@ -314,16 +314,7 @@ class ModsMenuState extends MusicBeatState
 			FlxG.sound.play(Paths.sound('cancelMenu'));
 			if(waitingToRestart)
 			{
-				//MusicBeatState.switchCustomStage("TitleState");
-				TitleState.initialized = false;
-				TitleState.closedState = false;
-				FlxG.sound.music.fadeOut(0.3);
-				if(FreeplayState.vocals != null)
-				{
-					FreeplayState.vocals.fadeOut(0.3);
-					FreeplayState.vocals = null;
-				}
-				FlxG.camera.fade(FlxColor.BLACK, 0.5, false, FlxG.resetGame, false);
+				Game.restartGame();
 			}
 			else MusicBeatState.switchCustomStage("MainMenuState");
 

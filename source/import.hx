@@ -1,6 +1,7 @@
 #if !macro
 // Engine Config DONT DELETE THIS OR IT WILL BREAK EVERYTHING
 import EngineConfig;
+import Game;
 
 //Discord API
 #if DISCORD_ALLOWED

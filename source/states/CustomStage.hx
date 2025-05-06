@@ -40,15 +40,23 @@ class CustomStage extends MusicBeatState {
 		trace("[CustomStage] Script API injected successfully for " + script.name + ".");
 	}
 
-	private function tryCall(script:HScript, func:String, args:Array<Dynamic> = null):Void {
+	private function tryCall(script:HScript, func:String, args:Array<Dynamic> = null, threaded:Bool = false):Void {
 		if (script.exists(func)) {
-			Subprocess.run(() -> {
+			if (threaded) {
+				Subprocess.run(() -> {
+					try {
+						script.call(func, args);
+					} catch (e:haxe.Exception) {
+						trace('[${script.name}] Error in $func(): ${e.message}');
+					}
+				});
+			} else {
 				try {
 					script.call(func, args);
 				} catch (e:haxe.Exception) {
 					trace('[${script.name}] Error in $func(): ${e.message}');
 				}
-			});
+			}
 		}
 	}
 
@@ -57,7 +65,7 @@ class CustomStage extends MusicBeatState {
 		try {
 			newScript = new HScript(null, file);
 			stageAPI(newScript);
-			tryCall(newScript, "onCreate");
+			tryCall(newScript, "onCreate", null, true);
 			hscriptArray.push(newScript);
 			trace('Initialized HScript successfully: $file');
 		} catch (e:IrisError) {
@@ -85,7 +93,7 @@ class CustomStage extends MusicBeatState {
 
 	public function new(stateName:String) {
 		super();
-		Mods.loadTopMod();
+		// Mods.loadTopMod();
 		instance = this;
 		stageName = stateName;
 		stagePath = Paths.customStage(stateName);
@@ -123,8 +131,9 @@ class CustomStage extends MusicBeatState {
 			}
 			if (combinedError != "") {
 				MusicBeatState.switchState(new states.ErrorState(
-					"HMM, you got some error in your code:\n" + combinedError + "\n\nPress ACCEPT to reload CustomStage.",
-					function() reload()
+					"HMM, you got some error in your code:\n" + combinedError + "\n\nPress ACCEPT to reload CustomStage.\n\nPress ESC to restart game ( Not recommended to Restart Game )",
+					function() reload(),
+					function() Game.restartGame()
 				));
 			}
 		}

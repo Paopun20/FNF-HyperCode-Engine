@@ -15,8 +15,25 @@ import psychlua.FunkinLua;
 #if HSCRIPT_ALLOWED
 import crowplexus.iris.Iris;
 import crowplexus.iris.IrisConfig;
-import crowplexus.hscript.Expr.Error as IrisError;
-import crowplexus.hscript.Printer;
+// import crowplexus.hscript.Expr.Error as IrisError;
+// import crowplexus.hscript.Printer;
+
+import hscript.Async;
+import hscript.Bytes;  
+import hscript.Checker;
+import hscript.Config;
+import hscript.CustomClassHandler;
+import hscript.Expr;
+import hscript.IHScriptCustomBehaviour;
+import hscript.IHScriptCustomConstructor;
+import hscript.Interp;
+import hscript.Macro;
+import hscript.Parser;
+import hscript.Printer;
+import hscript.Tools;
+import hscript.macros.ClassExtendMacro;
+import hscript.macros.UsingHandler;
+import hscript.macros.Utils;
 
 import haxe.ValueException;
 
@@ -86,10 +103,10 @@ class HScript extends Iris
             try {
                 parent.hscript = new HScript(parent, code, varsToBring);
             }
-            catch(e:IrisError) {
+            catch(e:hscript.Error) { // IrisError to hscript.Error
                 var pos:HScriptInfos = cast {fileName: parent.scriptName, isLua: true};
                 if(parent.lastCalledFunction != '') pos.funcName = parent.lastCalledFunction;
-                Iris.error(Printer.errorToString(e, false), pos);
+                Iris.error(Printer.errorToString(e), pos);
                 parent.hscript = null;
             }
         }
@@ -102,11 +119,11 @@ class HScript extends Iris
                 var ret:Dynamic = hs.execute();
                 hs.returnValue = ret;
             }
-            catch(e:IrisError) {
+            catch(e:hscript.Error) { // IrisError to hscript.Error
                 var pos:HScriptInfos = cast hs.interp.posInfos();
                 pos.isLua = true;
                 if(parent.lastCalledFunction != '') pos.funcName = parent.lastCalledFunction;
-                Iris.error(Printer.errorToString(e, false), pos);
+                Iris.error(Printer.errorToString(e), pos);
                 hs.returnValue = null;
             }
         }
@@ -181,7 +198,7 @@ class HScript extends Iris
                 var ret:Dynamic = execute();
                 returnValue = ret;
             } 
-            catch(e:IrisError) {
+            catch(e:hscript.Error) { // IrisError to hscript.Error
                 returnValue = null;
                 this.destroy();
                 throw e;
@@ -303,8 +320,8 @@ class HScript extends Iris
 
                 set(libName, Type.resolveClass(str + libName));
             }
-            catch (e:IrisError) {
-                Iris.error(Printer.errorToString(e, false), this.interp.posInfos());
+            catch (e:hscript.Error) { // IrisError to hscript.Error
+                Iris.error(Printer.errorToString(e), this.interp.posInfos());
             }
         });
         
@@ -504,8 +521,8 @@ class HScript extends Iris
                 if (c != null)
                     funk.hscript.set(libName, c);
             }
-            catch (e:IrisError) {
-                Iris.error(Printer.errorToString(e, false), pos);
+            catch (e:hscript.Error) { // IrisError to hscript.Error
+                Iris.error(Printer.errorToString(e), pos);
             }
             
             if (FunkinLua.getBool('luaDebugMode') && FunkinLua.getBool('luaDeprecatedWarnings')) {
@@ -534,7 +551,7 @@ class HScript extends Iris
             final ret = Reflect.callMethod(null, func, args ?? []);
             return {funName: funcToRun, signature: func, returnValue: ret};
         }
-        catch(e:IrisError) {
+        catch(e:hscript.Error) { // IrisError to hscript.Error
             logError(e, funcToRun);
         }
         catch (e:ValueException) {

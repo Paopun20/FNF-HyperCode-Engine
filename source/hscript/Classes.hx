@@ -1,6 +1,55 @@
 package hscript;
-import backend.*;
+
+import backend.Achievements;
+import backend.ALSoftConfig;
+import backend.BaseStage;
+import backend.BrainFuck;
+import backend.Buffer;
+import backend.ClientPrefs;
+import backend.Conductor;
+import backend.Controls;
+import backend.CoolUtil;
+import backend.CustomFadeTransition;
+import backend.Difficulty;
+import backend.Discord;
+import backend.Format;
+import backend.GetArgs;
+import backend.Highscore;
+import backend.HttpClient;
+import backend.InputFormatter;
+import backend.JsonHelper;
+import backend.Language;
+import backend.Mods;
+import backend.MusicBeatState;
+import backend.MusicBeatSubstate;
+import backend.Native;
+import backend.NoteTypesConfig;
+import backend.Paths;
+import backend.PsychCamera;
+import backend.Rating;
+import backend.ScreenInfo;
+import backend.Song;
+import backend.StageData;
+import backend.StageManager;
+import backend.Subprocess;
+import backend.UrlGen;
+import backend.UUID;
+import backend.WeekData;
+import backend.WindowManager;
+import backend.animation.PsychAnimationController;
+import backend.ui.PsychUIBox;
+import backend.ui.PsychUIButton;
+import backend.ui.PsychUICheckBox;
+import backend.ui.PsychUIDropDownMenu;
+import backend.ui.PsychUIEventHandler;
+import backend.ui.PsychUIInputText;
+import backend.ui.PsychUINumericStepper;
+import backend.ui.PsychUIRadioGroup;
+import backend.ui.PsychUISlider;
+import backend.ui.PsychUITab;
+
 import utils.NdllUtil;
+import utils.TransparentWindow;
 
 class Classes {
     public static var loadMap:Map<String, Dynamic> = [ //All the default classes
@@ -23,6 +72,7 @@ class Classes {
 		"UrlGen" => UrlGen,
 		"WindowManager" => WindowManager,
 		"NdllUtil" => NdllUtil,
+		"TransparentWindow" => TransparentWindow,
 
         "FlxTween" => flixel.tweens.FlxTween,
         "FlxEase" => flixel.tweens.FlxEase,
@@ -66,6 +116,5 @@ class Classes {
 		"FlxRuntimeShader" => flixel.addons.display.FlxRuntimeShader, 
 		#end
 		"ShaderFilter"	=> openfl.filters.ShaderFilter,
-		
     ];
 }

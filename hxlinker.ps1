@@ -30,5 +30,5 @@ Get-ChildItem -Path $targetPath -Recurse -Filter *.hx | ForEach-Object {
         $importPath = $importPath -replace "\.\.", "."
     }
 
-    Write-Output "import $importPath;"
+    Write-Output "import $importPath;" # | clip
 }

@@ -50,6 +50,12 @@ import backend.ui.PsychUITab;
 
 import utils.NdllUtil;
 import utils.TransparentWindow;
+import winapi.ToastNotification;
+import flixel.addons.display.FlxPieDial;
+
+#if hxvlc
+import hxvlc.flixel.FlxVideoSprite;
+#end
 
 class Classes {
     public static var loadMap:Map<String, Dynamic> = [ //All the default classes
@@ -63,6 +69,14 @@ class Classes {
         "FlxG" => flixel.FlxG,
         "FlxSprite" => flixel.FlxSprite,
         "FlxTimer" => flixel.util.FlxTimer,
+		
+		"FlxPieDial" => FlxPieDial,
+		#if hxvlc
+		"FlxVideo" => FlxVideoSprite,
+		#end
+
+		"FlxObject" => flixel.FlxObject,
+        "FlxRect" => flixel.math.FlxRect,
 
         "BrainFuck" => BrainFuck,
 		"GetArgs" => GetArgs,
@@ -73,6 +87,9 @@ class Classes {
 		"WindowManager" => WindowManager,
 		"NdllUtil" => NdllUtil,
 		"TransparentWindow" => TransparentWindow,
+		"ToastNotification" => ToastNotification,
+		"WindowColorMode" => WindowColorMode,
+		"Discord" => DiscordClient,
 
         "FlxTween" => flixel.tweens.FlxTween,
         "FlxEase" => flixel.tweens.FlxEase,

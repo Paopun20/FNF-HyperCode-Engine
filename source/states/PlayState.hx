@@ -6,6 +6,7 @@ import backend.WeekData;
 import backend.Song;
 import backend.Rating;
 import backend.Subprocess;
+import backend.HealthIconAnimation;
 
 import flixel.FlxBasic;
 import flixel.FlxObject;
@@ -260,6 +261,7 @@ class PlayState extends MusicBeatState
 	// Less laggy controls
 	private var keysArray:Array<String>;
 	public var songName:String;
+	public var healthIconAnimationID = "Psych";
 
 	// Callbacks for stages
 	public var startCallback:Void->Void = null;
@@ -1726,7 +1728,7 @@ class PlayState extends MusicBeatState
 		if (healthBar.bounds.max != null && health > healthBar.bounds.max)
 			health = healthBar.bounds.max;
 
-		updateIconsScale(elapsed);
+		updateIconsAnimation(elapsed);
 		updateIconsPosition();
 
 		if (startedCountdown && !paused)
@@ -1880,14 +1882,11 @@ class PlayState extends MusicBeatState
 	}
 
 	// Health icon updaters
-	public dynamic function updateIconsScale(elapsed:Float)
+	public dynamic function updateIconsAnimation(elapsed:Float)
 	{
-		var mult:Float = FlxMath.lerp(1, iconP1.scale.x, Math.exp(-elapsed * 9 * playbackRate));
-		iconP1.scale.set(mult, mult);
+		HealthIconAnimation.animation(iconP1, elapsed, instance.healthIconAnimationID, "Dance");
 		iconP1.updateHitbox();
-
-		var mult:Float = FlxMath.lerp(1, iconP2.scale.x, Math.exp(-elapsed * 9 * playbackRate));
-		iconP2.scale.set(mult, mult);
+		HealthIconAnimation.animation(iconP2, elapsed, instance.healthIconAnimationID, "Dance");
 		iconP2.updateHitbox();
 	}
 
@@ -3232,9 +3231,9 @@ class PlayState extends MusicBeatState
 		if (generatedMusic)
 			notes.sort(FlxSort.byY, ClientPrefs.data.downScroll ? FlxSort.ASCENDING : FlxSort.DESCENDING);
 
-		iconP1.scale.set(1.2, 1.2);
-		iconP2.scale.set(1.2, 1.2);
-
+		HealthIconAnimation.animation(iconP1, 0, instance.healthIconAnimationID, "Reset");
+		HealthIconAnimation.animation(iconP2, 0, instance.healthIconAnimationID, "Reset");
+		
 		iconP1.updateHitbox();
 		iconP2.updateHitbox();
 

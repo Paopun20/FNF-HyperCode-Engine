@@ -68,10 +68,15 @@ class CustomStage extends MusicBeatState {
 			tryCall(newScript, "onCreate", null, true);
 			hscriptArray.push(newScript);
 			trace('Initialized HScript successfully: $file');
-		} catch (e:IrisError) {
+		} catch (e:haxe.Exception)
+		{
+			trace("Error initializing HScript: " + e);
+			trace("Error in file: " + file);
+			trace("Error message: " + e.message);
+
 			var map = new Map<String, String>();
 			map.set("file", file);
-			map.set("error", e.toString());
+			map.set("error", e.message);
 			errorlist.push(map);
 			return;
 		}
@@ -113,9 +118,7 @@ class CustomStage extends MusicBeatState {
 			for (file in FileSystem.readDirectory(stagePath)) {
 				if (file.endsWith(".hx")) {
 					trace('Found .hx file: $stagePath/$file');
-					Subprocess.run(() -> {
-						initHScript(Sys.systemName() == "Windows" ? stagePath + "\\" + file : stagePath + "/" + file);
-					});
+					initHScript(Sys.systemName() == "Windows" ? stagePath + "\\" + file : stagePath + "/" + file);
 				}
 			}
 		} else {
@@ -123,19 +126,13 @@ class CustomStage extends MusicBeatState {
 		}
 
 		if (errorlist.length > 0) {
-			var combinedError = "";
-			for (e in errorlist) {
-				trace("Error in file: " + e.get("file"));
-				trace("Error message: " + e.get("error"));
-				combinedError += e.get("error") + "\n";
-			}
-			if (combinedError != "") {
-				MusicBeatState.switchState(new states.ErrorState(
-					"HMM, you got some error in your code:\n" + combinedError + "\n\nPress ACCEPT to reload CustomStage.\n\nPress ESC to restart game ( Not recommended to Restart Game )",
-					function() reload(),
-					function() Game.restartGame()
-				));
-			}
+			FlxTransitionableState.skipNextTransIn = true;
+			FlxTransitionableState.skipNextTransOut = true;
+			MusicBeatState.switchState(new states.CustomStageError(
+				errorlist,
+				function() reload(),
+				function() Game.restartGame()
+			));
 		}
 
 		for (script in hscriptArray) {

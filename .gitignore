@@ -30,3 +30,4 @@ source/core/httpbackup.hx
 mods/*
 hxlinker.ps1
 ToDo
+*.lnk

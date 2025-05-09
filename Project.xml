@@ -41,7 +41,8 @@
 	<!-- ____________________________ Window Settings ___________________________ -->
 
 	<!--These window settings apply to all targets-->
-	<window width="1280" height="720" fps="60" background="#000000" hardware="true" vsync="false" allow-high-dpi="true" />
+	<window width="1280" height="720" fps="60" background="#00000000" hardware="true" vsync="false" allow-high-dpi="true" />
+	<haxedef name="window-transparent" />
 
 	<!--HTML5-specific-->
 	<window if="html5" resizable="true" />
@@ -123,7 +124,8 @@
 
 	<haxelib name="hxvlc" if="VIDEOS_ALLOWED" version="2.0.1"/>
 
-	<haxelib name="hxdiscord_rpc" version="1.2.4" if="DISCORD_ALLOWED"/>
+	<haxelib name="hxdiscord_rpc" if="DISCORD_ALLOWED"/>
+	<haxelib name="hxWindowColorMode"/>
 	<haxelib name="flxanimate"/>
 	<haxelib name="tink_await"/>
 

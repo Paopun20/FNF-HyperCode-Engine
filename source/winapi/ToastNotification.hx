@@ -14,34 +14,45 @@ class ToastNotification {
         message = message.replace('"', '`"').replace('`', '``');
 
         var script = "
-            [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] > $null;
-            $template = [Windows.UI.Notifications.ToastTemplateType]::ToastText02;
-            $xml = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent($template);
-            $xml.GetElementsByTagName(\"text\")[0].AppendChild($xml.CreateTextNode(\"" + title + "\"));
-            $xml.GetElementsByTagName(\"text\")[1].AppendChild($xml.CreateTextNode(\"" + message + "\"));
-            $toast = [Windows.UI.Notifications.ToastNotification]::new($xml);
-            $notifier = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier(\"HaxeApp\");
-            $notifier.Show($toast);
-        ";
+function Show-Notification {
+    [cmdletbinding()]
+    Param (
+        [string]
+        $ToastTitle,
+        [string]
+        [parameter(ValueFromPipeline)]
+        $ToastText
+    )
 
+    [Windows.UI.Notifications.ToastNotificationManager, Windows.UI.Notifications, ContentType = WindowsRuntime] > $null
+    $Template = [Windows.UI.Notifications.ToastNotificationManager]::GetTemplateContent([Windows.UI.Notifications.ToastTemplateType]::ToastText02)
+
+    $RawXml = [xml] $Template.GetXml()
+    ($RawXml.toast.visual.binding.text|where {$_.id -eq \"1\"}).AppendChild($RawXml.CreateTextNode($ToastTitle)) > $null
+    ($RawXml.toast.visual.binding.text|where {$_.id -eq \"2\"}).AppendChild($RawXml.CreateTextNode($ToastText)) > $null
+
+    $SerializedXml = New-Object Windows.Data.Xml.Dom.XmlDocument
+    $SerializedXml.LoadXml($RawXml.OuterXml)
+
+    $Toast = [Windows.UI.Notifications.ToastNotification]::new($SerializedXml)
+    $Toast.Tag = \"PowerShell\"
+    $Toast.Group = \"PowerShell\"
+    $Toast.ExpirationTime = [DateTimeOffset]::Now.AddMinutes(1)
+
+    $Notifier = [Windows.UI.Notifications.ToastNotificationManager]::CreateToastNotifier(\"PowerShell\")
+    $Notifier.Show($Toast);
+}
+Show-Notification -ToastTitle " + title + " -ToastText " + message;
         // Use GUID
-        var tempFile = 'toast_' + UUID.generate() + '.ps1';
+        var tempFile = Sys.getEnv("TEMP") + '/Hy/toast_' + UUID.generate() + '.ps1';
         File.saveContent(tempFile, script);
 
         // Run PowerShell
         try {
-            Subprocess.run(() -> {
-                var p = new Process('powershell', ['-ExecutionPolicy', 'Bypass', '-NoProfile', '-File', tempFile]);
-                p.close();
-            });
+            new Process('powershell', ['-ExecutionPolicy', 'Bypass', '-NoProfile', '-File', tempFile]);
         } catch(e) {
             trace('Failed to show toast: ' + e);
         }
-
-        // Clean up
-        try {
-            FileSystem.deleteFile(tempFile);
-        } catch(e) {}
     }
 }
 #end

@@ -261,8 +261,8 @@ class WindowManagerLua {
 #if (windows)
 class ToastNotificationLua {
     public function new(lua: State) {
-        Lua_helper.add_callback(lua, "toastNotification", function(title:String, message:String, duration:Int) {
-            ToastNotification.showToast(title, message, duration);
+        Lua_helper.add_callback(lua, "toastNotification", function(title:String, message:String) {
+            ToastNotification.showToast(title, message);
         });
     }
 }

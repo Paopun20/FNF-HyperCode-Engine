@@ -13,6 +13,7 @@ class DiscordClient
 	public static var isInitialized:Bool = false;
 	private inline static final _defaultID:String = EngineConfig.DC_CLIENTID;
 	public static var clientID(default, set):String = _defaultID;
+	public static var whoIsConnectedTo:Null<cpp.RawConstPointer<DiscordUser>>;
 	private static var discordPresence:DiscordRichPresence;
 
 	public static function initialize():Void
@@ -39,9 +40,7 @@ class DiscordClient
 			}
 		});
 
-		// Sys.sleep(10);
-		// Sys.println('Shutting down Discord RPC...');
-		// Discord.Shutdown();
+		isInitialized = true;
 	}
 
 	public dynamic static function shutdown()
@@ -56,6 +55,7 @@ class DiscordClient
 		final username:String = request[0].username;
 		final globalName:String = request[0].username;
 		final discriminator:Int = Std.parseInt(request[0].discriminator);
+		whoIsConnectedTo = request;
 
 		if (discriminator != 0)
 			Sys.println('Discord: Connected to user ${username}#${discriminator} ($globalName)');
@@ -86,6 +86,7 @@ class DiscordClient
 	private static function onDisconnected(errorCode:Int, message:cpp.ConstCharStar):Void
 	{
 		Sys.println('Discord: Disconnected ($errorCode:$message)');
+		whoIsConnectedTo = null;
 	}
 
 	private static function onError(errorCode:Int, message:cpp.ConstCharStar):Void

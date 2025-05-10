@@ -42,7 +42,6 @@
 
 	<!--These window settings apply to all targets-->
 	<window width="1280" height="720" fps="60" background="#00000000" hardware="true" vsync="false" allow-high-dpi="true" />
-	<haxedef name="window-transparent" />
 
 	<!--HTML5-specific-->
 	<window if="html5" resizable="true" />

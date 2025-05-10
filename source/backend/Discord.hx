@@ -64,8 +64,8 @@ class DiscordClient
 
 		discordPresence = new DiscordRichPresence();
 		discordPresence.type = DiscordActivityType_Playing;
-		discordPresence.state = "LOADING";
-		discordPresence.details = "LOADING";
+		discordPresence.state = "LOADING :3";
+		discordPresence.details = "LOADING :3";
 		// discordPresence.largeImageKey = "";
 		// discordPresence.smallImageKey = "";
 
@@ -81,6 +81,7 @@ class DiscordClient
         discordPresence.buttons[1] = button2;
 
 		Discord.UpdatePresence(cpp.RawConstPointer.addressOf(discordPresence));
+		changePresence();
 	}
 
 	private static function onDisconnected(errorCode:Int, message:cpp.ConstCharStar):Void

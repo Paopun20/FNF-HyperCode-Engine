@@ -11,11 +11,13 @@ class ToastNotification
 {
 	public static function showToast(title:String, message:String):Void
 	{
-		// Escape special characters
-		title = title.replace('"', '`"').replace('`', '``');
-		message = message.replace('"', '`"').replace('`', '``');
+		try
+		{
+			// Escape special characters
+			title = title.replace('"', '`"').replace('`', '``');
+			message = message.replace('"', '`"').replace('`', '``');
 
-		var script = "
+			var script = "
 function Show-Notification {
     [cmdletbinding()]
     Param (
@@ -45,25 +47,46 @@ function Show-Notification {
     $Notifier.Show($Toast);
 }
 Show-Notification -ToastTitle \""
-			+ title
-			+ "\" -ToastText \""
-			+ message
-			+ "\"";
-		// Use GUID
-		var tempDir = Sys.systemName() == "Windows" ? Sys.getEnv("TEMP") + '\\HyperCode' : Sys.getEnv("TEMP") + '/HyperCode';
-		if (!FileSystem.exists(tempDir))
-			FileSystem.createDirectory(tempDir);
-		var tempFile = tempDir + (Sys.systemName() == "Windows" ? ('\\toast_' + UUID.generate() + '.ps1') : ('/toast_' + UUID.generate() + '.ps1'));
-		File.saveContent(tempFile, script);
-		// trace('Saved toast script to: ' + tempFile);
-		Subprocess.run(() -> {
-			var powershell = new Process("cmd /c start /realtime /min powershell -ExecutionPolicy Bypass -NoProfile -File " + tempFile);
+				+ title
+				+ "\" -ToastText \""
+				+ message
+				+ "\"";
 
-			haxe.Timer.delay(function() {
-				FileSystem.deleteFile(tempFile);
-				// trace('Deleted toast script: ' + tempFile);
-			}, 10000); // Delay deletion by 2 seconds
-		});
+			var tempDir = Sys.systemName() == "Windows" ? Sys.getEnv("TEMP") + '\\HyperCode' : Sys.getEnv("TEMP") + '/HyperCode';
+			if (!FileSystem.exists(tempDir))
+				FileSystem.createDirectory(tempDir);
+			var tempFile = tempDir + (Sys.systemName() == "Windows" ? ('\\toast_' + UUID.generate() + '.ps1') : ('/toast_' + UUID.generate() + '.ps1'));
+
+			File.saveContent(tempFile, script);
+
+			Subprocess.run(() ->
+			{
+				try
+				{
+					var powershell = new Process("cmd /c start /realtime /min powershell -ExecutionPolicy Bypass -NoProfile -File " + tempFile);
+					haxe.Timer.delay(function()
+					{
+						try
+						{
+							if (FileSystem.exists(tempFile))
+								FileSystem.deleteFile(tempFile);
+						}
+						catch (e)
+						{
+							trace("Error deleting toast script: " + e);
+						}
+					}, 10000);
+				}
+				catch (e)
+				{
+					trace("Error launching PowerShell toast script: " + e);
+				}
+			});
+		}
+		catch (e)
+		{
+			trace("Error showing toast notification: " + e);
+		}
 	}
 }
 #end

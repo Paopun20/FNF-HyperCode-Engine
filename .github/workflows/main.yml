@@ -113,7 +113,7 @@ jobs:
           haxelib install hxcpp --quiet
           setup\windows.bat
         shell: cmd
-      - run: haxelib run lime build windows ${{ matrix.arch == 32 && '-32 -D 32bits' || '' }} --app-version="$(cat VERSION)" "$ARGS"
+      - run: haxelib run lime build windows ${{ matrix.arch == 32 && '-32 -D 32bits -D HXCPP_M32' || '' }} --app-version="$(cat VERSION)" "$ARGS"
         shell: bash
       - uses: actions/upload-artifact@v4
         with:

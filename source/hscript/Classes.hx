@@ -86,9 +86,13 @@ class Classes {
 		"UrlGen" => UrlGen,
 		"WindowManager" => WindowManager,
 		"NdllUtil" => NdllUtil,
+
+		#if windows
 		"TransparentWindow" => TransparentWindow,
 		"ToastNotification" => ToastNotification,
 		"WindowColorMode" => WindowColorMode,
+		#end
+		
 		"Discord" => DiscordClient,
 
         "FlxTween" => flixel.tweens.FlxTween,

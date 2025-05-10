@@ -205,7 +205,10 @@ class PlayState extends MusicBeatState
 	public var botplayTxt:FlxText;
 
 	public var iconP1:HealthIcon;
+	public var iconP1AnimationID = "Psych";
 	public var iconP2:HealthIcon;
+	public var iconP2AnimationID = "Psych";
+
 	public var camHUD:FlxCamera;
 	public var camGame:FlxCamera;
 	public var camOther:FlxCamera;
@@ -261,7 +264,6 @@ class PlayState extends MusicBeatState
 	// Less laggy controls
 	private var keysArray:Array<String>;
 	public var songName:String;
-	public var healthIconAnimationID = "Psych";
 
 	// Callbacks for stages
 	public var startCallback:Void->Void = null;
@@ -1884,9 +1886,9 @@ class PlayState extends MusicBeatState
 	// Health icon updaters
 	public dynamic function updateIconsAnimation(elapsed:Float)
 	{
-		HealthIconAnimation.animation(iconP1, elapsed, instance.healthIconAnimationID, "Dance");
+		HealthIconAnimation.animation(iconP1, elapsed, instance.iconP1AnimationID, "Dance");
 		iconP1.updateHitbox();
-		HealthIconAnimation.animation(iconP2, elapsed, instance.healthIconAnimationID, "Dance");
+		HealthIconAnimation.animation(iconP2, elapsed, instance.iconP2AnimationID, "Dance");
 		iconP2.updateHitbox();
 	}
 
@@ -3231,8 +3233,8 @@ class PlayState extends MusicBeatState
 		if (generatedMusic)
 			notes.sort(FlxSort.byY, ClientPrefs.data.downScroll ? FlxSort.ASCENDING : FlxSort.DESCENDING);
 
-		HealthIconAnimation.animation(iconP1, 0, instance.healthIconAnimationID, "Reset");
-		HealthIconAnimation.animation(iconP2, 0, instance.healthIconAnimationID, "Reset");
+		HealthIconAnimation.animation(iconP1, 0, instance.iconP1AnimationID, "Reset");
+		HealthIconAnimation.animation(iconP2, 0, instance.iconP2AnimationID, "Reset");
 		
 		iconP1.updateHitbox();
 		iconP2.updateHitbox();

@@ -14,7 +14,7 @@ import states.PlayState;
 import backend.WeekData;
 #end
 
-import gui.FPSCounter;
+import debug.FPSCounter;
 import EngineConfig;
 
 import core.ImportCore;

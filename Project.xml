@@ -124,7 +124,7 @@
 	<haxelib name="hxvlc" if="VIDEOS_ALLOWED" version="2.0.1"/>
 
 	<haxelib name="hxdiscord_rpc" if="DISCORD_ALLOWED"/>
-	<haxelib name="hxWindowColorMode"/>
+	<haxelib name="hxWindowColorMode" if="desktop"/>
 	<haxelib name="flxanimate"/>
 	<haxelib name="tink_await"/>
 

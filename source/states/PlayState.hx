@@ -205,9 +205,12 @@ class PlayState extends MusicBeatState
 	public var botplayTxt:FlxText;
 
 	public var iconP1:HealthIcon;
+	public var iconP1Animation:HealthIconAnimation;
 	public var iconP1AnimationID = "Psych";
+
 	public var iconP2:HealthIcon;
 	public var iconP2AnimationID = "Psych";
+	public var iconP2Animation:HealthIconAnimation;
 
 	public var camHUD:FlxCamera;
 	public var camGame:FlxCamera;
@@ -544,12 +547,16 @@ class PlayState extends MusicBeatState
 		iconP1.y = healthBar.y - 75;
 		iconP1.visible = !ClientPrefs.data.hideHud;
 		iconP1.alpha = ClientPrefs.data.healthBarAlpha;
+		iconP1Animation = new HealthIconAnimation(iconP1);
+		iconP1Animation.set(instance.iconP1AnimationID);
 		uiGroup.add(iconP1);
 
 		iconP2 = new HealthIcon(dad.healthIcon, false);
 		iconP2.y = healthBar.y - 75;
 		iconP2.visible = !ClientPrefs.data.hideHud;
 		iconP2.alpha = ClientPrefs.data.healthBarAlpha;
+		iconP2Animation = new HealthIconAnimation(iconP2);
+		iconP2Animation.set(instance.iconP2AnimationID);
 		uiGroup.add(iconP2);
 
 		scoreTxt = new FlxText(0, healthBar.y + 40, FlxG.width, "", 20);
@@ -1886,9 +1893,9 @@ class PlayState extends MusicBeatState
 	// Health icon updaters
 	public dynamic function updateIconsAnimation(elapsed:Float)
 	{
-		HealthIconAnimation.animation(iconP1, elapsed, instance.iconP1AnimationID, "Dance");
+		iconP1Animation.animation(elapsed, "Dance");
 		iconP1.updateHitbox();
-		HealthIconAnimation.animation(iconP2, elapsed, instance.iconP2AnimationID, "Dance");
+		iconP2Animation.animation(elapsed, "Dance");
 		iconP2.updateHitbox();
 	}
 
@@ -3233,8 +3240,8 @@ class PlayState extends MusicBeatState
 		if (generatedMusic)
 			notes.sort(FlxSort.byY, ClientPrefs.data.downScroll ? FlxSort.ASCENDING : FlxSort.DESCENDING);
 
-		HealthIconAnimation.animation(iconP1, 0, instance.iconP1AnimationID, "Reset");
-		HealthIconAnimation.animation(iconP2, 0, instance.iconP2AnimationID, "Reset");
+		iconP1Animation.animation(0, "Reset");
+		iconP2Animation.animation(0, "Reset");
 		
 		iconP1.updateHitbox();
 		iconP2.updateHitbox();

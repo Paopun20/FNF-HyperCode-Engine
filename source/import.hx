@@ -67,7 +67,10 @@ import flixel.group.FlxSpriteGroup;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.addons.transition.FlxTransitionableState;
 
+#if windows
 import hxwindowmode.WindowColorMode;
+#end
+import CompileTime;
 
 using StringTools;
 #end

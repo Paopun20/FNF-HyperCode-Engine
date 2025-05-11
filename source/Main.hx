@@ -279,8 +279,8 @@ class Main extends Sprite
 		errMsg += "==== CRASH REPORT ====\n";
 		errMsg += "Engine Version: " + EngineConfig.VERSION + "\n";
 		errMsg += "Platform: " + #if windows "Windows" #elseif linux "Linux" #elseif mac "Mac" #elseif android "Android" #elseif ios "iOS" #else "Unknown" #end + "\n";
-		// errMsg += "Build Date: " + CompileTime.getBuildDate() + "\n";
-		// errMsg += "Build Hash: " + CompileTime.getGitHash() + "\n\n";
+		errMsg += "Build Date: " + CompileTime.buildDate() + "\n";
+		errMsg += "Build Hash: " + CompileTime.buildGitCommitSha() + "\n\n";
 
 		// Exception stack trace
 		errMsg += "==== STACK TRACE ====\n";
@@ -298,6 +298,10 @@ class Main extends Sprite
 					errMsg += "Method: " + classname + "." + method + "\n";
 				case LocalFunction(n):
 					errMsg += "Local Function: " + n + "\n";
+				case Module(m):
+					errMsg += "Module: " + m + "\n";
+				default:
+					errMsg += "Unknown: " + stackItem + "\n";
 			}
 		}
 

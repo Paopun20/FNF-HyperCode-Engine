@@ -48,7 +48,7 @@
 
 	<!--Desktop-specific-->
 	<window if="desktop" orientation="landscape" fullscreen="false" resizable="true" vsync="false"/>
-
+	
 	<!--Mobile-specific-->
 	<window if="mobile" orientation="landscape" fullscreen="true" width="0" height="0" resizable="false"/>
 
@@ -125,6 +125,7 @@
 
 	<haxelib name="hxdiscord_rpc" if="DISCORD_ALLOWED"/>
 	<haxelib name="hxWindowColorMode" if="desktop"/>
+	<haxelib name="CompileTime" />
 	<haxelib name="flxanimate"/>
 	<haxelib name="tink_await"/>
 

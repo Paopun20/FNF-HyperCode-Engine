@@ -80,7 +80,7 @@ HyperCode Engine comes with several new features and improvements over Psych Eng
 - Faster garbage collection
 - A modern C++11 codebase
 - Many new extensions
-- Experimental 3D support
+- 3D support
 
 ### **Is HyperCode Engine a fork of Psych Engine?**
 

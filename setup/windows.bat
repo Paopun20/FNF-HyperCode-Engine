@@ -13,6 +13,7 @@ haxelib install flixel 5.6.1
 haxelib install flixel-addons 3.2.2
 haxelib install flixel-tools 1.5.1
 haxelib install hxWindowColorMode
+haxelib install CompileTime
 haxelib install hscript-iris 1.1.3
 haxelib install hscript
 haxelib install hxp

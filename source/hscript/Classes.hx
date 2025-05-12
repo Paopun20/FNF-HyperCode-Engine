@@ -49,8 +49,11 @@ import backend.ui.PsychUISlider;
 import backend.ui.PsychUITab;
 
 import utils.NdllUtil;
+#if windows
 import utils.TransparentWindow;
 import winapi.ToastNotification;
+#end
+
 import flixel.addons.display.FlxPieDial;
 
 #if hxvlc

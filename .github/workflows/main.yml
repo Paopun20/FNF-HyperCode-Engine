@@ -292,7 +292,7 @@ jobs:
             💬 Thanks for testing! Your feedback helps us improve the project before stable releases.  
             Follow us or watch the repo to get notified about official updates.
             
-            — HyperCodeEngine AutoBuilder 🤖
+            — HyperCode Engine AutoBuilder 🤖
           draft: false
           prerelease: true
       - name: Upload Artifacts

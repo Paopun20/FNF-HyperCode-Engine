@@ -67,11 +67,11 @@ jobs:
           haxe-version: ${{ env.HAXE_VERSION }}
       - run: bash ./ci/setup-haxe.sh
       - run: haxelib run lime build Project.xml linux --app-version="$(cat VERSION)" "$ARGS"
-      - run: zip -r HyPsychEngine-Linux.zip export/release/linux/bin
+      - run: zip -r HyperCodeEngine-Linux.zip export/release/linux/bin
       - uses: actions/upload-artifact@v4
         with:
           name: Linux Build
-          path: HyPsychEngine-Linux.zip
+          path: HyperCodeEngine-Linux.zip
 
   buildWindows:
     runs-on: windows-latest
@@ -91,11 +91,11 @@ jobs:
         shell: cmd
       - run: haxelib run lime build windows ${{ matrix.arch == 32 && '-32 -D 32bits -D HXCPP_M32' || '' }} --app-version="$(cat VERSION)" "$ARGS"
         shell: bash
-      - run: powershell Compress-Archive -Path export/${{ matrix.arch == 64 && 'release' || '32bit' }}/windows/bin/* -DestinationPath HyPsychEngine-Windows-x${{ matrix.arch }}.zip
+      - run: powershell Compress-Archive -Path export/${{ matrix.arch == 64 && 'release' || '32bit' }}/windows/bin/* -DestinationPath HyperCodeEngine-Windows-x${{ matrix.arch }}.zip
       - uses: actions/upload-artifact@v4
         with:
           name: Windows Build (x${{ matrix.arch }})
-          path: HyPsychEngine-Windows-x${{ matrix.arch }}.zip
+          path: HyperCodeEngine-Windows-x${{ matrix.arch }}.zip
 
   buildMac:
     runs-on: macos-13
@@ -111,11 +111,11 @@ jobs:
       - run: bash ./ci/setup-haxe.sh
       - run: haxelib run lime rebuild lime mac -64
       - run: haxelib run lime build mac --app-version="$(cat VERSION)" "$ARGS"
-      - run: ditto -c -k --sequesterRsrc --keepParent export/release/macos/bin/HyPsychEngine.app HyPsychEngine-macOS.zip
+      - run: ditto -c -k --sequesterRsrc --keepParent export/release/macos/bin/HyperCodeEngine.app HyperCodeEngine-macOS.zip
       - uses: actions/upload-artifact@v4
         with:
           name: macOS Build
-          path: HyPsychEngine-macOS.zip
+          path: HyperCodeEngine-macOS.zip
 
   buildAndroid:
     if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.Mobile == 'true' }}
@@ -136,11 +136,11 @@ jobs:
       - run: bash ./ci/setup-haxe.sh
       - run: haxelib run lime setup android
       - run: haxelib run lime build android --app-version="$(cat VERSION)" "$ARGS"
-      - run: zip -r HyPsychEngine-Android.zip export/release/android/bin
+      - run: zip -r HyperCodeEngine-Android.zip export/release/android/bin
       - uses: actions/upload-artifact@v4
         with:
           name: Android Build
-          path: HyPsychEngine-Android.zip
+          path: HyperCodeEngine-Android.zip
 
   buildiOS:
     if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.Mobile == 'true' }}
@@ -157,11 +157,11 @@ jobs:
       - run: bash ./ci/setup-haxe.sh
       - run: haxelib run lime setup ios
       - run: haxelib run lime build ios --app-version="$(cat VERSION)" "$ARGS"
-      - run: zip -r HyPsychEngine-iOS.zip export/release/ios/bin
+      - run: zip -r HyperCodeEngine-iOS.zip export/release/ios/bin
       - uses: actions/upload-artifact@v4
         with:
           name: iOS Build
-          path: HyPsychEngine-iOS.zip
+          path: HyperCodeEngine-iOS.zip
 
   notifyDiscord:
     runs-on: ubuntu-latest
@@ -292,7 +292,7 @@ jobs:
             💬 Thanks for testing! Your feedback helps us improve the project before stable releases.  
             Follow us or watch the repo to get notified about official updates.
             
-            — HyPsychEngine AutoBuilder 🤖
+            — HyperCodeEngine AutoBuilder 🤖
           draft: false
           prerelease: true
       - name: Upload Artifacts

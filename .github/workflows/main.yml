@@ -26,7 +26,7 @@ jobs:
     if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.confirm == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - run: echo "Build confirmed. Proceeding with the build."
+      - run: echo "✅ Build confirmed."
 
   setup-haxe:
     runs-on: ubuntu-latest
@@ -41,7 +41,6 @@ jobs:
           restore-keys: ${{ runner.os }}-haxe-
 
   version:
-    name: Define Version
     runs-on: ubuntu-latest
     needs: setup-haxe
     outputs:
@@ -57,40 +56,26 @@ jobs:
 
   buildLinux:
     runs-on: ubuntu-latest
-    needs: version
+    needs: [version, confirm]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           name: Version
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.haxelib
-            ~/.lime
-          key: ${{ runner.os }}-haxe-${{ hashFiles('Project.xml', '**/*.hxml', '**/haxelib.json') }}
-          restore-keys: ${{ runner.os }}-haxe-
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
-      - run: |
-          haxelib setup ~/haxelib
-          haxelib install hxcpp --quiet
-          haxelib install lime --quiet
-          haxelib install openfl --quiet
-          chmod +x ./setup/unix.sh
-          ./setup/unix.sh
+      - run: bash ./ci/setup-haxe.sh
       - run: haxelib run lime build Project.xml linux --app-version="$(cat VERSION)" "$ARGS"
+      - run: zip -r HyPsychEngine-Linux.zip export/release/linux/bin
       - uses: actions/upload-artifact@v4
         with:
           name: Linux Build
-          path: export/release/linux/bin
-          if-no-files-found: warn
-          compression-level: 9
+          path: HyPsychEngine-Linux.zip
 
   buildWindows:
     runs-on: windows-latest
-    needs: version
+    needs: [version, confirm]
     strategy:
       matrix:
         arch: [64, 32]
@@ -99,68 +84,43 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: Version
-      - uses: actions/cache@v4
-        with:
-          path: |
-            C:\\haxelib
-          key: windows-haxe-${{ hashFiles('Project.xml', '**/*.hxml', '**/haxelib.json') }}
-          restore-keys: windows-haxe-
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
-      - run: |
-          haxelib setup C:/haxelib
-          haxelib install hxcpp --quiet
-          setup\windows.bat
+      - run: setup\windows.bat
         shell: cmd
       - run: haxelib run lime build windows ${{ matrix.arch == 32 && '-32 -D 32bits -D HXCPP_M32' || '' }} --app-version="$(cat VERSION)" "$ARGS"
         shell: bash
+      - run: powershell Compress-Archive -Path export/${{ matrix.arch == 64 && 'release' || '32bit' }}/windows/bin/* -DestinationPath HyPsychEngine-Windows-x${{ matrix.arch }}.zip
       - uses: actions/upload-artifact@v4
         with:
           name: Windows Build (x${{ matrix.arch }})
-          path: export/${{ matrix.arch == 64 && 'release' || '32bit' }}/windows/bin
-          if-no-files-found: warn
-          compression-level: 9
+          path: HyPsychEngine-Windows-x${{ matrix.arch }}.zip
 
   buildMac:
     runs-on: macos-13
-    needs: version
+    needs: [version, confirm]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           name: Version
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.haxelib
-            ~/.lime
-          key: macos-haxe-${{ hashFiles('Project.xml', '**/*.hxml', '**/haxelib.json') }}
-          restore-keys: macos-haxe-
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
-      - run: |
-          haxelib setup ~/haxelib
-          haxelib install hxcpp --quiet
-          haxelib install lime --quiet
-          haxelib install openfl --quiet || true
-          haxelib run lime rebuild lime mac -64
-          haxelib run lime rebuild lime mac -Dmac-catalyst -Dmac-arm64
-          chmod +x ./setup/unix.sh
-          ./setup/unix.sh
+      - run: bash ./ci/setup-haxe.sh
+      - run: haxelib run lime rebuild lime mac -64
       - run: haxelib run lime build mac --app-version="$(cat VERSION)" "$ARGS"
+      - run: ditto -c -k --sequesterRsrc --keepParent export/release/macos/bin/HyPsychEngine.app HyPsychEngine-macOS.zip
       - uses: actions/upload-artifact@v4
         with:
           name: macOS Build
-          path: export/release/macos/bin
-          if-no-files-found: warn
-          compression-level: 9
+          path: HyPsychEngine-macOS.zip
 
   buildAndroid:
     if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.Mobile == 'true' }}
     runs-on: ubuntu-latest
-    needs: version
+    needs: [version, confirm]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -173,76 +133,35 @@ jobs:
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
-      - uses: android-actions/setup-android@v3
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: ${{ runner.os }}-gradle-
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.haxelib
-            ~/.lime
-          key: ${{ runner.os }}-haxe-${{ hashFiles('Project.xml', '**/*.hxml', '**/haxelib.json') }}
-          restore-keys: ${{ runner.os }}-haxe-
-      - run: |
-          haxelib setup ~/haxelib
-          haxelib install hxcpp --quiet
-          haxelib install lime --quiet
-          haxelib install openfl --quiet || true
-          chmod +x ./setup/unix.sh
-          ./setup/unix.sh
-          haxelib run openfl setup android
-          flixel-tools setup android
-          haxelib run lime setup android
-      - run: lime setup android
+      - run: bash ./ci/setup-haxe.sh
+      - run: haxelib run lime setup android
       - run: haxelib run lime build android --app-version="$(cat VERSION)" "$ARGS"
+      - run: zip -r HyPsychEngine-Android.zip export/release/android/bin
       - uses: actions/upload-artifact@v4
         with:
           name: Android Build
-          path: export/release/android/bin
-          if-no-files-found: warn
-          compression-level: 9
+          path: HyPsychEngine-Android.zip
 
   buildiOS:
     if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.Mobile == 'true' }}
     runs-on: macos-13
-    needs: version
+    needs: [version, confirm]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           name: Version
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.haxelib
-            ~/.lime
-          key: macos-haxe-${{ hashFiles('Project.xml', '**/*.hxml', '**/haxelib.json') }}
-          restore-keys: macos-haxe-
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
-      - run: |
-          haxelib setup ~/haxelib
-          haxelib install hxcpp --quiet
-          haxelib install lime --quiet
-          haxelib install openfl --quiet
-          chmod +x ./setup/unix.sh
-          ./setup/unix.sh
-          haxelib run openfl setup ios
-          flixel-tools setup ios
-          haxelib run lime setup ios
+      - run: bash ./ci/setup-haxe.sh
+      - run: haxelib run lime setup ios
       - run: haxelib run lime build ios --app-version="$(cat VERSION)" "$ARGS"
+      - run: zip -r HyPsychEngine-iOS.zip export/release/ios/bin
       - uses: actions/upload-artifact@v4
         with:
           name: iOS Build
-          path: export/release/ios/bin/
-          if-no-files-found: warn
-          compression-level: 9
+          path: HyPsychEngine-iOS.zip
 
   notifyDiscord:
     runs-on: ubuntu-latest
@@ -306,3 +225,40 @@ jobs:
               \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\"
             }]
           }" "$DISCORD_WEBHOOK"
+
+  upload-to-github-releases:
+    runs-on: ubuntu-latest
+    needs:
+      - buildLinux
+      - buildWindows
+      - buildMac
+      - buildAndroid
+      - buildiOS
+      - version
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: builds
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ needs.version.outputs.version_tag }}
+          release_name: Release ${{ needs.version.outputs.version_tag }}
+          draft: false
+          prerelease: false
+      - name: Upload Artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            builds/*/*.zip
+            builds/*/*.apk
+            builds/*/*.ipa
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

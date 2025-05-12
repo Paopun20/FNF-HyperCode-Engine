@@ -250,9 +250,51 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ needs.version.outputs.version_tag }}
-          release_name: Release ${{ needs.version.outputs.version_tag }}
+          release_name: \[AutoBuild Bata\] Release ${{ needs.version.outputs.version_tag }}
+          body: |
+            🚧 **[AutoBuild] Experimental Release – Use With Caution!**
+                  
+            This release was automatically built from the latest changes pushed to the `main` branch.
+            It is generated for testing, preview, and development purposes only, and is **not considered stable or production-ready**.
+                  
+            ---
+            ### ⚠️ Disclaimer:
+            This version is **NOT an official release**. It may:
+            - Contain incomplete or experimental features.
+            - Include untested code or breaking changes.
+            - Lack performance optimization or full support across platforms.
+            - Be removed or overwritten in future automated builds.
+            
+            ---
+            ### 📦 Build Information:
+            - Version: `${{ needs.version.outputs.version_tag }}`
+            - Branch: `main`
+            - Commit: `${{ github.sha }}`
+            - Trigger: `${{ github.event_name }}`
+            - Timestamp: `${{ github.event.created }}`
+            
+            ---
+            ### 📋 What’s included:
+            - ✅ Desktop builds (Linux, Windows, macOS)
+            - ✅ Mobile builds (Android, iOS) *(if selected)*
+            - ✅ Automatically versioned build artifacts
+            - ✅ Discord notifications upon completion
+            
+            ---
+            ### 📣 Reporting Issues
+            Found a bug or unexpected behavior? Please open an issue on our GitHub repo and describe:
+            - What you were doing
+            - Expected vs actual results
+            - OS and platform info
+            - Attach logs/screenshots if possible
+            
+            ---
+            💬 Thanks for testing! Your feedback helps us improve the project before stable releases.  
+            Follow us or watch the repo to get notified about official updates.
+            
+            — HyPsychEngine AutoBuilder 🤖
           draft: false
-          prerelease: false
+          prerelease: true
       - name: Upload Artifacts
         uses: softprops/action-gh-release@v1
         with:

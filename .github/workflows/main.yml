@@ -253,7 +253,7 @@ jobs:
           path: builds
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        uses: actions/create-release@v1.1.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -293,7 +293,7 @@ jobs:
             💬 Thanks for testing! Your feedback helps us improve the project before stable releases.  
             Follow us or watch the repo to get notified about official updates.
             
-            — HyperCode Engine AutoBuilder 🤖
+            — HyperCode Engine AutoBuilder
           draft: false
           prerelease: true
       - name: Upload Artifacts

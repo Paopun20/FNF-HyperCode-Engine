@@ -235,7 +235,7 @@ jobs:
       - buildAndroid
       - buildiOS
       - version
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: always()
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -250,7 +250,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ needs.version.outputs.version_tag }}
-          release_name: \[AutoBuild Bata\] Release ${{ needs.version.outputs.version_tag }}
+          release_name: \[AutoBuild\] Experimental Release ${{ needs.version.outputs.version_tag }}
           body: |
             🚧 **[AutoBuild] Experimental Release – Use With Caution!**
                   
@@ -272,13 +272,6 @@ jobs:
             - Commit: `${{ github.sha }}`
             - Trigger: `${{ github.event_name }}`
             - Timestamp: `${{ github.event.created }}`
-            
-            ---
-            ### 📋 What’s included:
-            - ✅ Desktop builds (Linux, Windows, macOS)
-            - ✅ Mobile builds (Android, iOS) *(if selected)*
-            - ✅ Automatically versioned build artifacts
-            - ✅ Discord notifications upon completion
             
             ---
             ### 📣 Reporting Issues

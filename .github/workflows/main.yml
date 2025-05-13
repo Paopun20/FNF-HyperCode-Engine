@@ -9,6 +9,8 @@ permissions:
 on:
   push:
     branches: [ main ]
+    tags:
+    - 'v*'
   pull_request:
     branches: [ main ]
   workflow_dispatch:
@@ -258,7 +260,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ needs.version.outputs.version_tag }}
-          release_name: \[AutoBuild\] Experimental Release ${{ needs.version.outputs.version_tag }}
+          release_name: "[AutoBuild] Experimental Release ${{ needs.version.outputs.version_tag }}"
           body: |
             🚧 **[AutoBuild] Experimental Release – Use With Caution!**
                   
@@ -297,8 +299,9 @@ jobs:
           draft: false
           prerelease: true
       - name: Upload Artifacts
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2.2.2
         with:
+          tag_name: ${{ needs.version.outputs.version_tag }}
           files: |
             builds/*/*.zip
             builds/*/*.apk

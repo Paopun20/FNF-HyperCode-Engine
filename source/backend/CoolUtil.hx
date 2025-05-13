@@ -10,9 +10,11 @@ class CoolUtil
 	public static function checkForUpdates(url:String = null):String {
 		if (url == null || url.length == 0) url = EngineConfig.GITVERSION;
 		var version:String = states.MainMenuState.psychEngineVersion.trim();
+		var done = false;
 		if(ClientPrefs.data.checkForUpdates) {
 			trace('checking for updates...');
 			HttpClient.getRequest(url, function(suss, data) {
+				done = true;
 				if (suss) {
 					//data = data;
 					if(data != null && data.length > 0) {
@@ -28,6 +30,7 @@ class CoolUtil
 				}
 			});
 		}
+		while(!done) Sys.sleep(0.01);
 		return version;
 	}
 	inline public static function quantize(f:Float, snap:Float){

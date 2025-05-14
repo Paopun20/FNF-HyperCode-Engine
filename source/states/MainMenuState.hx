@@ -132,10 +132,12 @@ class MainMenuState extends MusicBeatState
 		#end
 
 		#if CHECK_FOR_UPDATES
-		if (showOutdatedWarning && ClientPrefs.data.checkForUpdates && substates.OutdatedSubState.updateVersion != psychEngineVersion) {
-			persistentUpdate = false;
-			showOutdatedWarning = false;
-			openSubState(new substates.OutdatedSubState());
+		if (!EngineConfig.THIS_IS_TEST_BUILD) {
+			if (showOutdatedWarning && ClientPrefs.data.checkForUpdates && substates.OutdatedSubState.updateVersion != psychEngineVersion) {
+				persistentUpdate = false;
+				showOutdatedWarning = false;
+				openSubState(new substates.OutdatedSubState());
+			}
 		}
 		#end
 

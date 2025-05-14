@@ -70,7 +70,9 @@ import flixel.addons.transition.FlxTransitionableState;
 #if windows
 import hxwindowmode.WindowColorMode;
 #end
+#if CompileTimeSupport
 import CompileTime;
+#end
 
 using StringTools;
 #end

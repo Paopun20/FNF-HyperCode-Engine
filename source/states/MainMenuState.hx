@@ -102,8 +102,12 @@ class MainMenuState extends MusicBeatState
 
 		if (EngineConfig.THIS_IS_TEST_BUILD) {
 			// Early Access
+			#if CompileTimeSupport
 			text += "[ Build ID: " + psychEngineVersion.replace("Indev", "").replace(" ", "");
-		    text += "-" + (() -> CompileTime.buildGitCommitSha().replace("'", ""))() +"-"+ (() -> CompileTime.buildDateString().replace("'", "").split(" ")[0])()  + "] // This is a test build! Please report any bugs.";
+			text += "-" + (() -> CompileTime.buildGitCommitSha().replace("'", ""))() +"-"+ (() -> CompileTime.buildDateString().replace("'", "").split(" ")[0])()  + "] // This is a test build! Please report any bugs.";
+			#else
+			text += "[ Build ID: can't generate ID ( CompileTime not support ) ]";
+			#end
 		}
 
 		var psychVer:FlxText = new FlxText(12, FlxG.height - 44, 0, text, 12);

@@ -125,7 +125,8 @@
 
 	<haxelib name="hxdiscord_rpc" if="DISCORD_ALLOWED"/>
 	<haxelib name="hxWindowColorMode" if="desktop"/>
-	<haxelib name="CompileTime" />
+	<haxedef name="CompileTimeSupport" if="desktop" unless="web || linux || mobile"/>
+	<haxelib name="CompileTime" if="CompileTimeSupport"/>
 	<haxelib name="flxanimate"/>
 	<haxelib name="tink_await"/>
 

@@ -280,8 +280,14 @@ class Main extends Sprite
 		errMsg += "==== CRASH REPORT ====\n";
 		errMsg += "Engine Version: " + EngineConfig.VERSION + "\n";
 		errMsg += "Platform: " + #if windows "Windows" #elseif linux "Linux" #elseif mac "Mac" #elseif android "Android" #elseif ios "iOS" #else "Unknown" #end + "\n";
+		#if CompileTimeSupport
 		errMsg += "Build Date: " + CompileTime.buildDateString() + "\n";
 		errMsg += "Build Hash: " + CompileTime.buildGitCommitSha() + "\n\n";
+		#else
+		errMsg += "Build Date: Unknown\n";
+		errMsg += "Build Hash: Unknown\n\n";
+		#end
+		errMsg += "Date: " + dateNow + "\n";
 
 		// Exception stack trace
 		errMsg += "==== STACK TRACE ====\n";

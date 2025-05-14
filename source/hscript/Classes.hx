@@ -97,7 +97,9 @@ class Classes {
 		#end
 		
 		"Discord" => DiscordClient,
+		#if CompileTimeSupport
 		"CompileTime" => CompileTime,
+		#end
 
         "FlxTween" => flixel.tweens.FlxTween,
         "FlxEase" => flixel.tweens.FlxEase,

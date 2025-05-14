@@ -134,14 +134,33 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: Version
-      - uses: actions/setup-java@v4
+
+      - name: Setup Android NDK
+        id: setup-ndk
+        uses: nttld/setup-ndk@main
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          ndk-version: r25c
+
+      - name: Setup Java JDK
+
+        uses: actions/setup-java@main
+        with:
+          distribution: 'zulu'
+          java-version: '18'
+
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
       - run: bash ./ci/setup-haxe.sh
+      - run: haxelib run lime rebuild hxcpp
+      
+      - name: Configure Android
+        run: |
+          haxelib run lime setup -alias -y
+          haxelib run lime config ANDROID_SDK $ANDROID_HOME
+          haxelib run lime config JAVA_HOME $JAVA_HOME
+          haxelib run lime config ANDROID_SETUP true
+
       - run: haxelib run lime setup android
       - run: haxelib run lime build android --app-version="$(cat VERSION)" "$ARGS"
       - run: zip -r HyperCodeEngine-Android.zip export/release/android/bin
@@ -162,9 +181,11 @@ jobs:
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
+          
+      - run: haxelib run lime rebuild hxcpp
       - run: bash ./ci/setup-haxe.sh
       - run: haxelib run lime setup ios
-      - run: haxelib run lime build ios --app-version="$(cat VERSION)" "$ARGS"
+      - run: haxelib run lime build ios --app-version="$(cat VERSION)" "$ARGS" -nosign
       - run: zip -r HyperCodeEngine-iOS.zip export/release/ios/bin
       - uses: actions/upload-artifact@v4
         with:

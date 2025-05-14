@@ -101,7 +101,9 @@ class MainMenuState extends MusicBeatState
 		var text:String = EngineConfig.ENGINE_NAME + " Engine v" + psychEngineVersion;
 
 		if (EngineConfig.THIS_IS_TEST_BUILD) {
-		    text += " [Early Access Edition] // This is a test build! Please report any bugs.";
+			// Early Access
+			text += "[ Build ID: " + psychEngineVersion.replace("Indev", "").replace(" ", "");
+		    text += "-" + (() -> CompileTime.buildGitCommitSha().replace("'", ""))() +"-"+ (() -> CompileTime.buildDateString().replace("'", "").split(" ")[0])()  + "] // This is a test build! Please report any bugs.";
 		}
 
 		var psychVer:FlxText = new FlxText(12, FlxG.height - 44, 0, text, 12);

@@ -118,7 +118,7 @@ class CustomStage extends MusicBeatState {
 			for (file in FileSystem.readDirectory(stagePath)) {
 				if (file.endsWith(".hx")) {
 					trace('Found .hx file: $stagePath/$file');
-					initHScript(Sys.systemName() == "Windows" ? stagePath + "\\" + file : stagePath + "/" + file);
+					initHScript(Sys.systemName() == "Windows" ? stagePath + "/" + file : stagePath + "\\" + file);
 				}
 			}
 		} else {

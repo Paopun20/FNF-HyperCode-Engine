@@ -64,7 +64,7 @@ jobs:
 
   wait:
     runs-on: ubuntu-latest
-    needs: [confirm, setup-haxe]
+    needs: [setup-haxe, version]
     steps:
       - run: echo "Haxe setup complete."
 

@@ -89,9 +89,11 @@ class CustomStage extends MusicBeatState {
 		}
 		var stagePath = Paths.customStage(stateName);
 		if (FileSystem.exists(stagePath) && FileSystem.isDirectory(stagePath)) {
+			#if HSCRIPT_ALLOWED
 			for (file in FileSystem.readDirectory(stagePath)) {
 				if (file.endsWith(".hx")) return true;
 			}
+			#end
 		}
 		return false;
 	}
@@ -132,9 +134,15 @@ class CustomStage extends MusicBeatState {
 		super.create();
 		if (FileSystem.exists(stagePath) && FileSystem.isDirectory(stagePath)) {
 			for (file in FileSystem.readDirectory(stagePath)) {
+				#if HSCRIPT_ALLOWED
 				if (file.endsWith(".hx")) {
 					trace('Found .hx file: $stagePath/$file');
 					initHScript(Paths.join([stagePath, file]));
+				}
+				#end
+
+				if (file.endsWith(".lua")) {
+					trace(' Hey, This lua file not supported yet: $stagePath/$file');
 				}
 			}
 		} else {

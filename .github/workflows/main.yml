@@ -50,7 +50,7 @@ jobs:
 
   version:
     runs-on: ubuntu-latest
-    needs: setup-haxe
+    needs: confirm
     outputs:
       version_tag: ${{ steps.setver.outputs.version }}
     steps:

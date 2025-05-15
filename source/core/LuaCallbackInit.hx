@@ -1,5 +1,6 @@
 package core;
 
+#if LUA_ALLOWED
 import backend.BrainFuck;
 import backend.GetArgs;
 import backend.HttpClient;
@@ -285,3 +286,10 @@ class LuaCallbackInit {
         #if (windows) new ToastNotificationLua(lua); #end
     }
 }
+#else
+class LuaCallbackInit {
+    public static function addLuaCallbacks(funk) {
+
+    }
+}
+#end

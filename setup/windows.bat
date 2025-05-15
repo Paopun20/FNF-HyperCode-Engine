@@ -18,6 +18,7 @@ haxelib install hscript-iris 1.1.3
 haxelib install hscript
 haxelib install hxp
 haxelib install hxcpp-debug-server
+haxelib install hxlua
 haxelib install tjson 1.4.0
 haxelib install tink_core
 haxelib install tink_await

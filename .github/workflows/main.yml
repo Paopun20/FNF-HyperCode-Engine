@@ -142,10 +142,14 @@ jobs:
           ndk-version: r25c
 
       - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set Android Environment Variables
         run: |
-          echo "ANDROID_SDK=/usr/local/lib/android/sdk" >> $GITHUB_ENV
+          echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+          echo "ANDROID_SDK=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
+          echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
           echo "ANDROID_NDK_ROOT=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
-          echo "ANDROID_SDK_ROOT=/usr/local/lib/android/sdk" >> $GITHUB_ENV
 
       - name: Setup Java JDK
         uses: actions/setup-java@main
@@ -156,12 +160,24 @@ jobs:
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
-      - run: bash ./ci/setup-haxe.sh
 
-      - run: haxelib run lime setup android
-      - run: haxelib run lime rebuild android
-      - run: haxelib run lime build android --app-version="$(cat VERSION)" "$ARGS"
-      - run: zip -r HyperCodeEngine-Android.zip export/release/android/bin
+      - name: Setup Haxe Dependencies
+        run: bash ./ci/setup-haxe.sh
+
+      - name: Setup Lime for Android
+        run: |
+          haxelib run lime config ANDROID_SDK $ANDROID_SDK_ROOT
+          haxelib run lime config ANDROID_NDK_ROOT ${{ steps.setup-ndk.outputs.ndk-path }}
+          haxelib run lime setup android -y
+
+      - name: Build Android
+        run: |
+          haxelib run lime rebuild android
+          haxelib run lime build android --app-version="$(cat VERSION)" "$ARGS"
+
+      - name: Package Android Build
+        run: zip -r HyperCodeEngine-Android.zip export/release/android/bin
+      
       - uses: actions/upload-artifact@v4
         with:
           name: Android Build

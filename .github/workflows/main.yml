@@ -62,9 +62,15 @@ jobs:
           name: Version
           path: VERSION
 
+  wait:
+    runs-on: ubuntu-latest
+    needs: [confirm, setup-haxe]
+    steps:
+      - run: echo "Haxe setup complete."
+
   buildLinux:
     runs-on: ubuntu-latest
-    needs: [version, confirm]
+    needs: [wait]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -83,7 +89,7 @@ jobs:
 
   buildWindows:
     runs-on: windows-latest
-    needs: [version, confirm]
+    needs: [wait]
     strategy:
       matrix:
         arch: [64, 32]
@@ -107,7 +113,7 @@ jobs:
 
   buildMac:
     runs-on: macos-13
-    needs: [version, confirm]
+    needs: [wait]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -128,7 +134,7 @@ jobs:
   buildAndroid:
     if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.Mobile == 'true' }}
     runs-on: ubuntu-latest
-    needs: [version, confirm]
+    needs: [wait]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
@@ -186,7 +192,7 @@ jobs:
   buildiOS:
     if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.Mobile == 'true' }}
     runs-on: macos-13
-    needs: [version, confirm]
+    needs: [wait]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4

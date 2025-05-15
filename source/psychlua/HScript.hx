@@ -679,7 +679,7 @@ class CustomFlxColor {
 #else
 // Fallback implementation when HSCRIPT_ALLOWED is false
 
-class HScript extends Iris {
+class HScript {
     #if LUA_ALLOWED
     public static function implement(funk:FunkinLua) {
         funk.addLocalCallback("runHaxeCode", function(codeToRun:String, ?varsToBring:Any = null, ?funcToRun:String = null, ?funcArgs:Array<Dynamic> = null):Dynamic {

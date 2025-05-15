@@ -152,16 +152,9 @@ jobs:
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
       - run: bash ./ci/setup-haxe.sh
-      - run: haxelib run lime rebuild hxcpp
-      
-      - name: Configure Android
-        run: |
-          haxelib run lime setup -alias -y
-          haxelib run lime config ANDROID_SDK $ANDROID_HOME
-          haxelib run lime config JAVA_HOME $JAVA_HOME
-          haxelib run lime config ANDROID_SETUP true
 
       - run: haxelib run lime setup android
+      - run: haxelib run lime rebuild android
       - run: haxelib run lime build android --app-version="$(cat VERSION)" "$ARGS"
       - run: zip -r HyperCodeEngine-Android.zip export/release/android/bin
       - uses: actions/upload-artifact@v4
@@ -179,12 +172,12 @@ jobs:
         with:
           name: Version
       - uses: krdlab/setup-haxe@master
-        with:
+        with: 
           haxe-version: ${{ env.HAXE_VERSION }}
-          
-      - run: haxelib run lime rebuild hxcpp
+
       - run: bash ./ci/setup-haxe.sh
       - run: haxelib run lime setup ios
+      - run: haxelib run lime rebuild ios
       - run: haxelib run lime build ios --app-version="$(cat VERSION)" "$ARGS" -nosign
       - run: zip -r HyperCodeEngine-iOS.zip export/release/ios/bin
       - uses: actions/upload-artifact@v4

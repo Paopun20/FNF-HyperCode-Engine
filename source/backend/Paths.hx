@@ -237,8 +237,7 @@ class Paths
 				continue;
 
 			if (!result.endsWith("/") && !result.endsWith("\\"))
-				result += "/";
-			result += part;
+				result += Sys.systemName() == "Windows" ? "\\" + part : "/" + part;
 		}
 		return result;
 	}

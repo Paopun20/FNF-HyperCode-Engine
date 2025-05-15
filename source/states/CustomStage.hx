@@ -108,6 +108,22 @@ class CustomStage extends MusicBeatState {
 		}
 	}
 
+	public function getStagePath():String {
+		return stagePath;
+	}
+
+	public function getStageName():String {
+		return stageName;
+	}
+
+	public function callFunctions(funcName:String, args:Array<Dynamic> = null):Void {
+		for (script in hscriptArray) {
+			if (script.exists(funcName)) {
+				tryCall(script, funcName, args);
+			}
+		}
+	}
+
 	public function reload() {
 		MusicBeatState.switchState(new CustomStage(stageName));
 	}
@@ -118,7 +134,7 @@ class CustomStage extends MusicBeatState {
 			for (file in FileSystem.readDirectory(stagePath)) {
 				if (file.endsWith(".hx")) {
 					trace('Found .hx file: $stagePath/$file');
-					initHScript(Sys.systemName() == "Windows" ? stagePath + "/" + file : stagePath + "\\" + file);
+					initHScript(Paths.join([stagePath, file]));
 				}
 			}
 		} else {
@@ -171,6 +187,7 @@ class CustomStage extends MusicBeatState {
 
 	override public function destroy():Void {
 		super.destroy();
+		instance = null;
 		for (script in hscriptArray) {
 			tryCall(script, "onDestroy");
 			script.destroy();

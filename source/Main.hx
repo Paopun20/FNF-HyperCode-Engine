@@ -15,6 +15,7 @@ import backend.WeekData;
 #end
 
 import debug.FPSCounter;
+import debug.DebugPopup;
 import EngineConfig;
 
 import core.ImportCore;
@@ -73,12 +74,57 @@ class Main extends Sprite
 	};
 
 	public static var fpsVar:FPSCounter;
+	public static var debugPop:DebugPopup;
+	public static var flxGame:FlxGame;
 
 	// You can pretty much ignore everything from here on - your code should go in your states.
 
 	public static function main():Void
 	{
 		Lib.current.addChild(new Main());
+	}
+
+	public function _InitCustomStage():Void
+	{
+		FlxG.signals.gameResized.add(function(w, h) {
+			if (FlxG.state is states.CustomStage)
+			{
+				var customStageCore:states.CustomStage = cast FlxG.state;
+				customStageCore.callFunctions("onResize", [w, h]);
+			}
+		});
+
+		FlxG.signals.focusGained.add(function() {
+			if (FlxG.state is states.CustomStage)
+			{
+				var customStageCore:states.CustomStage = cast FlxG.state;
+				customStageCore.callFunctions("onFocusGained", []);
+			}
+		});
+
+		FlxG.signals.focusLost.add(function() {
+			if (FlxG.state is states.CustomStage)
+			{
+				var customStageCore:states.CustomStage = cast FlxG.state;
+				customStageCore.callFunctions("onFocusLost", []);
+			}
+		});
+
+		FlxG.signals.preDraw.add(function() {
+			if (FlxG.state is states.CustomStage)
+			{
+				var customStageCore:states.CustomStage = cast FlxG.state;
+				customStageCore.callFunctions("onDraw", []);
+			}
+		});
+
+		FlxG.signals.postDraw.add(function() {
+			if (FlxG.state is states.CustomStage)
+			{
+				var customStageCore:states.CustomStage = cast FlxG.state;
+				customStageCore.callFunctions("onDrawPost", []);
+			}
+		});
 	}
 
 	public function new()
@@ -189,7 +235,11 @@ class Main extends Sprite
 		Controls.instance = new Controls();
 		ClientPrefs.loadDefaultKeys();
 		#if ACHIEVEMENTS_ALLOWED Achievements.load(); #end
-		addChild(new FlxGame(game.width, game.height, game.initialState, game.framerate, game.framerate, game.skipSplash, game.startFullscreen));
+		flxGame = new FlxGame(game.width, game.height, game.initialState, game.framerate, game.framerate, game.skipSplash, game.startFullscreen);
+		addChild(flxGame);
+
+		debugPop = new DebugPopup(10, 3, 0xFFFFFF);
+		addChild(debugPop);
 
 		#if !mobile
 		fpsVar = new FPSCounter(10, 3, 0xFFFFFF);
@@ -240,6 +290,8 @@ class Main extends Sprite
 			if (FlxG.game != null)
 			resetSpriteCache(FlxG.game);
 		});
+
+		_InitCustomStage();
 	}
 
 	static function resetSpriteCache(sprite:Sprite):Void {

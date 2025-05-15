@@ -8,6 +8,7 @@ import backend.ScreenInfo;
 import backend.UrlGen;
 #if desktop import backend.WindowManager; #end
 #if (windows) import winapi.ToastNotification; #end
+#if LUA_ALLOWED import llua.*; #end
 import states.PlayState;
 
 import haxe.ds.IntMap;

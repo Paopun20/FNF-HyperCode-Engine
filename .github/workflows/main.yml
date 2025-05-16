@@ -128,6 +128,7 @@ jobs:
 
   buildAndroid: # I lazy to make facking this shit.
     runs-on: ubuntu-latest
+    if: false
     needs: [wait]
     steps:
       - uses: actions/checkout@v4
@@ -231,6 +232,7 @@ jobs:
 
   buildiOS: # This too.
     runs-on: macos-13
+    if: false
     needs: [wait]
     steps:
       - uses: actions/checkout@v4

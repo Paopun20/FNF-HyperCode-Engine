@@ -66,7 +66,7 @@ class NdllUtil {
 	 */
 	public static function getFunctionFromPath(ndll:String, name:String, args:Int):Dynamic {
 		#if NDLLS_SUPPORTED
-		var fullPath = Paths.mods(ndll);
+		var fullPath = Paths.ndll(ndll);
 		if (!Assets.exists(fullPath)) {
 			Log.trace('Couldn\'t find ndll at ${fullPath}.');
 			return noop; 

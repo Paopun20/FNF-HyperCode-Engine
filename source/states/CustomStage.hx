@@ -59,7 +59,6 @@ class CustomStage extends MusicBeatState {
 			}
 		}
 	}
-
 	public function initHScript(file:String) {
 		var newScript:HScript = null;
 		try {
@@ -119,11 +118,13 @@ class CustomStage extends MusicBeatState {
 	}
 
 	public function callFunctions(funcName:String, args:Array<Dynamic> = null):Void {
+		#if HSCRIPT_ALLOWED
 		for (script in hscriptArray) {
 			if (script.exists(funcName)) {
 				tryCall(script, funcName, args);
 			}
 		}
+		#end
 	}
 
 	public function reload() {
@@ -141,9 +142,11 @@ class CustomStage extends MusicBeatState {
 				}
 				#end
 
+				#if LUA_ALLOWED
 				if (file.endsWith(".lua")) {
 					trace(' Hey, This lua file not supported yet: $stagePath/$file');
 				}
+				#end
 			}
 		} else {
 			trace('Stage path is invalid or not a directory: $stagePath');
@@ -159,9 +162,11 @@ class CustomStage extends MusicBeatState {
 			));
 		}
 
+		#if HSCRIPT_ALLOWED
 		for (script in hscriptArray) {
 			tryCall(script, "onCreatePost");
 		}
+		#end
 	}
 
 	var holding:Bool = false;
@@ -170,7 +175,9 @@ class CustomStage extends MusicBeatState {
 	override public function update(elapsed:Float):Void {
 		super.update(elapsed);
 		for (script in hscriptArray) {
+			#if HSCRIPT_ALLOWED
 			tryCall(script, "onUpdate", [elapsed]);
+			#end
 		}
 
 		if (controls.pressed('debug_1') && controls.pressed("reset")) {
@@ -189,18 +196,24 @@ class CustomStage extends MusicBeatState {
 		}
 
 		for (script in hscriptArray) {
+			#if HSCRIPT_ALLOWED
 			tryCall(script, "onUpdatePost", [elapsed]);
+			#end
 		}
 	}
 
 	override public function destroy():Void {
 		super.destroy();
 		instance = null;
+		#if HSCRIPT_ALLOWED
 		for (script in hscriptArray) {
 			tryCall(script, "onDestroy");
 			script.destroy();
 		}
+		#end
 		
+		#if HSCRIPT_ALLOWED
 		while (hscriptArray.length > 0) hscriptArray.pop(); // Fast
+		#end
 	}
 }

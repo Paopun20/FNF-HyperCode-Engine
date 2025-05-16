@@ -163,19 +163,7 @@ class MusicBeatState extends FlxState
 	
     public static function getStageByName(nextStateName:String):Class<FlxState>
 	{
-		var stageFlxMap:Map<String, Class<FlxState>> = [
-			"MainMenuState" => states.MainMenuState,
-			"TitleState" => states.TitleState,
-			"StoryMenuState" => states.StoryMenuState,
-			"AchievementsMenuState" => states.AchievementsMenuState,
-			"CreditsState" => states.CreditsState,
-			"ModsMenuState" => states.ModsMenuState,
-			"OptionsState" => options.OptionsState,
-			"FreeplayState" => states.FreeplayState,
-			"PlayState" => states.PlayState,
-			"LoadingState" => states.LoadingState,
-			"CustomStage" => states.CustomStage
-		];
+		var stageFlxMap:Map<String, Class<FlxState>> = Game.stageFlxMap;
 
 		if (stageFlxMap.exists(nextStateName))
 			return stageFlxMap.get(nextStateName);

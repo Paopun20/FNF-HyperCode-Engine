@@ -163,6 +163,13 @@ jobs:
             lib32gcc-s1 \
             lib32z1
 
+      - name: Setup JNI Environment
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
+          echo "JDK_HOME=$JAVA_HOME" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$JAVA_HOME/include -I$JAVA_HOME/include/linux" >> $GITHUB_ENV
+          echo "CFLAGS=-I$JAVA_HOME/include -I$JAVA_HOME/include/linux" >> $GITHUB_ENV
+
       - name: Setup Android NDK
         id: setup-ndk
         uses: nttld/setup-ndk@main

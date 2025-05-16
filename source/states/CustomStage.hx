@@ -174,11 +174,11 @@ class CustomStage extends MusicBeatState {
 
 	override public function update(elapsed:Float):Void {
 		super.update(elapsed);
+		#if HSCRIPT_ALLOWED
 		for (script in hscriptArray) {
-			#if HSCRIPT_ALLOWED
 			tryCall(script, "onUpdate", [elapsed]);
-			#end
 		}
+		#end
 
 		if (controls.pressed('debug_1') && controls.pressed("reset")) {
 			holding = true;
@@ -195,11 +195,11 @@ class CustomStage extends MusicBeatState {
 			holdtime = 0.0;
 		}
 
+		#if HSCRIPT_ALLOWED
 		for (script in hscriptArray) {
-			#if HSCRIPT_ALLOWED
 			tryCall(script, "onUpdatePost", [elapsed]);
-			#end
 		}
+		#end
 	}
 
 	override public function destroy():Void {

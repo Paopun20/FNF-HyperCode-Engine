@@ -1,3 +1,5 @@
+[![AutoBuild](https://github.com/HyperCodeCrew/FNF-HyperCode-Engine/actions/workflows/main.yml/badge.svg)](https://github.com/HyperCodeCrew/FNF-HyperCode-Engine/actions/workflows/main.yml)
+
 > [!Warning]  
 > **This engine is still under development!**  
 > If you encounter any bugs, please report them here: [GitHub Issues](https://github.com/Paopun20/FNF-HyperCode-Engine/issues)

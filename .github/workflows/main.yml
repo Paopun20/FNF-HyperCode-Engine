@@ -19,11 +19,6 @@ on:
         description: "Confirm to proceed with the build?"
         required: true
         type: boolean
-      Mobile:
-        description: "Include Android and iOS builds?"
-        required: true
-        type: boolean
-        default: true
 
 env:
   ARGS: "-D officialBuild -D NotDeveloper"
@@ -131,8 +126,7 @@ jobs:
           name: macOS Build
           path: HyperCodeEngine-macOS.zip
 
-  buildAndroid:
-    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.Mobile == 'true' }}
+  buildAndroid: # I lazy to make facking this shit.
     runs-on: ubuntu-latest
     needs: [wait]
     steps:
@@ -161,7 +155,13 @@ jobs:
             libc++-dev \
             lib32stdc++6 \
             lib32gcc-s1 \
-            lib32z1
+            lib32z1 \
+            cmake \
+            ninja-build
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v2.0.2
+        with:
+          cmake-version: '3.26.x'
 
       - name: Setup JNI Environment
         run: |
@@ -228,8 +228,8 @@ jobs:
         with:
           name: Android Build
           path: HyperCodeEngine-Android.zip
-  buildiOS:
-    if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.Mobile == 'true' }}
+
+  buildiOS: # This too.
     runs-on: macos-13
     needs: [wait]
     steps:
@@ -378,13 +378,16 @@ jobs:
             — HyperCode Engine AutoBuilder
           draft: false
           prerelease: true
+      - name: List files for upload
+        run: ls -R builds
+
       - name: Upload Artifacts
         uses: softprops/action-gh-release@v2.2.2
         with:
           tag_name: ${{ needs.version.outputs.version_tag }}
           files: |
-            builds/*/*.zip
-            builds/*/*.apk
-            builds/*/*.ipa
+            builds/**/*.zip
+            builds/**/*.apk
+            builds/**/*.ipa
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

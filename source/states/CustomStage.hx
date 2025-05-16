@@ -31,11 +31,19 @@ class CustomStage extends MusicBeatState {
 		set("MusicBeatState", MusicBeatState);
 		set("MainMenuState", MainMenuState);
 		set("StoryMenuState", StoryMenuState);
-		set("ModsMenuState", ModsMenuState);
+		#if MODS_ALLOWED set("ModsMenuState", ModsMenuState); #end
 		set("CreditsState", CreditsState);
 		set("AchievementsMenuState", AchievementsMenuState);
 		set("TitleState", TitleState);
 		set("CustomStage", CustomStage);
+		set("PlayState", PlayState);
+		
+		set("Main", Main);
+		set("Game", Game);
+
+		set("debugPop", Main.debugPop);
+		set("fpsVar", Main.fpsVar);
+		set("flxGame", Main.flxGame);
 
 		trace("[CustomStage] Script API injected successfully for " + script.name + ".");
 	}
@@ -62,6 +70,27 @@ class CustomStage extends MusicBeatState {
 	public function initHScript(file:String) {
 		var newScript:HScript = null;
 		try {
+			// Check if file exists first
+        	if (!FileSystem.exists(file)) {
+				trace('File does not exist: $file');
+				return;
+        	}
+
+        	// Try to read file contents
+        	var contents:String = null;
+			try {
+			    contents = sys.io.File.getContent(file);
+			} catch (e) {
+				trace('Error reading file: $file');
+				trace('Error message: ' + e.message);
+        	}
+
+        	// Verify contents aren't empty
+        	if (contents == null || StringTools.trim(contents).length == 0) {
+				trace('File is empty or contains only whitespace: $file');
+				return;
+			}
+
 			newScript = new HScript(null, file);
 			stageAPI(newScript);
 			tryCall(newScript, "onCreate", null, true);
@@ -138,13 +167,16 @@ class CustomStage extends MusicBeatState {
 				#if HSCRIPT_ALLOWED
 				if (file.endsWith(".hx")) {
 					trace('Found .hx file: $stagePath/$file');
-					initHScript(Paths.join([stagePath, file]));
+					var scriptPath = Paths.join([stagePath, file]);
+					trace('Attempting to read file at: ${FileSystem.absolutePath(scriptPath)}');
+
+					initHScript(scriptPath);
 				}
 				#end
 
 				#if LUA_ALLOWED
 				if (file.endsWith(".lua")) {
-					trace(' Hey, This lua file not supported yet: $stagePath/$file');
+					trace('Hey, This lua file not supported yet: $stagePath/$file');
 				}
 				#end
 			}

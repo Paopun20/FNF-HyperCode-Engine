@@ -141,6 +141,27 @@ jobs:
         with:
           name: Version
 
+      # Install required dependencies first
+      - name: Install Dependencies
+        run: |
+          sudo dpkg --add-architecture i386
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            gcc-multilib \
+            g++-multilib \
+            libc6-dev \
+            libc6-dev-i386 \
+            linux-libc-dev:i386 \
+            libstdc++6:i386 \
+            libgcc1:i386 \
+            zlib1g:i386 \
+            libncurses5:i386 \
+            libc++-dev \
+            lib32stdc++6 \
+            lib32gcc-s1 \
+            lib32z1
+
       - name: Setup Android NDK
         id: setup-ndk
         uses: nttld/setup-ndk@main
@@ -149,12 +170,8 @@ jobs:
 
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
-      
-      - run: sudo apt-get install -y build-essential libc++-dev
-      - run: sudo apt-get install -y lib32stdc++6
-      - run: sudo apt-get install -y lib32gcc-s1
-      - run: sudo apt-get install -y lib32z1
-      - run: sudo apt-get install -y lib32stdc++6
+        with:
+          cmdline-tools-version: latest
 
       - name: Set Android Environment Variables
         run: |
@@ -162,6 +179,7 @@ jobs:
           echo "ANDROID_SDK=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
           echo "ANDROID_NDK_ROOT=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
 
       - name: Setup Java JDK
         uses: actions/setup-java@main
@@ -174,7 +192,14 @@ jobs:
           haxe-version: ${{ env.HAXE_VERSION }}
 
       - name: Setup Haxe Dependencies
-        run: bash ./ci/setup-haxe.sh
+        run: |
+          haxelib setup ~/haxelib
+          haxelib install lime
+          haxelib install openfl
+          haxelib install flixel
+          haxelib git linc_luajit https://github.com/nebulazorua/linc_luajit.git
+          haxelib run lime setup
+          bash ./ci/setup-haxe.sh
 
       - name: Setup Lime for Android
         run: |
@@ -184,6 +209,7 @@ jobs:
 
       - name: Build Android
         run: |
+          haxelib run lime rebuild hxcpp
           haxelib run lime rebuild android
           haxelib run lime build android --app-version="$(cat VERSION)" "$ARGS"
 
@@ -194,7 +220,6 @@ jobs:
         with:
           name: Android Build
           path: HyperCodeEngine-Android.zip
-
   buildiOS:
     if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.Mobile == 'true' }}
     runs-on: macos-13

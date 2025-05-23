@@ -354,7 +354,6 @@ jobs:
               \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\" }
             }]
           }" "$DISCORD_WEBHOOK"
-
   prepare-release:
     runs-on: ubuntu-latest
     permissions:
@@ -362,10 +361,19 @@ jobs:
     needs:
       - check-build-status
       - version
-    if: needs.check-build-status.outputs.all_success == 'true'
+    if: always()
     outputs:
       release_id: ${{ steps.create_release.outputs.id }}
+      should_upload: ${{ steps.check_upload.outputs.should_upload }}
     steps:
+      - id: check_upload
+        run: |
+          if [[ "${{ needs.check-build-status.outputs.all_success }}" == "true" ]]; then
+            echo "should_upload=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "⚠️ Some builds failed - skipping artifact upload"
+            echo "should_upload=false" >> "$GITHUB_OUTPUT"
+          fi
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1.1.4
@@ -411,13 +419,12 @@ jobs:
             — HyperCode Engine AutoBuilder
           draft: false
           prerelease: true
-
   upload-artifacts:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     needs: [prepare-release, version]
-    if: needs.prepare-release.outputs.release_id != ''
+    if: needs.prepare-release.outputs.should_upload == 'true'
     steps:
       - name: Download all build artifacts
         uses: actions/download-artifact@v4

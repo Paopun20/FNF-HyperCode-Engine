@@ -125,19 +125,12 @@ jobs:
         with:
           name: macOS Build
           path: HyperCodeEngine-macOS.zip
-
-  buildAndroid: # I lazy to make facking this shit.
+  setup-android-deps:
     runs-on: ubuntu-latest
     if: false
     needs: [wait]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          name: Version
-
-      # Install required dependencies first
-      - name: Install Dependencies
+      - name: Install System Dependencies
         run: |
           sudo dpkg --add-architecture i386
           sudo apt-get update
@@ -163,14 +156,26 @@ jobs:
         uses: jwlawson/actions-setup-cmake@v2.0.2
         with:
           cmake-version: '3.26.x'
+      - name: Cache Dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            /usr/lib/i386-linux-gnu
+            /usr/lib32
+          key: android-deps-${{ runner.os }}-${{ hashFiles('.github/workflows/main.yml') }}
 
-      - name: Setup JNI Environment
-        run: |
-          echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
-          echo "JDK_HOME=$JAVA_HOME" >> $GITHUB_ENV
-          echo "CPPFLAGS=-I$JAVA_HOME/include -I$JAVA_HOME/include/linux" >> $GITHUB_ENV
-          echo "CFLAGS=-I$JAVA_HOME/include -I$JAVA_HOME/include/linux" >> $GITHUB_ENV
-
+  setup-android-env:
+    runs-on: ubuntu-latest
+    if: false
+    needs: [setup-android-deps]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Java JDK
+        uses: actions/setup-java@main
+        with:
+          distribution: 'zulu'
+          java-version: '18'
+      
       - name: Setup Android NDK
         id: setup-ndk
         uses: nttld/setup-ndk@main
@@ -184,22 +189,26 @@ jobs:
 
       - name: Set Android Environment Variables
         run: |
+          echo "JAVA_HOME=$JAVA_HOME" >> $GITHUB_ENV
+          echo "JDK_HOME=$JAVA_HOME" >> $GITHUB_ENV
+          echo "CPPFLAGS=-I$JAVA_HOME/include -I$JAVA_HOME/include/linux" >> $GITHUB_ENV
+          echo "CFLAGS=-I$JAVA_HOME/include -I$JAVA_HOME/include/linux" >> $GITHUB_ENV
           echo "ANDROID_HOME=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
           echo "ANDROID_SDK=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
           echo "ANDROID_NDK_HOME=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
           echo "ANDROID_NDK_ROOT=${{ steps.setup-ndk.outputs.ndk-path }}" >> $GITHUB_ENV
           echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
 
-      - name: Setup Java JDK
-        uses: actions/setup-java@main
-        with:
-          distribution: 'zulu'
-          java-version: '18'
-
+  setup-android-haxe:
+    runs-on: ubuntu-latest
+    if: false
+    needs: [setup-android-env]
+    steps:
+      - uses: actions/checkout@v4
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
-
+      
       - name: Setup Haxe Dependencies
         run: |
           haxelib setup ~/haxelib
@@ -215,6 +224,16 @@ jobs:
           haxelib run lime config ANDROID_SDK $ANDROID_SDK_ROOT
           haxelib run lime config ANDROID_NDK_ROOT ${{ steps.setup-ndk.outputs.ndk-path }}
           haxelib run lime setup android -y
+
+  buildAndroid:
+    runs-on: ubuntu-latest
+    if: false
+    needs: [setup-android-haxe]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Version
 
       - name: Build Android
         run: |
@@ -252,8 +271,7 @@ jobs:
         with:
           name: iOS Build
           path: HyperCodeEngine-iOS.zip
-
-  notifyDiscord:
+  check-build-status:
     runs-on: ubuntu-latest
     if: always()
     needs:
@@ -263,6 +281,43 @@ jobs:
       - buildAndroid
       - buildiOS
       - version
+    outputs:
+      status_linux: ${{ steps.check.outputs.linux }}
+      status_windows: ${{ steps.check.outputs.windows }}
+      status_mac: ${{ steps.check.outputs.mac }}
+      status_android: ${{ steps.check.outputs.android }}
+      status_ios: ${{ steps.check.outputs.ios }}
+      all_success: ${{ steps.check.outputs.all_success }}
+    steps:
+      - id: check
+        run: |
+          check() {
+            case "$1" in
+              success) echo "✅ Success";;
+              skipped) echo "⚪ Skipped";;
+              *) echo "❌ Failed";;
+            esac
+          }
+          
+          echo "linux=$(check "${{ needs.buildLinux.result }}")" >> "$GITHUB_OUTPUT"
+          echo "windows=$(check "${{ needs.buildWindows.result }}")" >> "$GITHUB_OUTPUT"
+          echo "mac=$(check "${{ needs.buildMac.result }}")" >> "$GITHUB_OUTPUT"
+          echo "android=$(check "${{ needs.buildAndroid.result }}")" >> "$GITHUB_OUTPUT"
+          echo "ios=$(check "${{ needs.buildiOS.result }}")" >> "$GITHUB_OUTPUT"
+          
+          if [[ "${{ needs.buildLinux.result }}" == "success" ]] && \
+             [[ "${{ needs.buildWindows.result }}" == "success" ]] && \
+             [[ "${{ needs.buildMac.result }}" == "success" ]] && \
+             [[ "${{ needs.buildAndroid.result }}" == "skipped" ]] && \
+             [[ "${{ needs.buildiOS.result }}" == "skipped" ]]; then
+            echo "all_success=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "all_success=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  notify-discord-status:
+    runs-on: ubuntu-latest
+    needs: [check-build-status, version]
     steps:
       - name: Notify Discord
         env:
@@ -272,31 +327,15 @@ jobs:
           BRANCH: ${{ github.ref_name }}
           COMMIT_MESSAGE: ${{ github.event.head_commit.message || github.event.pull_request.title || 'Manual Trigger' }}
           VERSION: ${{ needs.version.outputs.version_tag }}
+          STATUS_LINUX: ${{ needs.check-build-status.outputs.status_linux }}
+          STATUS_WIN: ${{ needs.check-build-status.outputs.status_windows }}
+          STATUS_MAC: ${{ needs.check-build-status.outputs.status_mac }}
+          STATUS_ANDROID: ${{ needs.check-build-status.outputs.status_android }}
+          STATUS_IOS: ${{ needs.check-build-status.outputs.status_ios }}
         run: |
-          check() {
-            case "$1" in
-              success) echo "✅ Success";;
-              skipped) echo "⚪ Skipped";;
-              *) echo "❌ Failed";;
-            esac
-          }
-
-          STATUS_LINUX=$(check "${{ needs.buildLinux.result }}")
-          STATUS_WIN=$(check "${{ needs.buildWindows.result }}")
-          STATUS_MAC=$(check "${{ needs.buildMac.result }}")
-          STATUS_ANDROID=$(check "${{ needs.buildAndroid.result }}")
-          STATUS_IOS=$(check "${{ needs.buildiOS.result }}")
-
-          TITLE="✅ All Builds Succeeded"
-          COLOR=65280
-          for status in "$STATUS_LINUX" "$STATUS_WIN" "$STATUS_MAC" "$STATUS_ANDROID" "$STATUS_IOS"; do
-            if [[ "$status" == "❌ Failed" ]]; then
-              TITLE="❌ Build Failure Detected"
-              COLOR=16711680
-              break
-            fi
-          done
-
+          TITLE="${{ needs.check-build-status.outputs.all_success == 'true' && '✅ All Builds Succeeded' || '❌ Build Failure Detected' }}"
+          COLOR="${{ needs.check-build-status.outputs.all_success == 'true' && '65280' || '16711680' }}"
+          
           CONTENT="🖥️ **Desktop Builds**\n• Linux: $STATUS_LINUX\n• Windows: $STATUS_WIN\n• macOS: $STATUS_MAC\n\n📱 **Mobile Builds**\n• Android: $STATUS_ANDROID\n• iOS: $STATUS_IOS"
 
           curl -H "Content-Type: application/json" -X POST -d "{
@@ -316,26 +355,18 @@ jobs:
             }]
           }" "$DISCORD_WEBHOOK"
 
-  UploadToGitHubReleases:
+  prepare-release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
     needs:
-      - buildLinux
-      - buildWindows
-      - buildMac
-      - buildAndroid
-      - buildiOS
+      - check-build-status
       - version
-    if: always()
+    if: needs.check-build-status.outputs.all_success == 'true'
+    outputs:
+      release_id: ${{ steps.create_release.outputs.id }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Download artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: builds
-      - name: Create Release
+      - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@v1.1.4
         env:
@@ -380,10 +411,21 @@ jobs:
             — HyperCode Engine AutoBuilder
           draft: false
           prerelease: true
-      - name: List files for upload
-        run: ls -R builds
 
-      - name: Upload Artifacts
+  upload-artifacts:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    needs: [prepare-release, version]
+    if: needs.prepare-release.outputs.release_id != ''
+    steps:
+      - name: Download all build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: builds
+      - name: List downloaded files
+        run: ls -R builds
+      - name: Upload Release Artifacts
         uses: softprops/action-gh-release@v2.2.2
         with:
           tag_name: ${{ needs.version.outputs.version_tag }}

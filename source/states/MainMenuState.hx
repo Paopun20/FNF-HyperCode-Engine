@@ -5,6 +5,7 @@ import flixel.effects.FlxFlicker;
 import lime.app.Application;
 import states.editors.MasterEditorMenu;
 import options.OptionsState;
+import backend.VanillaMod;
 
 enum MainMenuColumn {
 	LEFT;
@@ -88,6 +89,7 @@ class MainMenuState extends MusicBeatState
 			var item:FlxSprite = createMenuItem(option, 0, (num * 140) + 90);
 			item.y += (4 - optionShit.length) * 70; // Offsets for when you have anything other than 4 items
 			item.screenCenter(X);
+			VanillaMod.tryCall('onMenuItemCreatedPost', [item]);
 		}
 
 		if (leftOption != null)
@@ -103,10 +105,10 @@ class MainMenuState extends MusicBeatState
 		if (EngineConfig.THIS_IS_TEST_BUILD) {
 			// Early Access
 			#if CompileTimeSupport
-			text += "[ Build ID: " + psychEngineVersion.replace("Indev", "").replace(" ", "");
+			text += " [ Build ID: " + psychEngineVersion.replace("Indev", "").replace(" ", "");
 			text += "-" + (() -> CompileTime.buildGitCommitSha().replace("'", ""))() +"-"+ (() -> CompileTime.buildDateString().replace("'", "").split(" ")[0])()  + "] // This is a test build! Please report any bugs.";
 			#else
-			text += "[ Build ID: can't generate ID ( CompileTime not support ) ]";
+			text += " [ Build ID: can't generate ID ( CompileTime not support ) ]";
 			#end
 		}
 
@@ -142,6 +144,8 @@ class MainMenuState extends MusicBeatState
 		#end
 
 		FlxG.camera.follow(camFollow, null, 0.15);
+		VanillaMod.loadStage("MainMenuState");
+		VanillaMod.tryCall('onCreatePost', []);
 	}
 
 	function createMenuItem(name:String, x:Float, y:Float):FlxSprite
@@ -156,6 +160,7 @@ class MainMenuState extends MusicBeatState
 		menuItem.antialiasing = ClientPrefs.data.antialiasing;
 		menuItem.scrollFactor.set();
 		menuItems.add(menuItem);
+		VanillaMod.tryCall('onMenuItemCreated', [menuItem]);
 		return menuItem;
 	}
 
@@ -164,6 +169,8 @@ class MainMenuState extends MusicBeatState
 	var timeNotMoving:Float = 0;
 	override function update(elapsed:Float)
 	{
+		VanillaMod.tryCall('onUpdate', [elapsed]);
+
 		if (FlxG.sound.music.volume < 0.8)
 			FlxG.sound.music.volume = Math.min(FlxG.sound.music.volume + 0.5 * elapsed, 0.8);
 
@@ -372,6 +379,7 @@ class MainMenuState extends MusicBeatState
 			#end
 		}
 
+		VanillaMod.tryCall('onUpdatePost', [elapsed]);
 		super.update(elapsed);
 	}
 
@@ -385,6 +393,7 @@ class MainMenuState extends MusicBeatState
 		{
 			item.animation.play('idle');
 			item.centerOffsets();
+			VanillaMod.tryCall('onMenuItemUnselected', [item]);
 		}
 
 		var selectedItem:FlxSprite;
@@ -400,5 +409,11 @@ class MainMenuState extends MusicBeatState
 		selectedItem.animation.play('selected');
 		selectedItem.centerOffsets();
 		camFollow.y = selectedItem.getGraphicMidpoint().y;
+		VanillaMod.tryCall('onMenuItemSelected', [selectedItem]);
+	}
+
+	override function destroy() {
+		super.destroy();
+		VanillaMod.unloadStage();
 	}
 }

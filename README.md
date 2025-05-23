@@ -8,16 +8,13 @@
 
 ---
 
-## **HyperCode Engine: The Next Generation of Psych Engine**
+## **HyperCode Engine**
 
 HyperCode Engine is a **fork** of **Psych Engine 1.0.4**, developed with new features to enhance modding capabilities and improve performance. It introduces advanced tools like custom menus, improved garbage collection, 3D support, and more.
 
 ### Documentation
 - [HyperCode Engine Lua API](docs/HyperCodeEnging/LuaAPI.md) – Documentation for developers looking to work with Lua in their projects.
 - [Psych Engine API](https://shadowmario.github.io/psychengine.lua/) – API documentation for Psych Engine that you can also reference.
-
-## **About HyperCode Engine**
-HyperCode Engine is a powerful modding tool based on **Psych Engine**, improved with better performance, new features, and additional 3D support to make your modding experience even more enjoyable.
 
 ---
 
@@ -42,11 +39,7 @@ HyperCode Engine is a powerful modding tool based on **Psych Engine**, improved 
 
 ## **Designed for Modders**
 
-HyperCode Engine is made with modders in mind. It offers a flexible API and powerful features to allow you to create more complex and fun mods. However, it may still be a bit confusing at times. Sorry, not sorry!
-
-### saharan's libraries
-- `ext muun` — [GitHub](https://github.com/saharan/haxelibs)  
-- `hgsl` — [HGSL GitHub](https://github.com/saharan/HGSL)
+HyperCode Engine is made for advanced mods.
 
 ### T-Bar Engine's libraries
 - `flx3d` and `away3d` — [GitHub](https://github.com/TBar09/FNF-tbarEngine)
@@ -102,7 +95,6 @@ Please report any bugs or issues on the [GitHub Issues page](https://github.com/
 ## **Credits**
 
 - **Paopun20** - Main Developer (Solo Developer)
-- **saharan** - For the cool libraries
 - **T-Bar Engine** - For the 3D libraries and some code
 - **Codename Engine** - For the 3D model support and code improvements
 - **Shadow Mario** - For the original Psych Engine

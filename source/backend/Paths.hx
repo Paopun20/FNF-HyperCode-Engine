@@ -240,6 +240,8 @@ class Paths
 	// Custom Stage
 	inline static public function customStage(key:String)
 		return getPath('custom_stages/$key');
+	inline static public function vanillaModStage(key:String)
+		return getPath('custom_stages/vanillaModStages/$key.hx');
 
 	inline static public function join(paths:Array<String> = null):String
 	{

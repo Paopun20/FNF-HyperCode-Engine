@@ -15,6 +15,7 @@ class EngineLoadingStage extends MusicBeatState
     override public function update(elapsed:Float)
     {
         super.update(elapsed);
+        // Simulate loading process
         MusicBeatState.switchCustomStage("TitleState");
     }
     

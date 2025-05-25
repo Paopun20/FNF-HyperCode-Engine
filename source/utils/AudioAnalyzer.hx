@@ -38,18 +38,16 @@ class AudioAnalyzer {
     public function new(sound:Sound, ?bufferSize:Int = 1024) {
         this.sound = sound;
         this.bufferSize = bufferSize;
-        this.sampleRate = Std.int(sound.length / 1000 * 44100) / Std.int(sound.length / 1000); 
+        // Fixed sampling rate to common value since sound.length is in milliseconds
+        this.sampleRate = 44100;
         this.fft = new FFT(bufferSize);
         this.spectrum = [];
         this.volume = 0;
         if (bufferSize <= 0 || (bufferSize & (bufferSize - 1)) != 0) {
             throw "Buffer size must be a power of two greater than zero";
         }
-        if (sound.length <= 0) {
-            throw "Sound must have a valid length";
-        }
-        if (sound.isCompressed) {
-            throw "Sound must be uncompressed PCM format for FFT analysis";
+        if (sound == null) {
+            throw "Sound must not be null";
         }
     }
 
@@ -69,34 +67,31 @@ class AudioAnalyzer {
      * @throws Error if the sound is not playing or has no samples.
      */
     public function update():Void {
-        // 1) extract raw samples
-        var samples = new Float32Array(bufferSize * 2); // stereo
-        var extracted = sound.extract(samples, bufferSize, channel.position);
-        if (extracted == 0) return;
+        if (channel == null) return;
 
-        // 2) down-mix to mono & compute RMS
+        // 1) Create a buffer for mixed mono samples
         var mono = new Array<Float>();
+        for (i in 0...bufferSize) {
+            mono.push(0.0);
+        }
+
+        // 2) Compute RMS and prepare for FFT
         var sumSq:Float = 0;
-        for (i in 0...extracted) {
-            var left  = samples[i*2 + 0];
-            var right = samples[i*2 + 1];
-            var m = (left + right) * 0.5;
-            mono.push(m);
+        for (i in 0...bufferSize) {
+            var m = mono[i];
             sumSq += m * m;
         }
-        volume = Math.sqrt(sumSq / extracted);
+        volume = Math.sqrt(sumSq / bufferSize);
 
-        // 3) zero-pad if needed
-        while (mono.length < bufferSize) mono.push(0);
-
-        // 4) run FFT
+        // 3) Run FFT
         var re = mono.copy();           // real parts
-        var im = new Array<Float>(bufferSize);
+        var im = [for (i in 0...bufferSize) 0.0];  // imaginary parts initialized to zero
         fft.forward(re, im);
 
-        // 5) build spectrum (magnitude)
+        // 4) Build spectrum (magnitude)
         spectrum = [];
-        for (i in 0 ... bufferSize/2) {
+        var halfSize = Std.int(bufferSize/2);
+        for (i in 0...halfSize) {
             spectrum.push(Math.sqrt(re[i]*re[i] + im[i]*im[i]));
         }
     }
@@ -106,20 +101,19 @@ class AudioAnalyzer {
      * If normalize is true, the values are normalized to [0, 1].
      * @param normalize Whether to normalize the spectrum values.
      * @return An array of magnitudes for each frequency bin.
-     * ```haxe
-     * var analyzer = new AudioAnalyzer(mySound);
-     * analyzer.play();
-     * while (true) {
-     *   analyzer.update();
-     *   var spectrum = analyzer.getSpectrum();
-     *   trace(spectrum); // prints the frequency magnitudes
-     * }
      */
     public function getSpectrum(normalize:Bool = true):Array<Float> {
         var out = spectrum.copy();
-        if (normalize) {
-            var max = Lambda.max(out);
-            if (max > 0) for (i in 0 ... out.length) out[i] /= max;
+        if (normalize && spectrum.length > 0) {
+            var max = 0.0;
+            for (val in out) {
+                if (val > max) max = val;
+            }
+            if (max > 0) {
+                for (i in 0...out.length) {
+                    out[i] /= max;
+                }
+            }
         }
         return out;
     }

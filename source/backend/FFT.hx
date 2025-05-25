@@ -30,7 +30,7 @@ class FFT {
         // precompute twiddle factors
         cosTable = [];
         sinTable = [];
-        for (i in 0...size/2) {
+        for (i in 0...Std.int(size/2)) {
             var angle = -2 * Math.PI * i / size;
             cosTable.push(Math.cos(angle));
             sinTable.push(Math.sin(angle));
@@ -59,17 +59,20 @@ class FFT {
         var tableStep = size >> 1;
         for (stage in 1...log2Size+1) {
             var step = halfSize << 1;
-            var twiddleStep = size / step;
+            var twiddleStep = Std.int(size / step);
             for (m in 0...halfSize) {
-                var cosW = cosTable[m * twiddleStep];
-                var sinW = sinTable[m * twiddleStep];
-                for (k in m...size-1...step) {
+                var idx = Std.int(m * twiddleStep);
+                var cosW = cosTable[idx];
+                var sinW = sinTable[idx];
+                var k = m;
+                while (k < size) {
                     var tRe =  cosW * re[k + halfSize] - sinW * im[k + halfSize];
                     var tIm =  sinW * re[k + halfSize] + cosW * im[k + halfSize];
                     re[k + halfSize] = re[k] - tRe;
                     im[k + halfSize] = im[k] - tIm;
                     re[k] += tRe;
                     im[k] += tIm;
+                    k += step;
                 }
             }
             halfSize = step;

@@ -402,7 +402,14 @@ jobs:
             - Branch: `main`
             - Commit: `${{ github.sha }}`
             - Trigger: `${{ github.event_name }}`
-            - Timestamp: `${{ github.event.created }}`
+            - Timestamp: `$(date -u +"%Y-%m-%d %H:%M:%S UTC")`
+            ### 🔗 Build Status:
+            - Linux: `${{ needs.check-build-status.outputs.status_linux }}`
+            - Windows: `${{ needs.check-build-status.outputs.status_windows }}`
+            - macOS: `${{ needs.check-build-status.outputs.status_mac }}`
+            - Android: `${{ needs.check-build-status.outputs.status_android }}`
+            - iOS: `${{ needs.check-build-status.outputs.status_ios }}`
+            - All Builds: `${{ needs.check-build-status.outputs.all_success }}`
             
             ---
             ### 📣 Reporting Issues

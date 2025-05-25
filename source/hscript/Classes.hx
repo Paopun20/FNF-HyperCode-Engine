@@ -48,6 +48,7 @@ import backend.ui.PsychUIRadioGroup;
 import backend.ui.PsychUISlider;
 import backend.ui.PsychUITab;
 
+import utils.AudioAnalyzer;
 import utils.NdllUtil;
 #if windows
 import utils.TransparentWindow;
@@ -143,5 +144,7 @@ class Classes {
 		"FlxRuntimeShader" => flixel.addons.display.FlxRuntimeShader, 
 		#end
 		"ShaderFilter"	=> openfl.filters.ShaderFilter,
+		"AudioAnalyzer" => AudioAnalyzer,
+		"PsychCamera" => PsychCamera,
     ];
 }

@@ -548,7 +548,7 @@ class PlayState extends MusicBeatState
 		iconP1.visible = !ClientPrefs.data.hideHud;
 		iconP1.alpha = ClientPrefs.data.healthBarAlpha;
 		iconP1Animation = new HealthIconAnimation(iconP1);
-		iconP1Animation.set(instance.iconP1AnimationID);
+		iconP1Animation.set(this.iconP1AnimationID);
 		uiGroup.add(iconP1);
 
 		iconP2 = new HealthIcon(dad.healthIcon, false);
@@ -556,7 +556,7 @@ class PlayState extends MusicBeatState
 		iconP2.visible = !ClientPrefs.data.hideHud;
 		iconP2.alpha = ClientPrefs.data.healthBarAlpha;
 		iconP2Animation = new HealthIconAnimation(iconP2);
-		iconP2Animation.set(instance.iconP2AnimationID);
+		iconP2Animation.set(this.iconP2AnimationID);
 		uiGroup.add(iconP2);
 
 		scoreTxt = new FlxText(0, healthBar.y + 40, FlxG.width, "", 20);

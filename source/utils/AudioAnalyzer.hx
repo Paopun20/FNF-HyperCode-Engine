@@ -1,6 +1,9 @@
 package utils;
 import backend.FFT;
 import haxe.io.Float32Array;
+import openfl.media.Sound;
+import openfl.media.SoundChannel;
+import openfl.media.SoundTransform;
 
 /**
  * AudioAnalyzer class for analyzing audio data.

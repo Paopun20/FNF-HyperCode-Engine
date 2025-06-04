@@ -74,6 +74,7 @@ class Paths
 		}
 		// flags everything to be cleared out next unused memory clear
 		localTrackedAssets = [];
+		localTrackedAssets.resize(localTrackedAssets.length);
 		#if !html5 openfl.Assets.cache.clear("songs"); #end
 	}
 

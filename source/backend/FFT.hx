@@ -8,14 +8,11 @@ class FFT {
     private var sinTable:Array<Float>;
 
     public function new(size:Int) {
-        // must be power of two
-        if ((size & (size - 1)) != 0) {
-            throw "FFT size must be a power of two";
-        }
+        if ((size & (size - 1)) != 0) throw "FFT size must be a power of two";
+
         this.size = size;
         this.log2Size = Std.int(Math.log(size) / Math.log(2));
 
-        // build bit-reversal table
         bitrev = [];
         for (i in 0...size) {
             var rev = 0;
@@ -27,21 +24,16 @@ class FFT {
             bitrev.push(rev);
         }
 
-        // precompute twiddle factors
         cosTable = [];
         sinTable = [];
-        for (i in 0...Std.int(size/2)) {
+        for (i in 0...Std.int(size / 2)) {
             var angle = -2 * Math.PI * i / size;
             cosTable.push(Math.cos(angle));
             sinTable.push(Math.sin(angle));
         }
     }
 
-    /**
-     * In-place radix-2 FFT on real (re) and imaginary (im) arrays.
-     */
     public function forward(re:Array<Float>, im:Array<Float>):Void {
-        // 1) bit-reversal reorder
         for (i in 0...size) {
             var j = bitrev[i];
             if (j > i) {
@@ -54,20 +46,18 @@ class FFT {
             }
         }
 
-        // 2) Danielson-Lanczos section
         var halfSize = 1;
-        var tableStep = size >> 1;
-        for (stage in 1...log2Size+1) {
-            var step = halfSize << 1;
+        for (stage in 0...log2Size) {
+            var step = halfSize * 2;
             var twiddleStep = Std.int(size / step);
             for (m in 0...halfSize) {
-                var idx = Std.int(m * twiddleStep);
+                var idx = m * twiddleStep;
                 var cosW = cosTable[idx];
                 var sinW = sinTable[idx];
                 var k = m;
                 while (k < size) {
-                    var tRe =  cosW * re[k + halfSize] - sinW * im[k + halfSize];
-                    var tIm =  sinW * re[k + halfSize] + cosW * im[k + halfSize];
+                    var tRe = cosW * re[k + halfSize] - sinW * im[k + halfSize];
+                    var tIm = sinW * re[k + halfSize] + cosW * im[k + halfSize];
                     re[k + halfSize] = re[k] - tRe;
                     im[k + halfSize] = im[k] - tIm;
                     re[k] += tRe;

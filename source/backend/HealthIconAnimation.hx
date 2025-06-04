@@ -65,6 +65,13 @@ class HealthIconAnimation
         apply(typeID, elapsed);
     }
 
+    public inline function stop():Void 
+    {
+        apply("Reset", 0);
+        this.icon = null;
+        this.animationID = "None";
+    }
+
     private function updateAnimationType():Void
     {
         currentAnimationType = animationMap.exists(animationID) ? animationMap.get(animationID) : animationMap.get("None");

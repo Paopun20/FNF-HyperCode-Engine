@@ -190,6 +190,12 @@ class PlayState extends MusicBeatState
 	private var updateTime:Bool = true;
 	public static var changedDifficulty:Bool = false;
 	public static var chartingMode:Bool = false;
+	
+	/**
+	 * What it do
+	 * Just Disable Custom Health Icon Animation For Old Mods
+	 */
+	public static var legacyMode:Bool = false;
 
 	//Gameplay settings
 	public var healthGain:Float = 1;
@@ -203,7 +209,6 @@ class PlayState extends MusicBeatState
 
 	public var botplaySine:Float = 0;
 	public var botplayTxt:FlxText;
-
 	public var iconP1:HealthIcon;
 	public var iconP1Animation:HealthIconAnimation;
 	public var iconP1AnimationID = "Psych";
@@ -547,16 +552,20 @@ class PlayState extends MusicBeatState
 		iconP1.y = healthBar.y - 75;
 		iconP1.visible = !ClientPrefs.data.hideHud;
 		iconP1.alpha = ClientPrefs.data.healthBarAlpha;
-		iconP1Animation = new HealthIconAnimation(iconP1);
-		iconP1Animation.set(this.iconP1AnimationID);
+		if ( legacyMode == false ) {
+			iconP1Animation = new HealthIconAnimation(iconP1);
+			iconP1Animation.set(this.iconP1AnimationID);
+		}
 		uiGroup.add(iconP1);
 
 		iconP2 = new HealthIcon(dad.healthIcon, false);
 		iconP2.y = healthBar.y - 75;
 		iconP2.visible = !ClientPrefs.data.hideHud;
 		iconP2.alpha = ClientPrefs.data.healthBarAlpha;
-		iconP2Animation = new HealthIconAnimation(iconP2);
-		iconP2Animation.set(this.iconP2AnimationID);
+		if ( legacyMode == false ) {
+			iconP2Animation = new HealthIconAnimation(iconP2);
+			iconP2Animation.set(this.iconP2AnimationID);
+		}
 		uiGroup.add(iconP2);
 
 		scoreTxt = new FlxText(0, healthBar.y + 40, FlxG.width, "", 20);
@@ -1020,7 +1029,11 @@ class PlayState extends MusicBeatState
 
 			startTimer = new FlxTimer().start(Conductor.crochet / 1000 / playbackRate, function(tmr:FlxTimer)
 			{
-				characterBopper(tmr.loopsLeft);
+				try {
+					characterBopper(tmr.loopsLeft);
+				} catch (e:Dynamic) {
+					FlxG.log.error('Error on countdown tick: ' + e);
+				}
 
 				var introAssets:Map<String, Array<String>> = new Map<String, Array<String>>();
 				var introImagesArray:Array<String> = switch(stageUI) {
@@ -1240,6 +1253,7 @@ class PlayState extends MusicBeatState
 			opponentVocals.play();
 		}
 		else opponentVocals.pause();
+		callOnScripts("debugSetSongTime", [time]);
 		Conductor.songPosition = time;
 	}
 
@@ -1893,10 +1907,20 @@ class PlayState extends MusicBeatState
 	// Health icon updaters
 	public dynamic function updateIconsAnimation(elapsed:Float)
 	{
-		iconP1Animation.animation(elapsed, "Dance");
-		iconP1.updateHitbox();
-		iconP2Animation.animation(elapsed, "Dance");
-		iconP2.updateHitbox();
+		if ( legacyMode == false ) {
+			if ( iconP1Animation != null ) iconP1Animation.animation(elapsed, "Dance");
+			iconP1.updateHitbox();
+			if ( iconP2Animation != null ) iconP2Animation.animation(elapsed, "Dance");
+			iconP2.updateHitbox();
+		} else {
+			var mult:Float = FlxMath.lerp(1, iconP1.scale.x, Math.exp(-elapsed * 9 * playbackRate));
+			iconP1.scale.set(mult, mult);
+			iconP1.updateHitbox();
+
+			var mult:Float = FlxMath.lerp(1, iconP2.scale.x, Math.exp(-elapsed * 9 * playbackRate));
+			iconP2.scale.set(mult, mult);
+			iconP2.updateHitbox();
+		}
 	}
 
 	public dynamic function updateIconsPosition()
@@ -2440,6 +2464,18 @@ class PlayState extends MusicBeatState
 		camZooming = false;
 		inCutscene = false;
 		updateTime = false;
+		if ( legacyMode == false ) {
+			iconP1Animation.stop();
+			iconP2Animation.stop();
+			if ( iconP1Animation != null ) iconP1Animation = null;
+			if ( iconP2Animation != null ) iconP2Animation = null;
+		} else {
+			iconP1.scale.set(1.2, 1.2);
+			iconP2.scale.set(1.2, 1.2);
+
+			iconP1.updateHitbox();
+			iconP2.updateHitbox();
+		}
 
 		deathCounter = 0;
 		seenCutscene = false;
@@ -2534,7 +2570,9 @@ class PlayState extends MusicBeatState
 			invalidateNote(daNote);
 		}
 		unspawnNotes = [];
+		unspawnNotes.resize(unspawnNotes.length);
 		eventNotes = [];
+		eventNotes.resize(eventNotes.length);
 	}
 
 	public var totalPlayed:Int = 0;
@@ -3185,7 +3223,7 @@ class PlayState extends MusicBeatState
 				if(script.exists('onDestroy')) script.call('onDestroy');
 				script.destroy();
 			}
-
+		hscriptArray.resize(hscriptArray.length);
 		hscriptArray = null;
 		#end
 		stagesFunc(function(stage:BaseStage) stage.destroy());
@@ -3240,8 +3278,13 @@ class PlayState extends MusicBeatState
 		if (generatedMusic)
 			notes.sort(FlxSort.byY, ClientPrefs.data.downScroll ? FlxSort.ASCENDING : FlxSort.DESCENDING);
 
-		iconP1Animation.animation(0, "Reset");
-		iconP2Animation.animation(0, "Reset");
+		if ( legacyMode == false ) {
+			iconP1Animation.animation(0, "Reset");
+			iconP2Animation.animation(0, "Reset");
+		} else {
+			iconP1.scale.set(1.2, 1.2);
+			iconP2.scale.set(1.2, 1.2);
+		}
 		
 		iconP1.updateHitbox();
 		iconP2.updateHitbox();
@@ -3414,6 +3457,7 @@ class PlayState extends MusicBeatState
 		if(arr.length > 0)
 			for (script in arr)
 				luaArray.remove(script);
+		luaArray.resize(luaArray.length);
 		#end
 		return returnVal;
 	}

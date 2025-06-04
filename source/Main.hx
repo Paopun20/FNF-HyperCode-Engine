@@ -261,6 +261,7 @@ class Main extends Sprite
 		
 		#if windows
 		WindowColorMode.setDarkMode();
+		WindowColorMode.redrawWindowHeader(); // bug fix light window bar.
 		#end
 		
 		#if CRASH_HANDLER
@@ -294,24 +295,24 @@ class Main extends Sprite
 		}
 	}
 
-	function saveCrashReport(content:String):String
-		{
-			var path = "./crash/HyperCodeEngine_" + Date.now().toString().replace(" ", "_").replace(":", "'") + ".txt";
-			
-			if (!FileSystem.exists("./crash/")) {
-				FileSystem.createDirectory("./crash/");
-			}
-	
-			File.saveContent(path, content + "\n");
-			Sys.println(content);
-			Sys.println("Crash dump saved in " + Path.normalize(path));
-			
-			return path;
-		}
-
 	// Code was entirely made by sqirra-rng for their fnf engine named "Izzy Engine", big props to them!!!
 	// very cool person for real they don't get enough credit for their work
 	#if CRASH_HANDLER
+	function saveCrashReport(content:String):String
+	{
+		var path = "./crash/HyperCodeEngine_" + Date.now().toString().replace(" ", "_").replace(":", "'") + ".txt";
+		
+		if (!FileSystem.exists("./crash/")) {
+			FileSystem.createDirectory("./crash/");
+		}
+
+		File.saveContent(path, content + "\n");
+		Sys.println(content);
+		Sys.println("Crash dump saved in " + Path.normalize(path));
+		
+		return path;
+	}
+
 	function onCrash(e:UncaughtErrorEvent):Void
 	{
 		var errMsg:String = "";
@@ -335,25 +336,26 @@ class Main extends Sprite
 		errMsg += "Date: " + dateNow + "\n";
 
 		// Exception stack trace
-		errMsg += "==== STACK TRACE ====\n";
-		for (stackItem in callStack)
-		{
-			switch (stackItem)
-			{
-				case FilePos(s, file, line, column):
-					errMsg += file + " (line " + line + ")\n";
-				case CFunction:
-					errMsg += "C Function\n";
-				case Module(m):
-					errMsg += "Module: " + m + "\n";
-				case Method(classname, method):
-					errMsg += "Method: " + classname + "." + method + "\n";
-				case LocalFunction(n):
-					errMsg += "Local Function: " + n + "\n";
-				default:
-					errMsg += "Unknown: " + stackItem + "\n";
-			}
-		}
+    	var stackBuf = new StringBuf();
+    	stackBuf.add("==== STACK TRACE ====\n");
+    	var callStack = CallStack.exceptionStack(true);
+    	for (stackItem in callStack) {
+    	    switch (stackItem) {
+    	        case FilePos(s, file, line, column):
+    	            stackBuf.add("  File: " + file + " (line " + line + ")\n");
+    	        case CFunction:
+    	            stackBuf.add("  C Function\n");
+    	        case Module(m):
+    	            stackBuf.add("  Module: " + m + "\n");
+    	        case Method(classname, method):
+    	            stackBuf.add("  Method: " + classname + "." + method + "\n");
+    	        case LocalFunction(n):
+    	            stackBuf.add("  Local Function: " + n + "\n");
+    	        case _:
+    	            stackBuf.add("  Unknown stack item: " + Std.string(stackItem) + "\n");
+    	    }
+    	}
+    	errMsg += stackBuf.toString();
 
 		// Error details
 		errMsg += "\n==== ERROR DETAILS ====\n";
@@ -407,7 +409,7 @@ class Main extends Sprite
 			#if LUA_ALLOWED
 			errMsg += "\n==== MOD INFO ====\n";
 			errMsg += "Current Mod: " + Mods.currentModDirectory + "\n";
-			@:privateAccess errMsg += "Global Mods: " + Mods.globalMods.join(", ") + "\n";
+			@:privateAccess errMsg += "Global Mods:\n" + Mods.globalMods.join('\n	') + "\n";
 			#end
 		} catch(e:Dynamic) {
 			errMsg += "Failed to get mod info: " + e + "\n";
@@ -426,9 +428,16 @@ class Main extends Sprite
         var displayMsg = "The game crashed!\n";
         displayMsg += "A crash report has been saved to:\n" + Path.normalize(saveCrashReport(errMsg)) + "\n\n";
         displayMsg += "Error: " + Std.string(e.error).split("\n")[0] + "\n";
-        #if officialBuild
-        displayMsg += "\nPlease report this issue on GitHub.";
-        #end
+		#if (officialBuild && !NotDeveloper)
+		    displayMsg += "\nPlease restart the game. If the same crash occurs again, please send the crash report to the GitHub Issues page.\n\n";
+		    displayMsg += "How to send the crash report to the GitHub Issues page?\n";
+		    displayMsg += "- Go to the game folder.\n";
+		    displayMsg += "- Go to the 'crash' folder.\n";
+		    displayMsg += "- Send the latest crash report file to the GitHub Issues page.\n";
+		#else
+		    displayMsg += "\nHey Developer! Looks like you broke this engine again\n";
+		    displayMsg += "Here's your crash report, enjoy your nightmares! Dev...\n";
+		#end
 
         Application.current.window.alert(displayMsg, "Crash Report");
 

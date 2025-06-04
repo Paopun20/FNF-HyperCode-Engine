@@ -26,7 +26,7 @@ class APIScriptHandler {
 	#if HSCRIPT_ALLOWED
 	public static function tryCall(script:HScript, func:String, args:Array<Dynamic> = null): Dynamic {
 		if (script == null) {
-			trace('Script is null, cannot call function: $func');
+			// trace('Script is null, cannot call function: $func');
 			return null;
 		}
 

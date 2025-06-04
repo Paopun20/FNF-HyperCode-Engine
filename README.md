@@ -45,11 +45,16 @@ HyperCode Engine is made for advanced mods.
 - `flx3d` and `away3d` — [GitHub](https://github.com/TBar09/FNF-tbarEngine)
 
 ### Codename Engine's libraries
-- 3D model + NDLL support + improved HScript (modified for this engine)
+- away3d librarie — [GitHub](https://github.com/CodenameCrew/hscript-improved)
+- NDLL support — [GitHub](https://github.com/CodenameCrew/CodenameEngine)
+- HScript improved — [GitHub](https://github.com/CodenameCrew/CodenameEngine)
+- AudioAnalyzer — [GitHub](https://github.com/CodenameCrew/CodenameEngine)
+
+
 
 ---
 
-## **Extensions**
+## **Extensions ( Current this build supports )**
 
 ### **Lua + Haxe**
 - `BrainFuck`  
@@ -63,7 +68,7 @@ HyperCode Engine is made for advanced mods.
 
 ### **Haxe-Only**
 - `NdllUtil`
-- `Manager3D`
+- `AudioAnalyzer`
 
 ---
 

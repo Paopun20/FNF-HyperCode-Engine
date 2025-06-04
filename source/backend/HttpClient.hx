@@ -4,15 +4,12 @@ import haxe.Http;
 import haxe.http.HttpStatus;
 import haxe.Json;
 import haxe.ds.StringMap;
-import haxe.ds.Option;
-import Reflect;
 
 class HttpClient {
-    // Constants
-    public static final DEFAULT_TIMEOUT:Int = 10000; // 10 seconds
+    public static final DEFAULT_TIMEOUT:Int = 10000;
     public static final MAX_RETRIES:Int = 3;
+    public var HAS_INTERNET(default, null):Bool = true;
 
-    // Public API methods
     public static function hasInternet(callback:Bool->Void):Void {
         sendRequest("https://www.google.com", null, function(success, _) {
             callback(success);
@@ -33,9 +30,10 @@ class HttpClient {
         data:Dynamic,
         callback:(Bool, Dynamic)->Void,
         headers:StringMap<String> = null,
-        queryParams:StringMap<String> = null
+        queryParams:StringMap<String> = null,
+        contentType:String = "application/json"
     ):Void {
-        sendRequest(url, data, callback, true, headers, 0, "POST", queryParams);
+        sendRequest(url, data, callback, true, headers, 0, "POST", queryParams, contentType);
     }
 
     public static function putRequest(
@@ -43,9 +41,10 @@ class HttpClient {
         data:Dynamic,
         callback:(Bool, Dynamic)->Void,
         headers:StringMap<String> = null,
-        queryParams:StringMap<String> = null
+        queryParams:StringMap<String> = null,
+        contentType:String = "application/json"
     ):Void {
-        sendRequest(url, data, callback, true, headers, 0, "PUT", queryParams);
+        sendRequest(url, data, callback, true, headers, 0, "PUT", queryParams, contentType);
     }
 
     public static function deleteRequest(
@@ -62,9 +61,10 @@ class HttpClient {
         data:Dynamic,
         callback:(Bool, Dynamic)->Void,
         headers:StringMap<String> = null,
-        queryParams:StringMap<String> = null
+        queryParams:StringMap<String> = null,
+        contentType:String = "application/json"
     ):Void {
-        sendRequest(url, data, callback, true, headers, 0, "PATCH", queryParams);
+        sendRequest(url, data, callback, true, headers, 0, "PATCH", queryParams, contentType);
     }
 
     public static function streamRequest(
@@ -72,21 +72,22 @@ class HttpClient {
         data:Dynamic,
         callback:(Bool, Bool, Dynamic)->Void,
         headers:StringMap<String> = null,
-        queryParams:StringMap<String> = null
+        queryParams:StringMap<String> = null,
+        isSSE:Bool = false
     ):Void {
-        sendStream(url, data, callback, headers, queryParams);
+        sendStream(url, data, callback, headers, queryParams, isSSE);
     }
 
-    // Private implementation
     private static function sendRequest(
         url:String,
         data:Dynamic,
         callback:(Bool, Dynamic)->Void,
-        isPost:Bool = false,
+        hasPayload:Bool = false,
         headers:StringMap<String> = null,
         retries:Int = 0,
         method:String = "GET",
-        queryParams:StringMap<String> = null
+        queryParams:StringMap<String> = null,
+        contentType:String = "application/json"
     ):Void {
         if (retries > MAX_RETRIES) {
             logError("Max retries exceeded", url, retries);
@@ -106,15 +107,27 @@ class HttpClient {
         http.cnxTimeout = DEFAULT_TIMEOUT;
 
         setHeaders(http, headers);
-        
-        if (isPost || method != "GET") {
-            preparePostRequest(http, data, method);
+
+        if (hasPayload || method != "GET") {
+            preparePayloadRequest(http, data, method, contentType);
         }
 
-        http.onStatus = status -> httptrace('$method Status: $status');
-        http.onData = response -> handleSuccess(response, callback);
+        var statusCode = 0;
+        http.onStatus = status -> {
+            statusCode = status;
+            httptrace('$method Status: $status');
+        };
+        http.onData = response -> {
+            if (statusCode >= 400) {
+                handleError('HTTP $statusCode', url, retries, () -> {
+                    sendRequest(url, data, callback, hasPayload, headers, retries + 1, method, queryParams, contentType);
+                }, callback);
+            } else {
+                handleSuccess(response, callback);
+            }
+        };
         http.onError = error -> handleError(error, url, retries, () -> {
-            sendRequest(url, data, callback, isPost, headers, retries + 1, method, queryParams);
+            sendRequest(url, data, callback, hasPayload, headers, retries + 1, method, queryParams, contentType);
         }, callback);
 
         http.request();
@@ -125,7 +138,8 @@ class HttpClient {
         data:Dynamic,
         callback:(Bool, Bool, Dynamic)->Void,
         headers:StringMap<String> = null,
-        queryParams:StringMap<String> = null
+        queryParams:StringMap<String> = null,
+        isSSE:Bool = false
     ):Void {
         final parsedUrl = validateUrl(url);
         if (parsedUrl == null) {
@@ -133,88 +147,64 @@ class HttpClient {
             safeStreamCallback(callback, false, false, {error: "Invalid URL", url: url});
             return;
         }
-    
+
         final fullUrl = buildFullUrl(parsedUrl, queryParams);
         final http = new Http(fullUrl);
         http.cnxTimeout = DEFAULT_TIMEOUT;
-    
+
         setHeaders(http, headers);
-        
-        // Remove SSE-specific headers since we're handling raw stream
-        http.setHeader("Accept", "application/json");
-        http.setHeader("Connection", "keep-alive");
-    
+        if (isSSE) setStreamHeaders(http);
+
         final state = {
             closed: false,
-            buffer: new StringBuf(),
             lastDataTime: haxe.Timer.stamp()
         };
-    
-        // Heartbeat check for stream timeout
+
         final heartbeatTimer = new haxe.Timer(1000);
         heartbeatTimer.run = function() {
             if (state.closed) {
                 heartbeatTimer.stop();
                 return;
             }
-            
+
             if (haxe.Timer.stamp() - state.lastDataTime > 30) {
                 state.closed = true;
                 heartbeatTimer.stop();
                 safeStreamCallback(callback, false, true, {
-                    error: "Stream timeout", 
+                    error: "Stream timeout",
                     reason: "No data received for 30 seconds"
                 });
             }
         };
-    
+
         http.onBytes = function(bytes:haxe.io.Bytes) {
             if (state.closed) return;
-            
             state.lastDataTime = haxe.Timer.stamp();
-            final chunk = bytes.toString();
-            
-            // Directly pass through chunks without SSE parsing
-            safeStreamCallback(callback, true, false, {
-                chunk: chunk
-            });
+            safeStreamCallback(callback, true, false, {chunk: bytes.toString()});
         };
-    
+
         http.onError = function(error:String) {
             if (!state.closed) {
                 state.closed = true;
                 heartbeatTimer.stop();
                 logError("Stream error: " + error, url);
-                safeStreamCallback(callback, false, true, {
-                    error: error,
-                    closed: true
-                });
+                safeStreamCallback(callback, false, true, {error: error, closed: true});
             }
         };
-    
+
         http.onStatus = function(status:Int) {
             if (!state.closed && status >= 400) {
                 state.closed = true;
                 heartbeatTimer.stop();
-                final errorMsg = 'HTTP error $status';
-                logError(errorMsg, url);
-                safeStreamCallback(callback, false, true, {
-                    error: errorMsg, 
-                    status: status,
-                    closed: true
-                });
-            }
-            // Treat successful completion (status 200) as stream end
-            else if (!state.closed && status == 200) {
+                logError('HTTP error $status', url);
+                safeStreamCallback(callback, false, true, {error: 'HTTP error $status', status: status, closed: true});
+            } else if (!state.closed && status == 200) {
                 state.closed = true;
                 heartbeatTimer.stop();
-                safeStreamCallback(callback, true, true, {
-                    complete: true,
-                    status: status
-                });
+                safeStreamCallback(callback, true, true, {complete: true, status: status});
             }
         };
-    
+
         try {
             if (data != null) {
                 http.setHeader("Content-Type", "application/json");
@@ -228,22 +218,22 @@ class HttpClient {
                 state.closed = true;
                 heartbeatTimer.stop();
                 logError("Request failed: " + e, url);
-                safeStreamCallback(callback, false, true, {
-                    error: e,
-                    closed: true
-                });
+                safeStreamCallback(callback, false, true, {error: e, closed: true});
             }
         }
     }
 
-    // Helper methods
-    private static function buildFullUrl(baseUrl:String, queryParams:StringMap<String>):String {
-        if (queryParams == null) return baseUrl;
-        return baseUrl + "?" + buildQueryString(queryParams);
+    private static function preparePayloadRequest(http:Http, data:Dynamic, method:String, contentType:String):Void {
+        http.setHeader("Content-Type", contentType);
+        if (data != null && contentType == "application/json") {
+            http.setPostData(Json.stringify(data));
+        }
+        httptrace('Sending $method request with data: ${Json.stringify(data)}');
     }
 
-    private static function buildQueryString(params:StringMap<String>):String {
-        return [for (key in params.keys()) '$key=${StringTools.urlEncode(params.get(key))}'].join("&");
+    private static function buildFullUrl(baseUrl:String, queryParams:StringMap<String>):String {
+        if (queryParams == null) return baseUrl;
+        return baseUrl + "?" + [for (key in queryParams.keys()) '$key=${StringTools.urlEncode(queryParams.get(key))}'].join("&");
     }
 
     private static function setHeaders(http:Http, headers:StringMap<String>):Void {
@@ -259,17 +249,13 @@ class HttpClient {
         http.setHeader("Connection", "keep-alive");
     }
 
-    private static function preparePostRequest(http:Http, data:Dynamic, method:String):Void {
-        http.setHeader("Content-Type", "application/json");
-        if (data != null) {
-            http.setPostData(Json.stringify(data));
-        }
-        httptrace('Sending $method request with data: ${Json.stringify(data)}');
-    }
-
     private static function handleSuccess(response:String, callback:(Bool, Dynamic)->Void):Void {
         httptrace("Response received: " + response);
-        safeCallback(callback, true, response);
+        try {
+            safeCallback(callback, true, Json.parse(response));
+        } catch (e:Dynamic) {
+            safeCallback(callback, true, response);
+        }
     }
 
     private static function handleError(
@@ -281,7 +267,7 @@ class HttpClient {
     ):Void {
         final errorType = categorizeError(error);
         logError(errorType, url, retries);
-        
+
         if (shouldRetry(errorType)) {
             httptrace('Retrying... Attempt ${retries + 1}');
             retryCallback();
@@ -290,75 +276,17 @@ class HttpClient {
         }
     }
 
-    private static function processStreamEvent(
-        eventData:Dynamic,
-        callback:(Bool, Bool, Dynamic)->Void,
-        streamClosed:Bool
-    ):Void {
-        final choice = eventData.choices[0];
-        
-        if (choice.finish_reason != null) {
-            streamClosed = true;
-            safeStreamCallback(callback, true, true, {
-                finish_reason: choice.finish_reason,
-                usage: eventData.usage
-            });
-        } else if (choice.delta != null && choice.delta.content != null) {
-            safeStreamCallback(callback, true, false, {
-                content: choice.delta.content
-            });
-        }
-    }
-
-    private static function handleStreamError(
-        error:String,
-        url:String,
-        callback:(Bool, Bool, Dynamic)->Void,
-        streamClosed:Bool
-    ):Void {
-        if (!streamClosed) {
-            streamClosed = true;
-            logError("Stream error: " + error, url);
-            safeStreamCallback(callback, false, true, {error: error});
-        }
-    }
-
-    private static function handleStreamStatus(
-        status:Int,
-        url:String,
-        callback:(Bool, Bool, Dynamic)->Void,
-        streamClosed:Bool
-    ):Void {
-        if (status >= 400 && !streamClosed) {
-            streamClosed = true;
-            final errorMsg = 'HTTP error $status';
-            logError(errorMsg, url);
-            safeStreamCallback(callback, false, true, {error: errorMsg, status: status});
-        }
-    }
-
-    private static function safeCallback(
-        callback:(Bool, Dynamic)->Void,
-        success:Bool,
-        result:Dynamic
-    ):Void {
+    private static function safeCallback(callback:(Bool, Dynamic)->Void, success:Bool, result:Dynamic):Void {
         try {
-            if (callback == null) return;
-            callback(success, result);
+            if (callback != null) callback(success, result);
         } catch (e:Dynamic) {
             httptrace("Callback execution failed: " + e);
         }
     }
 
-    private static function safeStreamCallback(
-        callback:(Bool, Bool, Dynamic)->Void,
-        success:Bool,
-        finished:Bool,
-        data:Dynamic
-    ):Void {
+    private static function safeStreamCallback(callback:(Bool, Bool, Dynamic)->Void, success:Bool, finished:Bool, data:Dynamic):Void {
         try {
-            if (callback == null) return;
-            callback(success, finished, data);
+            if (callback != null) callback(success, finished, data);
         } catch (e:Dynamic) {
             logError("Stream callback failed: " + e, "");
         }
@@ -393,7 +321,10 @@ class HttpClient {
         final retryableErrors = [
             "Network Error", "Timeout Error", "General Error",
             "Service Unavailable", "Connection Refused", "Failed to Connect",
-            "Network Unreachable", "Host Down", "Gateway Timeout"
+            "Network Unreachable", "Host Down", "Gateway Timeout",
+            "SSL Error", "Too Many Requests", "Request Entity Too Large",
+            "Unsupported Media Type", "Not Implemented", "Bad Request",
+            "Unauthorized", "Forbidden", "Not Found", "Internal Server Error"
         ];
         return retryableErrors.contains(errorType);
     }

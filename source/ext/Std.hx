@@ -1,11 +1,11 @@
 package ext;
 
-extern inline final PI:Float = 3.141592653589793;
-extern inline final TWO_PI:Float = 6.283185307179586;
-extern inline final HALF_PI:Float = 1.5707963267948965;
-extern inline final E:Float = 2.718281828459045;
-extern inline final LOG2:Float = 0.69314718055994530942;
-extern inline final LOG10:Float = 2.302585092994045684;
+extern inline final PI:Float = 3.1415926535897932384626433832795; // PI 
+extern inline final TWO_PI:Float = PI * 2;
+extern inline final HALF_PI:Float = PI / 2;
+extern inline final E:Float = 2.7182818284590452353602874713527;
+extern inline final LOG2:Float = 0.693147180559945309417232121458176568075500134360255;
+extern inline final LOG10:Float = 2.30258509299404568409875017057736332492598758037004;
 
 overload extern inline function abs(a:Int):Int {
 	return a < 0 ? -a : a;

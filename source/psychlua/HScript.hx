@@ -18,22 +18,8 @@ import crowplexus.iris.IrisConfig;
 // import crowplexus.hscript.Expr.Error as IrisError;
 // import crowplexus.hscript.Printer;
 
-import hscript.Async;
-import hscript.Bytes;  
-import hscript.Checker;
-import hscript.Config;
-import hscript.CustomClassHandler;
 import hscript.Expr;
-import hscript.IHScriptCustomBehaviour;
-import hscript.IHScriptCustomConstructor;
-import hscript.Interp;
-import hscript.Macro;
-import hscript.Parser;
 import hscript.Printer;
-import hscript.Tools;
-import hscript.macros.ClassExtendMacro;
-import hscript.macros.UsingHandler;
-import hscript.macros.Utils;
 
 import haxe.ValueException;
 

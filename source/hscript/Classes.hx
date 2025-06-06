@@ -53,6 +53,7 @@ import utils.NdllUtil;
 #if windows
 import utils.TransparentWindow;
 import winapi.ToastNotification;
+import winapi.DexAPI;
 #end
 
 import flixel.addons.display.FlxPieDial;
@@ -93,6 +94,7 @@ class Classes {
 
 		#if windows
 		"TransparentWindow" => TransparentWindow,
+		"DexAPI" => DexAPI,
 		"ToastNotification" => ToastNotification,
 		"WindowColorMode" => WindowColorMode,
 		#end

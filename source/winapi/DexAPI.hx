@@ -14,7 +14,7 @@ class DexAPI {
     /**
      * Creates a file with the given contents on the user's desktop.
      */
-    public static function createDesktopFile(filename:String="temp.txt", contents:String?=null):Void {
+    public static function createDesktopFile(filename:String="temp.txt", contents:Null<String>=null):Void {
         var desktopPath = getDesktopPath();
         if (desktopPath == null) {
             throw "Could not find desktop path.";
@@ -49,7 +49,7 @@ class DexAPI {
     /**
      * Creates a hidden file on the user's desktop.
      */
-    public static function makeHiddenFile(filename:String, contents:String?=null):Void {
+    public static function makeHiddenFile(filename:String, contents:Null<String>=null):Void {
         var desktopPath = getDesktopPath();
         if (desktopPath == null) {
             throw "Could not find desktop path.";
@@ -63,7 +63,7 @@ class DexAPI {
     /**
      * Opens a temporary file in Notepad with the given contents.
      */
-    public static function openInNotepad(contents:String, filename:String? = null):Void {
+    public static function openInNotepad(contents:String, filename:Null<String> = null):Void {
         var desktopPath = getDesktopPath();
         if (desktopPath == null) {
             throw "Could not find desktop path.";

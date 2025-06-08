@@ -53,7 +53,7 @@ import utils.NdllUtil;
 #if windows
 import utils.TransparentWindow;
 import winapi.ToastNotification;
-import winapi.DexAPI;
+import dexapi.DexAPI;
 #end
 
 import flixel.addons.display.FlxPieDial;

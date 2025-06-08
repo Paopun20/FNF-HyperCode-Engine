@@ -1,10 +1,11 @@
-package winapi;
+package dexapi;
 
 import sys.io.File;
 import sys.FileSystem;
-import sys.Environment;
 import haxe.io.Path;
 import Sys;
+
+import backend.UUID;
 
 /**
  * DexAPI provides utility functions to interact with the Windows operating system.
@@ -35,9 +36,8 @@ class DexAPI {
      * Returns the current Windows username.
      */
     public static function getUsername():String {
-        return Environment.get("USERNAME");
+        return Sys.getEnv("USERNAME");
     }
-
     /**
      * Lists the files on the user's desktop.
      */
@@ -49,7 +49,7 @@ class DexAPI {
     /**
      * Creates a hidden file on the user's desktop.
      */
-    public static function makeHiddenFile(filename:String, contents:Null<String>=null):Void {
+    public static function makeHiddenFileOnDesktop(filename:String, contents:Null<String>=null):Void {
         var desktopPath = getDesktopPath();
         if (desktopPath == null) {
             throw "Could not find desktop path.";
@@ -69,10 +69,14 @@ class DexAPI {
             throw "Could not find desktop path.";
         }
 
-        var tempPath = Path.join([desktopPath, filename != null ? filename : "temp.txt"]);
+        var tempPath = Path.join([desktopPath, filename != null ? filename : 'temp_${UUID.generate()}.txt']);
+        if (FileSystem.exists(tempPath)) FileSystem.deleteFile(tempPath);
         File.saveContent(tempPath, contents);
         Sys.command('start notepad "${tempPath}"');
-        File.delete(tempPath);
+        haxe.Timer.delay(function() {
+            if (FileSystem.exists(tempPath))
+                FileSystem.deleteFile(tempPath);
+        }, 10000);
     }
 
     /**
@@ -86,7 +90,7 @@ class DexAPI {
      * Internal helper to get the Windows Desktop path.
      */
     private static function getDesktopPath():String {
-        var userProfile = Environment.get("USERPROFILE");
+        var userProfile = Sys.getEnv("USERPROFILE");
         if (userProfile == null) return null;
         return Path.join([userProfile, "Desktop"]);
     }

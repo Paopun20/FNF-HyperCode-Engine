@@ -13,7 +13,8 @@
 	<!--The flixel preloader is not accurate in Chrome. You can use it regularly if you embed the swf into a html file
 		or you can set the actual size of your file manually at "FlxPreloaderBase-onUpdate-bytesTotal"-->
 	<!-- <app preloader="Preloader" resizable="true" /> -->
-	<app preloader="flixel.system.FlxPreloader" />
+	<app preloader="flixel.system.FlxPreloader" if="NotDeveloper"/>
+	<app preloader="states.PreloaderState" unless="NotDeveloper"/>
 
 	<!--Minimum without FLX_NO_GAMEPAD: 11.8, without FLX_NO_NATIVE_CURSOR: 11.2-->
 	<set name="SWF_VERSION" value="11.8" />
@@ -125,7 +126,7 @@
 
 	<!-- Dev Only -->
 	<section unless="NotDeveloper">
-		<haxelib name="haxe-ws"/>
+		<!-- <haxelib name="haxe-ws"/> -->
 	</section>
 
 	<haxelib name="hxvlc" if="VIDEOS_ALLOWED" version="2.0.1"/>
@@ -151,7 +152,7 @@
 	<define name="x86_BUILD" if="32bits" />
 	<define name="x64_BUILD" unless="32bits" />
 	
-	<haxelib name="away3d" />
+	<haxelib name="away3d" version="git"/>
 	<define name="IMPORT_AWAY3D" />
 	<define name="THREE_D_SUPPORT" />
 	<define name="SOFTCODED_STATES" />

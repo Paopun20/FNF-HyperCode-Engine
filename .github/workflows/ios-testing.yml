@@ -1,0 +1,41 @@
+name: Build Unsigned iOS App with Lime
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Haxe
+      uses: krdlab/setup-haxe@v1
+      with:
+        haxe-version: 4.3.6
+
+    - name: Install Lime
+      run: |
+        haxelib install lime
+        haxelib run lime setup
+    - run: bash ./ci/setup-haxe.sh
+    
+    - name: Build iOS App (Release, No Sign)
+      run: lime build ios -release -nosign -D officialBuild -D NotDeveloper
+
+    - name: Package .app into unsigned .ipa
+      run: |
+        cd export/ios/build/Release-iphoneos
+        mkdir -p Payload
+        cp -r YourAppName.app Payload/
+        zip -r YourAppName.ipa Payload
+      shell: bash
+
+    - name: Upload unsigned .ipa artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ios-unsigned-ipa
+        path: export/ios/build/Release-iphoneos/YourAppName.ipa

@@ -26,7 +26,6 @@ jobs:
         haxelib install flixel-ui
         haxelib install flixel-addons
         haxelib install hxcpp
-        haxelib run flixel-tools setup
     
     - run: bash ./ci/setup-haxe.sh
 

@@ -26,16 +26,18 @@ jobs:
     - name: Build iOS App (Release, No Sign)
       run: haxelib run lime build ios -release -nosign -D officialBuild -D NotDeveloper
 
+    - run: dir export/ios/build/Release-iphoneos
+
     - name: Package .app into unsigned .ipa
       run: |
         cd export/ios/build/Release-iphoneos
         mkdir -p Payload
-        cp -r YourAppName.app Payload/
-        zip -r YourAppName.ipa Payload
+        cp -r HyperCodeEngine.app Payload/
+        zip -r HyperCodeEngine.ipa Payload
       shell: bash
 
     - name: Upload unsigned .ipa artifact
       uses: actions/upload-artifact@v4.6.2
       with:
         name: ios-unsigned-ipa
-        path: export/ios/build/Release-iphoneos/YourAppName.ipa
+        path: export/ios/build/Release-iphoneos/HyperCodeEngine.ipa

@@ -177,6 +177,7 @@ class MusicBeatState extends FlxState
 			Mods.loadTopMod();
 		}
 
+		#if MODS_ALLOWED
 		trace('have Custom Stage ' + states.CustomStage.haveCustomStage(nextStateName));
 		trace('Switching to state: ' + nextStateName);
 		trace('Load ' + nextStateName);
@@ -191,7 +192,6 @@ class MusicBeatState extends FlxState
 			}
 		}
 
-		#if MODS_ALLOWED
 		if (modsAllowed)
 		{
 			if (states.CustomStage.haveCustomStage(nextStateName))
@@ -213,7 +213,15 @@ class MusicBeatState extends FlxState
 		catch (e:haxe.Exception)
 		{
 			trace('[CustomStage API ERROR] ' + e);
-			MusicBeatState.switchCustomStage("MainMenuState");
+			MusicBeatState.switchState(new CustomStageError(
+				"Failed to load custom stage: " + nextStateName +
+				"Please check the stage name and ensure it exists." + 
+				"Error: " + e.message + 
+				"Stack Trace: " + e.toString() + 
+				"Please report this issue to the developers.",
+				function() reload(),
+				function() Game.restartGame()
+			));
 		}
 	}
 	public static function resetState()

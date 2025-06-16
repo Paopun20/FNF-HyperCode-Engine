@@ -18,7 +18,7 @@ class Game extends MusicBeatState {
 		"FreeplayState" => states.FreeplayState,
 		"PlayState" => states.PlayState,
 		"LoadingState" => states.LoadingState,
-		"CustomStage" => states.CustomStage
+		#if HSCRIPT_ALLOWED "CustomStage" => states.CustomStage #end
 	];
 
 	public static function restartGame() {

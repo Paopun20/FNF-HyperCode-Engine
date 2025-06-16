@@ -26,13 +26,20 @@ jobs:
         haxelib install flixel-ui
         haxelib install flixel-addons
         haxelib install hxcpp
+        haxelib run lime setup
     
-    - run: bash ./ci/setup-haxe.sh
+    - name: Run Haxe Setup
+      run: bash ./ci/setup-haxe.sh
+
+    - name: Install iOS dependencies
+      run: |
+        brew install ios-deploy
+        haxelib run lime setup ios
 
     - name: Configure iOS Build
       run: |
-        haxelib run lime config ios-setup
         haxelib run lime config IPHONE_VER 12.0
+        haxelib run lime config IOS_SIMULATOR true
 
     - name: Build iOS App
       run: |

@@ -116,7 +116,11 @@ class CustomStage extends MusicBeatState {
 	}
 
 	public static function haveCustomStage(stateName:String):Bool {
+		#if HSCRIPT_ALLOWED
 		return CustomStageLoader.haveCustomStage(stateName);
+		#else
+		return false;
+		#end
 	}
 
 	public function callFunctions(funcName:String, args:Array<Dynamic> = null):Void {

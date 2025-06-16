@@ -2,6 +2,7 @@ package backend;
 
 import flixel.FlxState;
 import backend.PsychCamera;
+import states.CustomStageError;
 
 class MusicBeatState extends FlxState
 {
@@ -213,15 +214,8 @@ class MusicBeatState extends FlxState
 		catch (e:haxe.Exception)
 		{
 			trace('[CustomStage API ERROR] ' + e);
-			MusicBeatState.switchState(new CustomStageError(
-				"Failed to load custom stage: " + nextStateName +
-				"Please check the stage name and ensure it exists." + 
-				"Error: " + e.message + 
-				"Stack Trace: " + e.toString() + 
-				"Please report this issue to the developers.",
-				function() reload(),
-				function() Game.restartGame()
-			));
+			trace('Some is something wrong, try switching to MainMenuState');
+			MusicBeatState.switchCustomStage("MainMenuState");
 		}
 	}
 	public static function resetState()

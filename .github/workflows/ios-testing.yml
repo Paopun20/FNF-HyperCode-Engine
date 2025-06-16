@@ -22,7 +22,7 @@ jobs:
         haxelib install lime
         haxelib run lime setup
     - run: bash ./ci/setup-haxe.sh
-    
+
     - name: Build iOS App (Release, No Sign)
       run: lime build ios -release -nosign -D officialBuild -D NotDeveloper
 
@@ -35,7 +35,7 @@ jobs:
       shell: bash
 
     - name: Upload unsigned .ipa artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4.6.2
       with:
         name: ios-unsigned-ipa
         path: export/ios/build/Release-iphoneos/YourAppName.ipa

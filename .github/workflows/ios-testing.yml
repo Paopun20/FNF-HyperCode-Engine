@@ -24,7 +24,7 @@ jobs:
     - run: bash ./ci/setup-haxe.sh
 
     - name: Build iOS App (Release, No Sign)
-      run: lime build ios -release -nosign -D officialBuild -D NotDeveloper
+      run: haxelib run lime build ios -release -nosign -D officialBuild -D NotDeveloper
 
     - name: Package .app into unsigned .ipa
       run: |

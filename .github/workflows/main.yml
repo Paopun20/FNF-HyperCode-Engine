@@ -355,6 +355,7 @@ jobs:
               \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\" }
             }]
           }" "$DISCORD_WEBHOOK"
+  
   prepare-release:
     runs-on: ubuntu-latest
     permissions:
@@ -362,7 +363,7 @@ jobs:
     needs:
       - check-build-status
       - version
-    if: always()
+    if: false
     outputs:
       release_id: ${{ steps.create_release.outputs.id }}
       should_upload: ${{ steps.check_upload.outputs.should_upload }}

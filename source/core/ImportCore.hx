@@ -34,6 +34,7 @@ import tink.await.*;
 using Lambda;
 using StringTools;
 
+#if HSCRIPT_ALLOWED
 import hscript.Async;
 import hscript.Bytes;
 import hscript.Checker;
@@ -51,5 +52,6 @@ import hscript.Tools;
 import hscript.macros.ClassExtendMacro;  
 import hscript.macros.UsingHandler;      
 import hscript.macros.Utils;
+#end
 
 class ImportCore {}

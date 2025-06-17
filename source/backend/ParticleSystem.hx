@@ -4,6 +4,8 @@ import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxAngle;
 import flixel.math.FlxMath;
 import haxe.ds.StringMap;
+import objects.ParticleSprite;
+import objects.ParticleSprite.ParticleData;
 
 class ParticleSystem extends FlxTypedGroup<ParticleSprite> {
     // Particle system properties
@@ -118,7 +120,7 @@ class ParticleSystem extends FlxTypedGroup<ParticleSprite> {
     inline function set_accelTanVar(v:Float):Float return _accelTanVar = v;
 
     // Emit a single particle
-    public function emit(x:Float = 0, y:Float = 0):Void {
+    public function emit(x:Float = 0, y:Float = 0):ParticleSprite {
         var p = new ParticleSprite();
         p.loadGraphic(_particleTexture);
         p.setPosition(
@@ -136,16 +138,16 @@ class ParticleSystem extends FlxTypedGroup<ParticleSprite> {
         p.alpha = 1;
         p.acceleration.set(_gravityX, _gravityY);
 
-        var d = new StringMap<Dynamic>();
-        d.set("life", life);
-        d.set("time", 0.0);
-        d.set("dx", p.x);
-        d.set("dy", p.y);
-        d.set("accelRad", _accelRad + (Math.random() * 2 - 1) * _accelRadVar);
-        d.set("accelTan", _accelTan + (Math.random() * 2 - 1) * _accelTanVar);
+        var d:ParticleData = new ParticleData();
+        d.life = life;
+        d.time = 0.0;
+        d.dx = p.x;
+        d.dy = p.y;
+        d.accelRad = _accelRad + (Math.random() * 2 - 1) * _accelRadVar;
+        d.accelTan = _accelTan + (Math.random() * 2 - 1) * _accelTanVar;
         p.userData = d;
 
-        add(p);
+        return p;
     }
 
     // Update logic
@@ -155,24 +157,24 @@ class ParticleSystem extends FlxTypedGroup<ParticleSprite> {
             var d = p.userData;
             if (d == null) continue;
 
-            d.set("time", d.get("time") + elapsed);
-            if (d.get("time") >= d.get("life")) {
+            d.time += elapsed;
+            if (d.time >= d.life) {
                 p.kill();
                 continue;
             }
 
-            var dx = p.x - d.get("dx");
-            var dy = p.y - d.get("dy");
+            var dx = p.x - d.dx;
+            var dy = p.y - d.dy;
             var dist = Math.sqrt(dx * dx + dy * dy);
             var ax = 0.0;
             var ay = 0.0;
 
             if (dist != 0) {
-                var accRad = d.get("accelRad");
+                var accRad = d.accelRad;
                 ax += dx / dist * accRad;
                 ay += dy / dist * accRad;
 
-                var accTan = d.get("accelTan");
+                var accTan = d.accelTan;
                 ax += -dy / dist * accTan;
                 ay += dx / dist * accTan;
             }
@@ -180,7 +182,7 @@ class ParticleSystem extends FlxTypedGroup<ParticleSprite> {
             p.acceleration.x += ax;
             p.acceleration.y += ay;
 
-            p.alpha = 1 - (d.get("time") / d.get("life"));
+            p.alpha = 1 - (d.time / d.life);
         }
     }
 

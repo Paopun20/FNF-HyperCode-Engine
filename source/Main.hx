@@ -406,7 +406,7 @@ class Main extends Sprite
 
 		// Mod info
 		try {
-			#if LUA_ALLOWED
+			#if MODS_ALLOWED
 			errMsg += "\n==== MOD INFO ====\n";
 			errMsg += "Current Mod: " + Mods.currentModDirectory + "\n";
 			@:privateAccess errMsg += "Global Mods:\n" + Mods.globalMods.join('\n	') + "\n";

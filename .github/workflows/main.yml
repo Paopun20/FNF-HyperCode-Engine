@@ -35,7 +35,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: confirm
     steps:
-      - uses: actions/cache@v4.2.3
+      - uses: actions/cache@main
         with:
           path: |
             ~/.haxelib
@@ -52,7 +52,7 @@ jobs:
       - id: setver
         run: echo "version=4.0.0-${{ github.run_id }}" >> "$GITHUB_OUTPUT"
       - run: echo "4.0.0-${{ github.run_id }}" > VERSION
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@main
         with:
           name: Version
           path: VERSION
@@ -67,8 +67,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: [wait]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@main
+      - uses: actions/download-artifact@main
         with:
           name: Version
       - uses: krdlab/setup-haxe@master
@@ -77,7 +77,7 @@ jobs:
       - run: bash ./ci/setup-haxe.sh
       - run: haxelib run lime build Project.xml linux --app-version="$(cat VERSION)" "$ARGS"
       - run: zip -r HyperCodeEngine-Linux.zip export/release/linux/bin
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@main
         with:
           name: Linux Build
           path: HyperCodeEngine-Linux.zip
@@ -89,8 +89,8 @@ jobs:
       matrix:
         arch: [64, 32]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@main
+      - uses: actions/download-artifact@main
         with:
           name: Version
       - uses: krdlab/setup-haxe@master
@@ -101,7 +101,7 @@ jobs:
       - run: haxelib run lime build windows ${{ matrix.arch == 32 && '-32 -D 32bits -D HXCPP_M32' || '' }} --app-version="$(cat VERSION)" "$ARGS"
         shell: bash
       - run: powershell Compress-Archive -Path export/${{ matrix.arch == 64 && 'release' || '32bit' }}/windows/bin/* -DestinationPath HyperCodeEngine-Windows-x${{ matrix.arch }}.zip
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@main
         with:
           name: Windows Build (x${{ matrix.arch }})
           path: HyperCodeEngine-Windows-x${{ matrix.arch }}.zip
@@ -110,8 +110,8 @@ jobs:
     runs-on: macos-13
     needs: [wait]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@main
+      - uses: actions/download-artifact@main
         with:
           name: Version
       - uses: krdlab/setup-haxe@master
@@ -121,7 +121,7 @@ jobs:
       - run: haxelib run lime rebuild lime mac -64
       - run: haxelib run lime build mac --app-version="$(cat VERSION)" "$ARGS"
       - run: ditto -c -k --sequesterRsrc --keepParent export/release/macos/bin/HyperCodeEngine.app HyperCodeEngine-macOS.zip
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@main
         with:
           name: macOS Build
           path: HyperCodeEngine-macOS.zip
@@ -153,11 +153,11 @@ jobs:
             cmake \
             ninja-build
       - name: Setup CMake
-        uses: jwlawson/actions-setup-cmake@v2.0.2
+        uses: jwlawson/actions-setup-cmake@master
         with:
           cmake-version: '3.26.x'
       - name: Cache Dependencies
-        uses: actions/cache@v4.2.3
+        uses: actions/cache@main
         with:
           path: |
             /usr/lib/i386-linux-gnu
@@ -169,7 +169,7 @@ jobs:
     if: false
     needs: [setup-android-deps]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@main
       - name: Setup Java JDK
         uses: actions/setup-java@main
         with:
@@ -183,7 +183,7 @@ jobs:
           ndk-version: r25c
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@main
         with:
           cmdline-tools-version: latest
 
@@ -204,7 +204,7 @@ jobs:
     if: false
     needs: [setup-android-env]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@main
       - uses: krdlab/setup-haxe@master
         with:
           haxe-version: ${{ env.HAXE_VERSION }}
@@ -230,8 +230,8 @@ jobs:
     if: false
     needs: [setup-android-haxe]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@main
+      - uses: actions/download-artifact@main
         with:
           name: Version
 
@@ -243,8 +243,8 @@ jobs:
 
       - name: Package Android Build
         run: zip -r HyperCodeEngine-Android.zip export/release/android/bin
-      
-      - uses: actions/upload-artifact@v4
+
+      - uses: actions/upload-artifact@main
         with:
           name: Android Build
           path: HyperCodeEngine-Android.zip
@@ -254,8 +254,8 @@ jobs:
     if: false
     needs: [wait]
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@main
+      - uses: actions/download-artifact@main
         with:
           name: Version
       - uses: krdlab/setup-haxe@master
@@ -377,15 +377,15 @@ jobs:
             echo "should_upload=false" >> "$GITHUB_OUTPUT"
           fi
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
       - name: Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@main
         with:
           path: builds
 
       - name: Create GitHub Release
         id: create_release
-        uses: actions/create-release@v1.1.4
+        uses: actions/create-release@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -443,7 +443,7 @@ jobs:
     if: needs.prepare-release.outputs.should_upload == 'true'
     steps:
       - name: Download all build artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@main
         with:
           path: builds
           
@@ -466,7 +466,7 @@ jobs:
           ls -lh release-artifacts/
           
       - name: Upload Release Artifacts
-        uses: softprops/action-gh-release@v2.2.2
+        uses: softprops/action-gh-release@master
         with:
           tag_name: ${{ needs.version.outputs.version_tag }}
           files: |

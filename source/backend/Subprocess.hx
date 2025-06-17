@@ -3,7 +3,7 @@ package backend;
 import sys.thread.Thread;
 
 class Subprocess {
-    public static function run(haxefunc:() -> Void):Thread {
+    public static function startThread(haxefunc:() -> Void):Thread {
         if (haxefunc == null) {
             throw "Provided function is null!";
         }
@@ -11,7 +11,7 @@ class Subprocess {
         try {
             var thread = Thread.create(() -> {
                 try {
-                    haxefunc();
+                    return haxefunc();
                 } catch (e) {
                     trace("Exception inside thread: " + e);
                 }

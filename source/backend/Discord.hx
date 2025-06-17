@@ -16,6 +16,8 @@ class DiscordClient
 	public static var whoIsConnectedTo:Null<cpp.RawConstPointer<DiscordUser>>;
 	private static var discordPresence:DiscordRichPresence;
 
+	private static final button1:DiscordButton = new DiscordButton();
+	private static final button2:DiscordButton = new DiscordButton();
 	public static function initialize():Void
 	{
 		Sys.println('Initializing Discord RPC...');
@@ -25,6 +27,13 @@ class DiscordClient
 		handlers.disconnected = cpp.Function.fromStaticFunction(onDisconnected);
 		handlers.errored = cpp.Function.fromStaticFunction(onError);
 		Discord.Initialize(_defaultID, cpp.RawPointer.addressOf(handlers), false, null);
+		button1.label = "Download";
+		button1.url = EngineConfig.ENGINE_URL + "/releases";
+		button2.label = "GitHub link";
+		button2.url = EngineConfig.ENGINE_URL;
+		
+		discordPresence.buttons[0] = button1;
+        discordPresence.buttons[1] = button2;
 
 		Thread.create(function():Void
 		{
@@ -68,17 +77,6 @@ class DiscordClient
 		discordPresence.details = "LOADING :3";
 		// discordPresence.largeImageKey = "";
 		// discordPresence.smallImageKey = "";
-
-        final button1:DiscordButton = new DiscordButton();
-        button1.label = "HyCode Engine 0.0.1 Trailer";
-        button1.url = "https://www.youtube.com/watch?v=xvFZjo5PgG0&pp=0gcJCdgAo7VqN5tD";
-        
-        final button2:DiscordButton = new DiscordButton();
-        button2.label = "Test";
-        button2.url = "https://discord.gg/fortnite";
-        
-        discordPresence.buttons[0] = button1;
-        discordPresence.buttons[1] = button2;
 
 		Discord.UpdatePresence(cpp.RawConstPointer.addressOf(discordPresence));
 		changePresence();

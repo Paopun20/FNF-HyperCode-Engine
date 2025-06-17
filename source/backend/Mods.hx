@@ -17,6 +17,7 @@ class Mods
 		'characters',
 		'custom_events',
 		'custom_notetypes',
+		'custom_stages',
 		'data',
 		'songs',
 		'music',
@@ -224,6 +225,21 @@ class Mods
 		updatedOnState = true;
 		//trace('Saved modsList.txt');
 		#end
+	}
+
+	public static function getModsFolder():String
+	{
+	    #if MODS_ALLOWED
+	        #if ios
+	            return lime.system.System.getDirectory("documents") + "/Mods/";
+	        #elseif android
+	            return lime.system.System.getDirectory("documents") + "/Mods/";
+	        #else
+	            return "Mods/";
+	        #end
+	    #else
+	        return null; // or throw an error if mods shouldn't be used
+	    #end
 	}
 
 	public static function loadTopMod()

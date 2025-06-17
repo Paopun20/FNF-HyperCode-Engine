@@ -25,6 +25,7 @@ class EditorPlayState extends MusicBeatSubstate
 	var inst:FlxSound = new FlxSound();
 	var vocals:FlxSound;
 	var opponentVocals:FlxSound;
+	var lyricsVocals:FlxSound;
 	
 	var notes:FlxTypedGroup<Note>;
 	var unspawnNotes:Array<Note> = [];
@@ -73,6 +74,7 @@ class EditorPlayState extends MusicBeatSubstate
 		/* setting up some important data */
 		this.vocals = allVocals[0];
 		this.opponentVocals = allVocals[1];
+		this.lyricsVocals = allVocals[2];
 		this._noteList = noteList;
 		this.startPos = Conductor.songPosition;
 		Conductor.songPosition = startPos;
@@ -280,14 +282,15 @@ class EditorPlayState extends MusicBeatSubstate
 		@:privateAccess inst.loadEmbedded(FlxG.sound.music._sound);
 		inst.looped = false;
 		inst.onComplete = finishSong;
-		inst.volume = vocals.volume = opponentVocals.volume = 1;
+		inst.volume = vocals.volume = opponentVocals.volume = lyricsVocals.volume = 1;
 		FlxG.sound.list.add(inst);
 
 		FlxG.sound.music.pause();
 		inst.play();
 		vocals.play();
 		opponentVocals.play();
-		inst.time = vocals.time = opponentVocals.time = startPos - Conductor.offset;
+		lyricsVocals.play();
+		inst.time = vocals.time = opponentVocals.time = lyricsVocals.time = startPos - Conductor.offset;
 
 		// Song duration in a float, useful for the time left feature
 		songLength = inst.length;
@@ -311,7 +314,7 @@ class EditorPlayState extends MusicBeatSubstate
 		var songData = PlayState.SONG;
 		Conductor.bpm = songData.bpm;
 
-		inst.volume = vocals.volume = opponentVocals.volume = 0;
+		inst.volume = vocals.volume = opponentVocals.volume = lyricsVocals.volume = 0;
 
 		notes = new FlxTypedGroup<Note>();
 		add(notes);
@@ -497,11 +500,12 @@ class EditorPlayState extends MusicBeatSubstate
 		inst.pause();
 		vocals.pause();
 		opponentVocals.pause();
+		lyricsVocals.pause();
 
 		if(finishTimer != null)
 			finishTimer.destroy();
 
-		Conductor.songPosition = FlxG.sound.music.time = vocals.time = opponentVocals.time = startPos - Conductor.offset;
+		Conductor.songPosition = FlxG.sound.music.time = vocals.time = opponentVocals.time = lyricsVocals.time = startPos - Conductor.offset;
 		close();
 	}
 	

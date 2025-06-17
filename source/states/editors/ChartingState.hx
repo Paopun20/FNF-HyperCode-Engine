@@ -62,6 +62,7 @@ enum abstract WaveformTarget(String)
 	var INST = 'inst';
 	var PLAYER = 'voc';
 	var OPPONENT = 'opp';
+	var LYRICS = 'lyrics';
 }
 
 class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychUIEvent
@@ -84,7 +85,9 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		['Change Character', "Value 1: Character to change (Dad, BF, GF)\nValue 2: New character's name"],
 		['Change Scroll Speed', "Value 1: Scroll Speed Multiplier (1 is default)\nValue 2: Time it takes to change fully in seconds."],
 		['Set Property', "Value 1: Variable name\nValue 2: New value"],
-		['Play Sound', "Value 1: Sound file name\nValue 2: Volume (Default: 1), ranges from 0 to 1"]
+		['Play Sound', "Value 1: Sound file name\nValue 2: Volume (Default: 1), ranges from 0 to 1"],
+		
+		['Placeholder', "Yes, it placeholder for you"]
 	];
 	
 	public static var keysArray:Array<FlxKey> = [ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT]; //Used for Vortex Editor
@@ -136,7 +139,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 
 	var chartEditorSave:FlxSave;
 	var mainBox:PsychUIBox;
-	var mainBoxPosition:FlxPoint = FlxPoint.get(920, 40);
+	var mainBoxPosition:FlxPoint = FlxPoint.get(760, 40);
 	var infoBox:PsychUIBox;
 	var infoBoxPosition:FlxPoint = FlxPoint.get(1000, 360);
 	var upperBox:PsychUIBox;
@@ -184,6 +187,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 	
 	var vocals:FlxSound = new FlxSound();
 	var opponentVocals:FlxSound = new FlxSound();
+	var lyricsVocals:FlxSound = new FlxSound();
 
 	var timeLine:FlxSprite;
 	var infoText:FlxText;
@@ -226,11 +230,14 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		FlxG.mouse.visible = true;
 		FlxG.sound.list.add(vocals);
 		FlxG.sound.list.add(opponentVocals);
+		FlxG.sound.list.add(lyricsVocals);
 
 		vocals.autoDestroy = false;
 		vocals.looped = true;
 		opponentVocals.autoDestroy = false;
 		opponentVocals.looped = true;
+		lyricsVocals.autoDestroy = false;
+		lyricsVocals.looped = true;
 
 		initPsychCamera();
 		camUI = new FlxCamera();
@@ -382,7 +389,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		infoBox.getTab('Information').menu.add(infoText);
 		add(infoBox);
 
-		mainBox = new PsychUIBox(mainBoxPosition.x, mainBoxPosition.y, 300, 280, ['Charting', 'Data', 'Events', 'Note', 'Section', 'Song']);
+		mainBox = new PsychUIBox(mainBoxPosition.x, mainBoxPosition.y, 350, 305, ['Charting', 'Data', 'Events', 'Note', 'Section', 'Song']);
 		mainBox.selectedName = 'Song';
 		mainBox.scrollFactor.set();
 		mainBox.cameras = [camUI];
@@ -402,7 +409,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		if(chartEditorSave.data.infoBoxPosition != null && chartEditorSave.data.infoBoxPosition.length > 1)
 			infoBox.setPosition(chartEditorSave.data.infoBoxPosition[0], chartEditorSave.data.infoBoxPosition[1]);
 
-		upperBox = new PsychUIBox(40, 40, 330, 300, ['File', 'Edit', 'View']);
+		upperBox = new PsychUIBox(40, 40, 430, 300, ['File', 'Edit', 'View']);
 		upperBox.scrollFactor.set();
 		upperBox.isMinimized = true;
 		upperBox.minimizeOnFocusLost = true;
@@ -445,11 +452,13 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		reloadNotesDropdowns();
 		if(!_shouldReset)
 		{
-			vocals.time = opponentVocals.time = FlxG.sound.music.time = Conductor.songPosition - Conductor.offset;
+			vocals.time = opponentVocals.time = lyricsVocals.time = FlxG.sound.music.time = Conductor.songPosition - Conductor.offset;
 			if(FlxG.sound.music.time >= vocals.length)
 				vocals.pause();
 			if(FlxG.sound.music.time >= opponentVocals.length)
 				opponentVocals.pause();
+			if(FlxG.sound.music.time >= lyricsVocals.length)
+				lyricsVocals.pause();
 		}
 
 		reloadNotes();
@@ -921,7 +930,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 					var timeToGoBack:Float = 0;
 					if(!FlxG.keys.pressed.SHIFT) timeToGoBack = cachedSectionTimes[curSec] + (curSec > 0 ? 0.000001 : 0);
 					else loadSection(0);
-					Conductor.songPosition = FlxG.sound.music.time = vocals.time = opponentVocals.time = timeToGoBack;
+					Conductor.songPosition = FlxG.sound.music.time = vocals.time = opponentVocals.time = lyricsVocals.time = timeToGoBack;
 				}
 				else if(FlxG.keys.pressed.W != FlxG.keys.pressed.S || FlxG.mouse.wheel != 0)
 				{
@@ -972,7 +981,8 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 				vocals.pause();
 			if(FlxG.sound.music.time >= opponentVocals.length)
 				opponentVocals.pause();
-
+			if(FlxG.sound.music.time >= lyricsVocals.length)
+				lyricsVocals.pause();
 			while(curSec > 0 && Conductor.songPosition < cachedSectionTimes[curSec])
 				loadSection(curSec - 1);
 			while(curSec < cachedSectionTimes.length - 1 && Conductor.songPosition >= cachedSectionTimes[curSec + 1])
@@ -1830,6 +1840,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 
 		@:privateAccess vocals.cleanup(true);
 		@:privateAccess opponentVocals.cleanup(true);
+		@:privateAccess lyricsVocals.cleanup(true);
 		if (PlayState.SONG.needsVoices)
 		{
 			try
@@ -1850,6 +1861,16 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 					opponentVocals.pause();
 					opponentVocals.time = time;
 				}
+
+				var lyrics:Sound = Paths.voices(PlayState.SONG.song, "Lyrics");
+				if(lyrics != null && lyrics.length > 0)
+				{
+					lyricsVocals.loadEmbedded(lyrics);
+					lyricsVocals.volume = 0;
+					lyricsVocals.play();
+					lyricsVocals.pause();
+					lyricsVocals.time = time;
+				}
 			}
 			catch (e:Dynamic) {}
 		}
@@ -1867,7 +1888,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 	{
 		trace('song completed');
 		setSongPlaying(false);
-		Conductor.songPosition = FlxG.sound.music.time = vocals.time = opponentVocals.time = FlxG.sound.music.length - 1;
+		Conductor.songPosition = FlxG.sound.music.time = vocals.time = opponentVocals.time = lyricsVocals.time = FlxG.sound.music.length - 1;
 		curSec = PlayState.SONG.notes.length - 1;
 		forceDataUpdate = true;
 	}
@@ -1877,9 +1898,11 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		FlxG.sound.music.volume = instVolumeStepper.value;
 		vocals.volume = playerVolumeStepper.value;
 		opponentVocals.volume = opponentVolumeStepper.value;
+		lyricsVocals.volume = lyricsVolumeStepper.value;
 		if(instMuteCheckBox.checked) FlxG.sound.music.volume = 0;
 		if(playerMuteCheckBox.checked) vocals.volume = 0;
 		if(opponentMuteCheckBox.checked) opponentVocals.volume = 0;
+		if(lyricsMuteCheckBox.checked) lyricsVocals.volume = 0;
 	}
 
 	var playbackRate:Float = 1;
@@ -1890,6 +1913,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		FlxG.sound.music.pitch = value;
 		vocals.pitch = value;
 		opponentVocals.pitch = value;
+		lyricsVocals.pitch = value;
 		#end
 	}
 
@@ -1899,12 +1923,14 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 
 		vocals.time = FlxG.sound.music.time;
 		opponentVocals.time = FlxG.sound.music.time;
+		lyricsVocals.time = FlxG.sound.music.time;
 
 		if(doPlay)
 		{
 			FlxG.sound.music.play();
 			if(FlxG.sound.music.time < vocals.length) vocals.play(true, FlxG.sound.music.time);
 			if(FlxG.sound.music.time < opponentVocals.length) opponentVocals.play(true, FlxG.sound.music.time);
+			if(FlxG.sound.music.time < lyricsVocals.length) lyricsVocals.play(true, FlxG.sound.music.time);
 			updateAudioVolume();
 		}
 		else
@@ -1912,6 +1938,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 			FlxG.sound.music.pause();
 			vocals.pause();
 			opponentVocals.pause();
+			lyricsVocals.pause();
 		}
 
 		for (note in strumLineNotes)
@@ -2351,6 +2378,8 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 	var playerMuteCheckBox:PsychUICheckBox;
 	var opponentVolumeStepper:PsychUINumericStepper;
 	var opponentMuteCheckBox:PsychUICheckBox;
+	var lyricsVolumeStepper:PsychUINumericStepper;
+	var lyricsMuteCheckBox:PsychUICheckBox;
 	function addChartingTab()
 	{
 		var tab_group = mainBox.getTab('Charting').menu;
@@ -2384,11 +2413,37 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		playerVolumeStepper.onValueChange = updateAudioVolume;
 		opponentVolumeStepper = new PsychUINumericStepper(objX + 200, objY, 0.1, 1, 0, 1, 1);
 		opponentVolumeStepper.onValueChange = updateAudioVolume;
+		lyricsVolumeStepper = new PsychUINumericStepper(objX + 300, objY, 0.1, 1, 0, 1, 1);
+		lyricsVolumeStepper.onValueChange = updateAudioVolume;
 
 		objY += 25;
 		instMuteCheckBox = new PsychUICheckBox(objX, objY, 'Mute', 60, updateAudioVolume);
 		playerMuteCheckBox = new PsychUICheckBox(objX + 100, objY, 'Mute', 60, updateAudioVolume);
 		opponentMuteCheckBox = new PsychUICheckBox(objX + 200, objY, 'Mute', 60, updateAudioVolume);
+		lyricsMuteCheckBox = new PsychUICheckBox(objX + 300, objY, 'Mute', 60, updateAudioVolume);
+
+		objY += 25;
+		var quickinstwaveform = new PsychUIButton(objX, objY, 'Quick Waveform', function() {
+			waveformTarget = chartEditorSave.data.waveformTarget = INST;
+			updateWaveform();
+		}, 60);
+		var quickplayerwaveform = new PsychUIButton(objX + 100, objY, 'Quick Waveform', function() {
+			waveformTarget = chartEditorSave.data.waveformTarget = PLAYER;
+			updateWaveform();
+		}, 60);
+		var quickopponentwaveform = new PsychUIButton(objX + 200, objY, 'Quick Waveform', function() {
+			waveformTarget = chartEditorSave.data.waveformTarget = OPPONENT;
+			updateWaveform();
+		}, 60);
+		var quicklyricswaveform = new PsychUIButton(objX + 300, objY, 'Quick Waveform', function() {
+			waveformTarget = chartEditorSave.data.waveformTarget = LYRICS;
+			updateWaveform();
+		}, 60);
+
+		quickinstwaveform.text.size = 5;
+		quickplayerwaveform.text.size = 5;
+		quickopponentwaveform.text.size = 5;
+		quicklyricswaveform.text.size = 5;
 
 		tab_group.add(playbackSlider);
 		tab_group.add(mouseSnapCheckBox);
@@ -2404,12 +2459,20 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		tab_group.add(new FlxText(instVolumeStepper.x, instVolumeStepper.y - 15, 100, 'Inst. Volume:'));
 		tab_group.add(new FlxText(playerVolumeStepper.x, playerVolumeStepper.y - 15, 100, 'Main Vocals:'));
 		tab_group.add(new FlxText(opponentVolumeStepper.x, opponentVolumeStepper.y - 15, 100, 'Opp. Vocals:'));
+		tab_group.add(new FlxText(lyricsVolumeStepper.x, lyricsVolumeStepper.y - 15, 100, 'Lyrics Vocals:'));
 		tab_group.add(instVolumeStepper);
 		tab_group.add(instMuteCheckBox);
 		tab_group.add(playerVolumeStepper);
 		tab_group.add(playerMuteCheckBox);
 		tab_group.add(opponentVolumeStepper);
 		tab_group.add(opponentMuteCheckBox);
+		tab_group.add(lyricsVolumeStepper);
+		tab_group.add(lyricsMuteCheckBox);
+
+		tab_group.add(quickinstwaveform);
+		tab_group.add(quickplayerwaveform);
+		tab_group.add(quickopponentwaveform);
+		tab_group.add(quicklyricswaveform);
 	}
 
 	var gameOverCharDropDown:PsychUIDropDownMenu;
@@ -4298,8 +4361,8 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 					input.cameras = state.cameras;
 					input.forceCase = UPPER_CASE;
 
-					var options:Array<WaveformTarget> = [INST, PLAYER, OPPONENT];
-					var radioGrp:PsychUIRadioGroup = new PsychUIRadioGroup(check.x + 120, check.y, ['Instrumental', 'Main Vocals', 'Opponent Vocals']);
+					var options:Array<WaveformTarget> = [INST, PLAYER, OPPONENT, LYRICS];
+					var radioGrp:PsychUIRadioGroup = new PsychUIRadioGroup(check.x + 120, check.y, ['Instrumental', 'Main Vocals', 'Opponent Vocals', 'lyrics Vocals']);
 					radioGrp.cameras = state.cameras;
 					radioGrp.onClick = function()
 					{
@@ -4797,7 +4860,7 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 		setSongPlaying(false);
 		chartEditorSave.flush(); //just in case a random crash happens before loading
 
-		openSubState(new EditorPlayState(cast notes, [vocals, opponentVocals]));
+		openSubState(new EditorPlayState(cast notes, [vocals, opponentVocals, lyricsVocals]));
 		upperBox.isMinimized = true;
 		upperBox.visible = mainBox.visible = infoBox.visible = false;
 	}
@@ -5146,6 +5209,8 @@ class ChartingState extends MusicBeatState implements PsychUIEventHandler.PsychU
 				vocals;
 			case OPPONENT:
 				opponentVocals;
+			case LYRICS:
+				lyricsVocals;
 			default:
 				null;
 		}

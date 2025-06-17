@@ -117,7 +117,7 @@ Show-Notification -ToastTitle \""
 
 			File.saveContent(tempFile, script);
 
-			Subprocess.run(() ->
+			Subprocess.startThread(() ->
 			{
 				try
 				{

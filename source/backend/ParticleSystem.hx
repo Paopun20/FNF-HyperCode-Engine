@@ -146,7 +146,8 @@ class ParticleSystem extends FlxTypedGroup<ParticleSprite> {
         d.accelRad = _accelRad + (Math.random() * 2 - 1) * _accelRadVar;
         d.accelTan = _accelTan + (Math.random() * 2 - 1) * _accelTanVar;
         p.userData = d;
-
+        
+        add(p);
         return p;
     }
 

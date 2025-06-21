@@ -1,4 +1,4 @@
-package states.customstage;
+package customstage;
 import psychlua.HScript;
 import states.*;
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project>
 	<!-- _________________________ Application Settings _________________________ -->
-
+	<define name="IsDeveloperBuild" unless="NotDeveloper" />
 	<app title="Friday Night Funkin': HyperCode Engine" file="HyperCodeEngine" packageName="com.paopun20.HyperCodeengine" package="com.paopun20.HyperCodeengine" main="Main" version="0.2.8" company="Paopun20" />
 
 	<!--Switch Export with Unique ApplicationID and Icon-->
@@ -13,8 +13,8 @@
 	<!--The flixel preloader is not accurate in Chrome. You can use it regularly if you embed the swf into a html file
 		or you can set the actual size of your file manually at "FlxPreloaderBase-onUpdate-bytesTotal"-->
 	<!-- <app preloader="Preloader" resizable="true" /> -->
-	<app preloader="flixel.system.FlxPreloader" if="NotDeveloper"/>
-	<app preloader="states.PreloaderState" unless="NotDeveloper"/>
+	<app preloader="flixel.system.FlxPreloader" unless="IsDeveloperBuild" resizable="true"/>
+	<app preloader="states.PreloaderState" if="IsDeveloperBuild" resizable="true"/>
 
 	<!--Minimum without FLX_NO_GAMEPAD: 11.8, without FLX_NO_NATIVE_CURSOR: 11.2-->
 	<set name="SWF_VERSION" value="11.8" />
@@ -125,7 +125,7 @@
 	<haxelib name="hscript-improved" if="HSCRIPT_ALLOWED"/>
 
 	<!-- Dev Only -->
-	<section unless="NotDeveloper">
+	<section if="IsDeveloperBuild">
 		<!-- <haxelib name="haxe-ws"/> -->
 	</section>
 

@@ -1,10 +1,10 @@
-package states.customstage;
+package customstage;
 
 import psychlua.HScript;
 import backend.Subprocess;
 import backend.MusicBeatState;
 import backend.Paths;
-import states.customstage.API;
+import customstage.API;
 import states.*;
 import sys.io.File;
 import sys.FileSystem;

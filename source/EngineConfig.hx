@@ -23,9 +23,9 @@ class EngineConfig {
     //======================
     // Build Flags
     //======================
-    #if NotDeveloper
-        public static inline final IS_DEVELOPER:Bool = false;
-    #else
+    #if IsDeveloperBuild
         public static inline final IS_DEVELOPER:Bool = true;
+    #else
+        public static inline final IS_DEVELOPER:Bool = false;
     #end
 }

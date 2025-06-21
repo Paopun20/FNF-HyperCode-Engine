@@ -14,8 +14,8 @@ import psychlua.CustomSubstate;
 #if HSCRIPT_ALLOWED
 import crowplexus.hscript.Expr.Error as IrisError;
 import psychlua.HScript;
-import states.customstage.CustomStageScriptHandler;
-import states.customstage.CustomStageLoader;
+import customstage.CustomStageScriptHandler;
+import customstage.CustomStageLoader;
 #end
 
 class CustomStage extends MusicBeatState {

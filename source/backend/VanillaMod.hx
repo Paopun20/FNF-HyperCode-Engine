@@ -9,8 +9,8 @@ import backend.Mods;
 import sys.FileSystem;
 
 #if HSCRIPT_ALLOWED
-import states.customstage.CustomStageScriptHandler;
-import states.customstage.API;
+import customstage.CustomStageScriptHandler;
+import customstage.API;
 #end
 
 class VanillaMod {

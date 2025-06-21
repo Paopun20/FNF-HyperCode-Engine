@@ -1,4 +1,4 @@
-package states.customstage;
+package customstage;
 
 import backend.Mods;
 import backend.Paths;

@@ -1,10 +1,8 @@
-[![AutoBuild](https://github.com/HyperCodeCrew/FNF-HyperCode-Engine/actions/workflows/main.yml/badge.svg)](https://github.com/HyperCodeCrew/FNF-HyperCode-Engine/actions/workflows/main.yml)
-
 > [!Warning]  
 > **This engine is still under development!**  
-> If you encounter any bugs, please report them here: [GitHub Issues](https://github.com/Paopun20/FNF-HyperCode-Engine/issues)
+> If you encounter any bugs, please report them here: [GitHub Issues](https://github.com/HyperCodeCrew/FNF-HyperCode-Engine/issues)
 
-# Welcome to HyperCode Engine! 🎉
+# Welcome to HyperCode Engine!
 
 ---
 
@@ -13,7 +11,7 @@
 HyperCode Engine is a **fork** of **Psych Engine 1.0.4**, developed with new features to enhance modding capabilities and improve performance. It introduces advanced tools like custom menus, improved garbage collection, 3D support, and more.
 
 ### Documentation
-- [HyperCode Engine Lua API](docs/HyperCodeEnging/LuaAPI.md) – Documentation for developers looking to work with Lua in their projects.
+- [HyperCode Engine Lua API](docs/HyperCodeEnging/LuaAPI.md) – OLD Documentation LOL, pls wait for 2.0 Documentation (WIP)
 - [Psych Engine API](https://shadowmario.github.io/psychengine.lua/) – API documentation for Psych Engine that you can also reference.
 
 ---
@@ -33,7 +31,7 @@ HyperCode Engine is a **fork** of **Psych Engine 1.0.4**, developed with new fea
   Buffers allow for more efficient data handling, improving overall performance by temporarily storing data in memory.
 
 - **3D Model Support [!! Work in Progress !!]**  
-  3D model support is now available! While this feature is experimental and still has many bugs, it's an exciting addition for more visually appealing scenes.
+  3D model support is now available! and still has many bugs, it's an exciting addition for more visually appealing scenes.
 
 ---
 
@@ -45,12 +43,10 @@ HyperCode Engine is made for advanced mods.
 - `flx3d` and `away3d` — [GitHub](https://github.com/TBar09/FNF-tbarEngine)
 
 ### Codename Engine's libraries
-- away3d librarie — [GitHub](https://github.com/CodenameCrew/hscript-improved)
+- away3d librarie — [GitHub](https://github.com/CodenameCrew/away3d)
 - NDLL support — [GitHub](https://github.com/CodenameCrew/CodenameEngine)
-- HScript improved — [GitHub](https://github.com/CodenameCrew/CodenameEngine)
+- HScript improved — [GitHub](https://github.com/CodenameCrew/hscript-improved)
 - AudioAnalyzer — [GitHub](https://github.com/CodenameCrew/CodenameEngine)
-
-
 
 ---
 
@@ -70,39 +66,8 @@ HyperCode Engine is made for advanced mods.
 - `NdllUtil`
 - `AudioAnalyzer`
 
----
-
-## **Frequently Asked Questions**
-
-### **What makes HyperCode Engine different from Psych Engine?**
-
-HyperCode Engine comes with several new features and improvements over Psych Engine, such as:
-- Faster garbage collection
-- A modern C++11 codebase
-- Many new extensions
-- 3D support
-
-### **Is HyperCode Engine a fork of Psych Engine?**
-
-Yes, HyperCode Engine is a **fork** of **Psych Engine**, but with many improvements and additional features.
-
-### **How do I install HyperCode Engine?**
-
-You can download the latest stable version from the [GitHub Releases page](https://github.com/Paopun20/FNF-HyperCode-Engine/releases)  
-For early access to the newest builds, check out the [GitHub Actions page](https://github.com/Paopun20/FNF-HyperCode-Engine/actions)
-
-### **How can I report bugs or issues?**
-
-Please report any bugs or issues on the [GitHub Issues page](https://github.com/Paopun20/FNF-HyperCode-Engine/issues)
-
----
-
 ## **Credits**
 
 - **Paopun20** - Main Developer (Solo Developer)
 - **T-Bar Engine** - For the 3D libraries and some code
 - **Codename Engine** - For the 3D model support and code improvements
-- **Shadow Mario** - For the original Psych Engine
-
-## **Special Thanks**
-- **You** - For using and supporting this engine!

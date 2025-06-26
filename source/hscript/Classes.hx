@@ -78,6 +78,7 @@ class Classes {
 		"FlxPieDial" => FlxPieDial,
 		#if hxvlc
 		"FlxVideo" => FlxVideoSprite,
+		"VideoSprite" => objects.VideoSprite,
 		#end
 
 		"FlxObject" => flixel.FlxObject,

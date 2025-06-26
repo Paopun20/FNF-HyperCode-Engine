@@ -7,6 +7,7 @@ import openfl.display.Bitmap;
 import openfl.text.TextField;
 import backend.Paths;
 
+// It work for html5?
 @:bitmap(Paths.image("loading_screen/icon"))
 class LogoBitmapData extends BitmapData {}
 
